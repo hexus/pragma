@@ -1,0 +1,33 @@
+{
+  "name": "pragma",
+  "version": "0.1.0",
+  "description": "Pathfinder Character Sheet",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "EXIT;"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexus/pragma.git"
+  },
+  "keywords": [
+    "pathfinder",
+    "character",
+    "sheet"
+  ],
+  "author": "Chris Andrew <chris@hexus.io>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hexus/pragma/issues"
+  },
+  "homepage": "https://github.com/hexus/pragma#readme",
+  "devDependencies": {
+    "@babel/core": "7.0.0-beta.46",
+    "@babel/preset-env": "7.0.0-beta.46",
+    "babel-loader": "^8.0.0-beta.0",
+    "riot": "^3.12.0",
+    "riot-compiler": "^3.5.1",
+    "riot-tag-loader": "^2.1.0",
+    "webpack": "^4.17.2"
+  }
+}

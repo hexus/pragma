@@ -1,0 +1,9 @@
+* text=auto
+
+LICENSE text eol=lf
+*.git* text eol=lf
+*.jshintrc text eol=lf
+*.md text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.tag text eol=lf
