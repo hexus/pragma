@@ -1,6 +1,8 @@
 import riot from 'riot';
-import app from './tags/app.tag';
+import pragma from './tags/pragma.tag';
 
-riot.mount('app', {
+let tags = riot.mount('pragma', {
 	test: 'test'
 });
+
+export default tags;
