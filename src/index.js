@@ -7,14 +7,23 @@ let state = {
 	store: {
 		characters: {
 			1: {
-				name: 'Shade',
-				race: 'Tiefling',
-				class: 'Sorcerer'
+				general: {
+					name: 'Shade',
+					race: 'Tiefling',
+					class: 'Sorcerer',
+					gender: 'Male',
+					age: 27,
+					height: "5'9\"",
+					hair: 'Black',
+					eyes: 'Black'
+				}
 			},
 			2: {
-				name: 'Zyra',
-				race: 'Catfolk',
-				class: 'Mindblade'
+				general: {
+					name: 'Zyra',
+					race: 'Catfolk',
+					class: 'Mindblade'
+				}
 			}
 		}
 	}

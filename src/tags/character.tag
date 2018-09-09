@@ -1,9 +1,11 @@
 <character>
 	<h2>Character</h2>
 
-	<p><strong>Name:</strong> { character.name }</p>
+	<character-general general="{ character.general }"></character-general>
 
 	<script>
+		import './character-general.tag';
+
 		console.log(this);
 
 		this.character = this.opts.character;
