@@ -6,8 +6,12 @@
 	<script>
 		import './character-general.tag';
 
-		console.log(this);
+		console.log('character', this);
 
 		this.character = this.opts.character;
+
+		this.on('mount', function () {
+			console.log('character mount args', arguments);
+		})
 	</script>
 </character>

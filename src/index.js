@@ -29,4 +29,11 @@ let state = {
 	}
 };
 
-let tags = riot.mount('pragma', state);
+let app = {
+	events: riot.observable(),
+	state: state
+};
+
+let tags = riot.mount('*', {
+	app: app
+});

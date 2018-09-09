@@ -4,6 +4,8 @@
 	<p>{ general.name }</p>
 
 	<script>
+		console.log('character-general', this);
+
 		this.general = this.opts.general;
 
 		this.edit = function (event) {
@@ -18,7 +20,11 @@
 			// 	value: event.target.value
 			// });
 
-			this.update();
+			riot.update();
 		}
+
+		this.on('mount', function () {
+			console.log('character-general mount args', arguments);
+		})
 	</script>
 </character-general>
