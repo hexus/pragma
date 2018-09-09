@@ -1,8 +1,23 @@
 import riot from 'riot';
-import pragma from './tags/pragma.tag';
 
-let tags = riot.mount('pragma', {
-	test: 'swag'
-});
+import './tags/pragma.tag';
 
-export default tags;
+let state = {
+	currentCharacter: 1,
+	store: {
+		characters: {
+			1: {
+				name: 'Shade',
+				race: 'Tiefling',
+				class: 'Sorcerer'
+			},
+			2: {
+				name: 'Zyra',
+				race: 'Catfolk',
+				class: 'Mindblade'
+			}
+		}
+	}
+};
+
+let tags = riot.mount('pragma', state);
