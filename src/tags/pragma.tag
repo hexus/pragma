@@ -1,15 +1,39 @@
 <pragma>
 	<h1>Pragma</h1>
 	
-	<button onclick="{test}"></button>
+	<button onclick="{ test }">Test console.log</button>
 	
-	<span>{opts.test}</span>
+	<div>{ opts.test }</div>
 	
-	<script type="text/javascript">
-		console.log(opts);
+	<div>
+		{ date }
+	</div>
+	
+	<script>
+		console.log(this, opts);
 		
-		this.test = () => {
-			console.log('TEST!');
+		this.date = new Date();
+		this.time = new Date().toString();
+		
+		this.test = function () {
+			console.log('test', arguments);
+		}
+		
+		this.tick = function () {
+			console.log(arguments);
+			
+			this.date.setTime(Date.now())
+			this.time = this.date.toString();
+			this.update();
 		};
+		
+		let timer = setInterval(this.tick.bind(this), 1000);
+		
+		this.on('unmount', function () {
+			this.date = null;
+			this.time = null;
+			this.test = null;
+			clearInterval(timer);
+		});
 	</script>
 </pragma>
