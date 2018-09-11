@@ -1,17 +1,15 @@
 <character>
-	<h2>Character</h2>
-
-	<character-general general="{ character.general }"></character-general>
+	<general general="{ character.general }"></general>
+	<abilities abilities="{ character.abilities }"></abilities>
 
 	<script>
-		import './character-general.tag';
-
-		console.log('character', this);
+		import './character/general.tag';
+		import './character/abilities.tag';
 
 		this.character = this.opts.character;
 
 		this.on('mount', function () {
-			console.log('character mount args', arguments);
-		})
+
+		});
 	</script>
 </character>
