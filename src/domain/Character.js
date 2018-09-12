@@ -17,4 +17,34 @@ export default class Character
 	{
 		return this.general.name;
 	}
+	
+	get str()
+	{
+		return this.abilities.str;
+	}
+	
+	get dex()
+	{
+		return this.abilities.dex;
+	}
+	
+	get con()
+	{
+		return this.abilities.con;
+	}
+	
+	get int()
+	{
+		return this.abilities.int;
+	}
+	
+	get wis()
+	{
+		return this.abilities.wis;
+	}
+	
+	get cha()
+	{
+		return this.abilities.cha;
+	}
 }

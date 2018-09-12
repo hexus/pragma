@@ -11,14 +11,15 @@
 	</fieldset>
 
 	<script>
-		import toUpper from 'lodash/toUpper';
-		this.abilities = this.opts.abilities;
-
 		// input type=number fails to compile in a webpack production bundle;
 		// can't use one with an expression value
 		//this.inputType = 'number';
 
+		import toUpper from 'lodash/toUpper';
+
 		this.upperCase = toUpper;
+
+		this.abilities = this.opts.abilities;
 
 		this.edit = function (event) {
 			this.abilities[event.target.name] = event.target.value;

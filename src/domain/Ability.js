@@ -6,14 +6,18 @@ import AbilityScore from './AbilityScore';
 export default class Ability
 {
 	/**
-	 * @param {string} name
-	 * @param {int}    score
+	 * @param {string} name  - Ability name
+	 * @param {int}    score - Ability score
+	 * @param {int}    bonus - Bonus score
 	 */
-	constructor(name, score)
+	constructor(name, score, bonus)
 	{
+		bonus = bonus || 0;
+		
 		this.name = name;
 		this.shortName = name.substr(0, 3);
 		this.abilityScore = new AbilityScore(score);
+		this.tempScore = new AbilityScore(score + bonus);
 	}
 	
 	/**
