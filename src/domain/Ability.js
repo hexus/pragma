@@ -16,8 +16,8 @@ export default class Ability
 		
 		this.name = name;
 		this.shortName = name.substr(0, 3);
-		this.abilityScore = new AbilityScore(score);
-		this.tempScore = new AbilityScore(score + bonus);
+		this.abilityScore = new AbilityScore(score + bonus);
+		this.baseScore = new AbilityScore(score);
 	}
 	
 	/**
@@ -34,6 +34,22 @@ export default class Ability
 	set score(score)
 	{
 		this.abilityScore.score = score;
+	}
+	
+	/**
+	 * @returns {int}
+	 */
+	get baseScore()
+	{
+		return this.baseScore.score;
+	}
+	
+	/**
+	 * @returns {int}
+	 */
+	get baseModifier()
+	{
+		return this.baseScore.modifier;
 	}
 	
 	/**
