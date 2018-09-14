@@ -19,7 +19,7 @@
 
 	<script>
 		import './character.tag';
-		
+
 		this.state = this.opts.app.state;
 		this.store = this.state.store;
 		this.strict = false;

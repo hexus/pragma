@@ -1,3 +1,5 @@
+import clamp from 'lodash/clamp';
+
 /**
  * A character ability score.
  */
@@ -13,7 +15,7 @@ export default class AbilityScore
 		/**
 		 * @type {int}
 		 */
-		this.score = Math.max(1, Math.min(45, score)) || 10;
+		this.score = clamp(score, 1, 60);
 	}
 	
 	/**
