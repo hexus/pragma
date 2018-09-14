@@ -21,12 +21,37 @@ let state = {
 				race: 'Tiefling',
 				class: 'Sorcerer',
 				abilities: {
-					str: 8,
-					dex: 12,
-					con: 12,
-					int: 12,
-					wis: 14,
-					cha: 17
+					str: {
+						score: 8,
+						modifier: -1
+					},
+					dex: {
+						score: 12,
+						modifier: 1
+					},
+					con: {
+						score: 12,
+						modifier: 1
+					},
+					int: {
+						score: 12,
+						modifier: 1
+					},
+					wis: {
+						score: 14,
+						modifier: 2
+					},
+					cha: {
+						score: 17,
+						modifier: 3,
+						temp: 21,
+						tempModifier: 5
+					}
+				},
+				bonuses: {
+					abilities: [
+					
+					]
 				}
 			},
 			2: {

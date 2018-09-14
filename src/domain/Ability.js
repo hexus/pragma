@@ -7,17 +7,19 @@ export default class Ability
 {
 	/**
 	 * @param {string} name  - Ability name
-	 * @param {int}    score - Ability score
-	 * @param {int}    bonus - Bonus score
+	 * @param {int}    score - Base ability score
+	 * @param {int}    temp  - Temporary score
 	 */
-	constructor(name, score, bonus)
+	constructor(name, score, temp)
 	{
-		bonus = bonus || 0;
+		temp = temp || 0;
 		
 		this.name = name;
 		this.shortName = name.substr(0, 3);
-		this.abilityScore = new AbilityScore(score + bonus);
-		this.baseScore = new AbilityScore(score);
+		
+		// new AbilityScore(base, bonus)
+		this.abilityScore = new AbilityScore(score);
+		this.tempScore = new AbilityScore(temp);
 	}
 	
 	/**
@@ -39,24 +41,32 @@ export default class Ability
 	/**
 	 * @returns {int}
 	 */
-	get baseScore()
-	{
-		return this.baseScore.score;
-	}
-	
-	/**
-	 * @returns {int}
-	 */
-	get baseModifier()
-	{
-		return this.baseScore.modifier;
-	}
-	
-	/**
-	 * @returns {int}
-	 */
 	get modifier()
 	{
 		return this.abilityScore.modifier;
+	}
+	
+	/**
+	 * @returns {int}
+	 */
+	get temp()
+	{
+		return this.tempScore.score;
+	}
+	
+	/**
+	 * @returns {int}
+	 */
+	get tempModifier()
+	{
+		return this.tempScore.modifier;
+	}
+	
+	/**
+	 * @returns {int}
+	 */
+	get bonus()
+	{
+		return this.temp - this.score;
 	}
 }
