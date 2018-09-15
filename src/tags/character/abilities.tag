@@ -37,5 +37,9 @@
 
 			this.triggerDom('change');
 		};
+
+		this.on('update', function () {
+			this.abilities = this.opts.abilities;
+		});
 	</script>
 </abilities>

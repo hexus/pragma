@@ -14,8 +14,6 @@
 		</label>
 
 		<character character="{ sheet }" strict="{ strict }" onchange="{ () => {} }"></character>
-
-		{ sheet.abilities.cha.score }
 	</virtual>
 
 	<script>

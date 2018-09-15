@@ -73,8 +73,6 @@ export default class CharacterSheetProcessor
 			sheet.abilities[name].tempModifier = ability.tempModifier;
 		});
 		
-		console.log(sheet);
-		
 		return sheet;
 	}
 }

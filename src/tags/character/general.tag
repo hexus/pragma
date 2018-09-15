@@ -21,13 +21,8 @@
 		};
 
 		this.edit = function (event) {
-			console.log(event);
-
 			// Update the value
 			this.general[event.target.name] = event.target.value;
-
-			// Global update
-			//riot.update();
 		};
 	</script>
 </general>

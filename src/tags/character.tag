@@ -12,8 +12,8 @@
 			this.triggerDom('change');
 		};
 
-		this.on('mount', function () {
-
+		this.on('update', function () {
+			this.character = this.opts.character;
 		});
 	</script>
 </character>
