@@ -11,8 +11,6 @@
 			<input type="number" name="{ name + '.temp' }" min="1" max="60" step="1" value="{ ability.temp }" onkeyup="{ edit }" onchange="{ edit }" />
 			<input type="number" name="{ name + '.tempModifier' }" min="-5" max="25" step="1" value="{ ability.tempModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }" />
 		</p>
-
-		{ abilities.cha.score } { abilities.cha.modifier } { abilities.cha.temp } { abilities.cha.tempModifier }
 	</fieldset>
 
 	<script>
