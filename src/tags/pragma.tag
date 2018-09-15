@@ -10,10 +10,10 @@
 	<virtual if="{ sheet }">
 		<h2>Character Sheet</h2>
 		<label>
-			<input type="checkbox" name="strict" onchange="{ onStrictChange }"/> Strict
+			<input type="checkbox" name="strict" checked="{ sheet.strict }" onchange="{ onStrictChange }"/> Strict
 		</label>
 
-		<character character="{ sheet }" strict="{ strict }" onchange="{ () => {} }"></character>
+		<character character="{ sheet }" strict="{ sheet.strict }" onchange="{ () => {} }"></character>
 	</virtual>
 
 	<script>
@@ -30,28 +30,27 @@
 
 		let character = state.character || factory.create();
 
-		this.sheet = state.sheet;
-		this.strict = false;
+		this.sheet = state.sheet || {};
 
 		// Methods
 		this.process = function () {
-			if (this.strict) {
+			if (this.sheet.strict) {
 				processor.process(character, this.sheet);
 			}
 		};
 
 		// DOM handlers
 		this.onStrictChange = function (event) {
-			this.strict = event.currentTarget.checked;
+			this.sheet.strict = event.currentTarget.checked;
 			this.process();
 		};
 
 		// Event handlers
-		this.on('update', function () {
+		this.on('mount', function () {
 			this.process();
 		});
 
-		this.on('mount', function () {
+		this.on('update', function () {
 			this.process();
 		});
 
@@ -60,7 +59,6 @@
 			this.store = null;
 			this.character = null;
 			this.sheet = null;
-			this.strict = null;
 			this.change = null;
 		});
 	</script>

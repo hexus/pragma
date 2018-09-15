@@ -1,6 +1,7 @@
 export default {
 	characters: {
 		1: {
+			strict: true,
 			general: {
 				name: 'Shade',
 					age: 27,
@@ -48,25 +49,38 @@ export default {
 			}
 		},
 		2: {
+			strict: true,
 			general: {
 				name: 'Zyra',
-					age: 22,
-					gender: 'Female',
-					height: "5'6\"",
-					weight: "9st7lb",
-					hair: 'Black',
-					eyes: 'Black',
-					home: 'Ilun'
+				age: 22,
+				gender: 'Female',
+				height: "5'6\"",
+				weight: "9st7lb",
+				hair: 'Black',
+				eyes: 'Black',
+				home: 'Ilun'
 			},
 			race: 'Catfolk',
 			class: 'Mindblade',
 			abilities: {
-					str: 14,
-					dex: 12,
-					con: 13,
-					int: 16,
-					wis: 10,
-					cha: 10
+				str: {
+					score: 14
+				},
+				dex: {
+					score: 12
+				},
+				con: {
+					score: 13
+				},
+				int: {
+					score: 16
+				},
+				wis: {
+					score: 10
+				},
+				cha: {
+					score: 10
+				}
 			}
 		}
 	}
