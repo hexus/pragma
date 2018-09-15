@@ -1,4 +1,5 @@
 import riot from 'riot';
+import domEvent from 'mixins/domEvent';
 import './tags/pragma.tag';
 
 import CharacterFactory from './services/CharacterFactory';
@@ -24,6 +25,8 @@ let app = {
 };
 
 app.state.sheet = app.store.characters[1];
+
+riot.mixin(domEvent);
 
 app.tags = riot.mount('pragma', {
 	app: app

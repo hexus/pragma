@@ -10,10 +10,10 @@
 	<virtual if="{ sheet }">
 		<h2>Character Sheet</h2>
 		<label>
-			<input type="checkbox" name="strict" onchange="{ change }"/> Strict
+			<input type="checkbox" name="strict" onchange="{ onStrictChange }"/> Strict
 		</label>
 
-		<character character="{ sheet }" strict="{ strict }"></character>
+		<character character="{ sheet }" strict="{ strict }" onchange="{ () => {} }"></character>
 
 		{ sheet.abilities.cha.score }
 	</virtual>
@@ -43,7 +43,7 @@
 		};
 
 		// DOM handlers
-		this.change = function (event) {
+		this.onStrictChange = function (event) {
 			this.strict = event.currentTarget.checked;
 			this.process();
 		};
