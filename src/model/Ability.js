@@ -54,6 +54,11 @@ export default class Ability
 		return this.tempScore.score;
 	}
 	
+	set temp(score)
+	{
+		this.tempScore.score = score;
+	}
+	
 	/**
 	 * @returns {int}
 	 */
