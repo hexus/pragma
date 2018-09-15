@@ -4,7 +4,8 @@
   "description": "Pathfinder Character Sheet",
   "main": "src/index.js",
   "scripts": {
-    "test": "EXIT;"
+    "build": "webpack",
+    "watch": "webpack -w"
   },
   "repository": {
     "type": "git",

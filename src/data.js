@@ -1,6 +1,6 @@
 //import Class from './domain/Class';
 
-let database = {
+let data = {
 	classes: {
 	
 	},
@@ -12,4 +12,4 @@ let database = {
 	}
 };
 
-export default database;
+export default data;

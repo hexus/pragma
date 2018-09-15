@@ -1,7 +1,7 @@
 import riot from 'riot';
 import './tags/pragma.tag';
 
-import database from './database';
+import data from './data';
 
 let state = {
 	currentCharacter: null,
@@ -84,10 +84,12 @@ state.currentCharacter = state.store.characters[1];
 
 let app = {
 	events: riot.observable(),
-	database: database,
+	data: data,
 	state: state
 };
 
-riot.mount('pragma', {
+app.tags = riot.mount('pragma', {
 	app: app
 });
+
+export default app;

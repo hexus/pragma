@@ -4,7 +4,11 @@ module.exports = {
 	mode: 'development',
 	output: {
 		path: path.join(__dirname, 'build'),
-		filename: 'pragma.js'
+		filename: 'pragma.js',
+		publicPath: '/build/',
+		library: 'pragma',
+		libraryExport: 'default',
+		libraryTarget: 'umd'
 	},
 	resolve: {
 		modules: [
