@@ -4,13 +4,14 @@ export default {
 			strict: true,
 			general: {
 				name: 'Shade',
-					age: 27,
-					gender: 'Male',
-					height: "5'9\"",
-					weight: '10st',
-					hair: 'Black',
-					eyes: 'Black',
-					home: 'Enaevia'
+				alignment: 'Chaotic Neutral',
+				age: 27,
+				gender: 'Male',
+				height: "5'9\"",
+				weight: '10st',
+				hair: 'Black',
+				eyes: 'Black',
+				home: 'Enaevia'
 			},
 			race: 'Tiefling',
 			class: 'Sorcerer',
@@ -40,6 +41,18 @@ export default {
 					modifier: 3,
 					temp: 21,
 					tempModifier: 5
+				}
+			},
+			defense: {
+				ac: {
+					total: 20,
+					armorBonus: 3,
+					shieldBonus: 2,
+					dexModifier: 1,
+					sizeModifier: 0,
+					naturalArmor: 0,
+					deflection: 0,
+					misc: 0
 				}
 			},
 			bonuses: {

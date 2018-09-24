@@ -13,11 +13,10 @@ export default class Ability
 	constructor(name, score, temp)
 	{
 		temp = temp || 0;
-		
+
 		this.name = name;
 		this.shortName = name.substr(0, 3);
-		
-		// new AbilityScore(base, bonus)
+
 		this.abilityScore = new AbilityScore(score);
 		this.tempScore = new AbilityScore(temp);
 	}
@@ -54,6 +53,9 @@ export default class Ability
 		return this.tempScore.score;
 	}
 	
+	/**
+	 * @param {int} score
+	 */
 	set temp(score)
 	{
 		this.tempScore.score = score;

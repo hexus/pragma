@@ -9,9 +9,18 @@
 
 	<virtual if="{ sheet }">
 		<h2>Character Sheet</h2>
-		<label>
-			<input type="checkbox" name="strict" checked="{ sheet.strict }" onchange="{ onStrictChange }"/> Strict
-		</label>
+
+		<fieldset>
+			<legend>Ruleset</legend>
+
+			<label>
+				<input type="radio" name="strict" checked="{ !sheet.strict }" value="" onchange="{ onStrictChange }"/> Free
+			</label>
+
+			<label>
+				<input type="radio" name="strict" checked="{ sheet.strict }" value="1" onchange="{ onStrictChange }"/> Stringent
+			</label>
+		</fieldset>
 
 		<character character="{ sheet }" strict="{ sheet.strict }" onchange="{ () => {} }"></character>
 	</virtual>
@@ -41,7 +50,7 @@
 
 		// DOM handlers
 		this.onStrictChange = function (event) {
-			this.sheet.strict = event.currentTarget.checked;
+			this.sheet.strict = event.currentTarget.value;
 			this.process();
 		};
 
