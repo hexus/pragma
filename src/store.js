@@ -22,37 +22,114 @@ export default {
 				},
 				dex: {
 					score: 12,
-					modifier: 1
+					modifier: +1
 				},
 				con: {
 					score: 12,
-					modifier: 1
+					modifier: +1
 				},
 				int: {
 					score: 12,
-					modifier: 1
+					modifier: +1
 				},
 				wis: {
 					score: 14,
-					modifier: 2
+					modifier: +2
 				},
 				cha: {
 					score: 17,
-					modifier: 3,
+					modifier: +3,
 					temp: 21,
-					tempModifier: 5
+					tempModifier: +5
 				}
 			},
 			defense: {
-				ac: {
+				hitPoints: {
+					total: 52,
+					current: 52,
+					nonLethalDamage: 0
+				},
+				armorClass: {
 					total: 20,
 					armorBonus: 3,
 					shieldBonus: 2,
-					dexModifier: 1,
+					dexModifier: +1,
 					sizeModifier: 0,
 					naturalArmor: 0,
 					deflection: 0,
-					misc: 0
+					miscModifier: 0,
+					tempModifier: 0
+				},
+				touchArmorClass: 11,
+				flatFootedArmorClass: 11,
+				damageReduction: 0,
+				spellResistance: 0,
+				saves: {
+					fortitude: {
+						total: 4,
+						base: 3,
+						ability: 'con',
+						abilityModifier: +1,
+						magicModifier: 0,
+						miscModifier: 0,
+						tempModifier: 0
+					},
+					reflex: {
+						total: 6,
+						base: 3,
+						ability: 'dex',
+						abilityModifier: +1,
+						magicModifier: 0,
+						miscModifier: +2,
+						tempModifier: 0
+					},
+					will: {
+						total: 7,
+						base: 5,
+						ability: 'wis',
+						abilityModifier: +2,
+						magicModifier: 0,
+						miscModifier: 0,
+						tempModifier: 0
+					}
+				},
+				resistances: {
+					cold: 5,
+					fire: 5,
+					electricity: 15
+				},
+				combatManeuverDefense: {
+					total: 14,
+					baseAttackBonus: 4,
+					strModifier: -1,
+					dexModifier: +1,
+					sizeModifier: 0,
+					miscModifier: 0,
+					tempModifier: 0
+				}
+			},
+			offense: {
+				initiative: {
+					total: 5,
+					dexModifier: +1,
+					miscModifier: +4
+				},
+				baseAttackBonus: 4,
+				speed: {
+					land: '5\'',
+					withArmor: 'N/A',
+					fly: '',
+					swim: '',
+					climb: '',
+					burrow: ''
+				},
+				combatManeuverBonus: {
+					total: 3,
+					baseAttackBonus: 4,
+					strModifier: -1,
+					sizeModifier: 0,
+					miscModifier: 0,
+					tempModifier: 0
 				}
 			},
 			bonuses: {
