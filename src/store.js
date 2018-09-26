@@ -51,6 +51,8 @@ export default {
 				},
 				armorClass: {
 					total: 20,
+					touch: 11,
+					flatFooted: 11,
 					armorBonus: 3,
 					shieldBonus: 2,
 					dexModifier: +1,
@@ -58,25 +60,23 @@ export default {
 					naturalArmor: 0,
 					deflection: 0,
 					miscModifier: 0,
-					tempModifier: 0
+					tempModifier: 0,
 				},
-				touchArmorClass: 11,
-				flatFootedArmorClass: 11,
 				damageReduction: 0,
 				spellResistance: 0,
 				saves: {
 					fortitude: {
 						total: 4,
 						base: 3,
-						ability: 'con', // visual aid
+						abilityModifier: +1, // con
 						magicModifier: 0,
 						miscModifier: 0,
 						tempModifier: 0
 					},
-					reflex: {
+					reflex: { // dex
 						total: 6,
 						base: 3,
-						ability: 'dex', // visual aid
+						abilityModifier: +1, // dex
 						magicModifier: 0,
 						miscModifier: +2,
 						tempModifier: 0
@@ -84,7 +84,7 @@ export default {
 					will: {
 						total: 7,
 						base: 5,
-						ability: 'wis', // visual aid
+						abilityModifier: +2, // wis
 						magicModifier: 0,
 						miscModifier: 0,
 						tempModifier: 0
@@ -108,7 +108,7 @@ export default {
 			offense: {
 				initiative: {
 					total: 5,
-					dexModifier: +1,
+					abilityModifier: +1, // Dex
 					miscModifier: +4
 				},
 				baseAttackBonus: 4,

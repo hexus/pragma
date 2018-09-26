@@ -18,11 +18,11 @@
 			</label>
 
 			<label>
-				<input type="radio" name="strict" checked="{ sheet.strict }" value="simple" onchange="{ onStrictChange }"/> Propagate <!-- Modifier propagation only -->
+				<input type="radio" name="strict" checked="{ sheet.strict }" value="simple" onchange="{ onStrictChange }"/> Propagate <!-- Value propagation only -->
 			</label>
 
 			<label>
-				<input type="radio" name="strict" checked="{ sheet.strict }" value="strict" onchange="{ onStrictChange }"/> Process <!-- Derive everything possible -->
+				<input type="radio" name="strict" checked="{ sheet.strict }" value="strict" onchange="{ onStrictChange }"/> Process <!-- Derive all the things -->
 			</label>
 		</fieldset>
 

@@ -8,6 +8,11 @@
 			</label>
 			<input type="number" name="hitPoints.current" min="-15" max="{ defense.hitPoints.total }" step="1" value="{ defense.hitPoints.current }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="hitPoints.nonLethalDamage" min="0" max="100" value="{ defense.hitPoints.nonLethalDamage }"/>
+
+			<label>
+				<span>Damage reduction</span>
+				<
+			</label>
 		</p>
 
 		<p>
@@ -23,8 +28,18 @@
 			<input type="number" name="armorClass.deflection" min="0" max="100" step="1" value="{ defense.armorClass.deflection }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.miscModifier" min="0" max="100" step="1" value="{ defense.armorClass.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.tempModifier" min="0" max="100" step="1" value="{ defense.armorClass.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+		</p>
 
+		<p>
+			<label>
+				<span>Touch</span>
+				<input type="number" name="armorClass.touch" min="0" max="100" step="1" value="{ defense.armorClass.touch }" onkeyup="{ edit }" onchange="{ edit }"/>
+			</label>
 
+			<label>
+				<span>Flat-footed</span>
+				<input type="number" name="armorClass.flatFooted" min="0" max="100" step="1" value="{ defense.armorClass.flatFooted }" onkeyup="{ edit }" onchange="{ edit }"/>
+			</label>
 		</p>
 
 		<p each="{ save, name in defense.saves }">
