@@ -68,8 +68,7 @@ export default {
 					fortitude: {
 						total: 4,
 						base: 3,
-						ability: 'con',
-						abilityModifier: +1,
+						ability: 'con', // visual aid
 						magicModifier: 0,
 						miscModifier: 0,
 						tempModifier: 0
@@ -77,8 +76,7 @@ export default {
 					reflex: {
 						total: 6,
 						base: 3,
-						ability: 'dex',
-						abilityModifier: +1,
+						ability: 'dex', // visual aid
 						magicModifier: 0,
 						miscModifier: +2,
 						tempModifier: 0
@@ -86,8 +84,7 @@ export default {
 					will: {
 						total: 7,
 						base: 5,
-						ability: 'wis',
-						abilityModifier: +2,
+						ability: 'wis', // visual aid
 						magicModifier: 0,
 						miscModifier: 0,
 						tempModifier: 0

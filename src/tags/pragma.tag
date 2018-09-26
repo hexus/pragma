@@ -11,14 +11,18 @@
 		<h2>Character Sheet</h2>
 
 		<fieldset>
-			<legend>Ruleset</legend>
+			<legend>Processing</legend>
 
 			<label>
-				<input type="radio" name="strict" checked="{ !sheet.strict }" value="" onchange="{ onStrictChange }"/> Free
+				<input type="radio" name="strict" checked="{ !sheet.strict }" value="" onchange="{ onStrictChange }"/> None
 			</label>
 
 			<label>
-				<input type="radio" name="strict" checked="{ sheet.strict }" value="1" onchange="{ onStrictChange }"/> Stringent
+				<input type="radio" name="strict" checked="{ sheet.strict }" value="simple" onchange="{ onStrictChange }"/> Propagate <!-- Modifier propagation only -->
+			</label>
+
+			<label>
+				<input type="radio" name="strict" checked="{ sheet.strict }" value="strict" onchange="{ onStrictChange }"/> Process <!-- Derive everything possible -->
 			</label>
 		</fieldset>
 
