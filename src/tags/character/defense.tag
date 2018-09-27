@@ -27,7 +27,7 @@
 			</label>
 			<input type="number" name="armorClass.armorBonus" min="0" max="100" step="1" value="{ defense.armorClass.armorBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.shieldBonus" min="0" max="100" step="1" value="{ defense.armorClass.shieldBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
-			<input type="number" name="armorClass.abilityModifier" min="0" max="100" step="1" value="{ abilities[abilityMaps.defense.armorClass].modifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			<input type="number" name="armorClass.abilityModifier" min="0" max="100" step="1" value="{ defense.armorClass.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			<input type="number" name="armorClass.sizeModifier" min="0" max="100" step="1" value="{ defense.armorClass.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.naturalArmor" min="0" max="100" step="1" value="{ defense.armorClass.naturalArmor }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.deflection" min="0" max="100" step="1" value="{ defense.armorClass.deflection }" onkeyup="{ edit }" onchange="{ edit }"/>
@@ -48,14 +48,12 @@
 		</p>
 
 		<p each="{ save, name in defense.saves }">
-			{ void(this.ability = abilities[abilityMaps.defense.saves[name]]) }
-
 			<label>
 				<span>{ name }</span>
 				<input type="number" name="{ 'defense.saves.' + name + '.total' }" min="0" max="100" value="{ save.total }" onkeyup="{ edit }" onchange="{ edit }"/>
 			</label>
 			<input type="number" name="{ 'defense.saves.' + name + '.base' }" min="0" max="100" step="1" value="{ save.base }" onkeyup="{ edit }" onchange="{ edit }"/>
-			<input type="number" name="{ 'defense.saves.' + name + '.abilityModifier' }" min="0" max="100" step="1" value="{ ability.tempModifier || ability.modifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			<input type="number" name="{ 'defense.saves.' + name + '.abilityModifier' }" min="0" max="100" step="1" value="{ save.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			<input type="number" name="{ 'defense.saves.' + name + '.magicModifier' }" min="0" max="100" step="1" value="{ save.magicModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="{ 'defense.saves.' + name + '.miscModifier' }" min="0" max="100" step="1" value="{ save.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="{ 'defense.saves.' + name + '.tempModifier' }" min="0" max="100" step="1" value="{ save.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
@@ -70,7 +68,6 @@
 		this.min = Math.min;
 
 		this.abilityMaps = abilityMaps;
-		this.abilities = this.opts.abilities;
 		this.defense = this.opts.defense;
 
 		this.edit = function (event) {

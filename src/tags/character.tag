@@ -1,7 +1,7 @@
 <character>
 	<general general="{ character.general }"></general>
 	<abilities abilities="{ character.abilities }" strict="{ opts.strict }" onchange="{ change }"></abilities>
-	<defense abilities="{ character.abilities }" defense="{ character.defense }"  strict="{ opts.strict }" onchange="{ change }"></defense>
+	<defense defense="{ character.defense }"  strict="{ opts.strict }" onchange="{ change }"></defense>
 
 	<script>
 		import './character/general.tag';
