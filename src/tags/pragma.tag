@@ -14,15 +14,18 @@
 			<legend>Processing</legend>
 
 			<label>
-				<input type="radio" name="strict" checked="{ !sheet.strict }" value="" onchange="{ onStrictChange }"/> None
+				<input type="radio" name="strict" checked="{ !sheet.strict }" value="" onchange="{ onStrictChange }"/>
+				Permissive <!-- Free text -->
 			</label>
 
 			<label>
-				<input type="radio" name="strict" checked="{ sheet.strict }" value="simple" onchange="{ onStrictChange }"/> Propagate <!-- Value propagation only -->
+				<input type="radio" name="strict" checked="{ sheet.strict }" value="simple" onchange="{ onStrictChange }"/>
+				Propagated <!-- Modifier propagation -->
 			</label>
 
 			<label>
-				<input type="radio" name="strict" checked="{ sheet.strict }" value="strict" onchange="{ onStrictChange }"/> Process <!-- Derive all the things -->
+				<input type="radio" name="strict" checked="{ sheet.strict }" value="strict" onchange="{ onStrictChange }"/>
+				Processed <!-- Derive all the things -->
 			</label>
 		</fieldset>
 
