@@ -15,7 +15,7 @@ export default class CharacterSheetProcessor
 	 */
 	constructor()
 	{
-		this.abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+	
 	}
 	
 	/**
@@ -82,7 +82,8 @@ export default class CharacterSheetProcessor
  *
  * @typedef {Object} CharacterSheet
  *
- * @property {Object} general                  - General character information
+ * // TODO: Rename general to background?
+ * @property {Object} general                  - General character statistics
  * @property {string} general.name             - Character name
  * @property {string} [general.alignment]      - Character alignment
  * @property {number} [general.age]            - Character age, in years
@@ -115,7 +116,7 @@ export default class CharacterSheetProcessor
  * @property {number} defense.armorClass.flatFooted      - Flat-footed armor class
  * @property {number} defense.armorClass.armorBonus      - Armor bonus to armor class
  * @property {number} defense.armorClass.shieldBonus     - Shield bonus to armor class
- * @property {number} defense.armorClass.abilityModifier - Ability modifier added to armor class
+ * @property {number} defense.armorClass.abilityModifier - Ability modifier added to armor class (dexterity)
  * @property {number} defense.armorClass.sizeModifier    - Size modifier added to armor class
  * @property {number} defense.armorClass.naturalArmor    - Natural armor added to armor class
  * @property {number} defense.armorClass.deflection      - Deflection armor class
@@ -128,9 +129,11 @@ export default class CharacterSheetProcessor
  * @property {SavingThrow}   defense.saves.reflex        - Reflex saving throw
  * @property {SavingThrow}   defense.saves.will          - Will saving throw
  * @property {Object} defense.resistances                - Damage resistances
- * @property {number} defense.resistances.cold           - Cold resistance
- * @property {number} defense.resistances.fire           - Fire resistance
- * @property {number} defense.resistances.electricity    - Electricity resistance
+ * @property {number} [defense.resistances.cold]         - Cold resistance
+ * @property {number} [defense.resistances.fire]         - Fire resistance
+ * @property {number} [defense.resistances.electricity]  - Electricity resistance
+ * @property {number} [defense.resistances.sonic]        - Sonic resistance
+ * @property {number} [defense.resistances.acid]         - Acid resistance
  * @property {Object} defense.combatManeuverDefense                 - Combat maneuver defense
  * @property {number} defense.combatManeuverDefense.total           - Total combat maneuver defense
  * @property {number} defense.combatManeuverDefense.baseAttackBonus - Combat maneuver defense base attack bonus
@@ -142,7 +145,7 @@ export default class CharacterSheetProcessor
  *
  * @property {Object} offense                                     - Offense statistics
  * @property {Object} offense.initiative                          - Initiative score
- * @property {number} offense.initiative.abilityModifier          - Initiative ability modifier
+ * @property {number} offense.initiative.abilityModifier          - Initiative ability modifier (dexterity)
  * @property {number} offense.initiative.miscModifier             - Miscellaneous initiative modifier
  * @property {number} offense.baseAttackBonus                     - Base attack bonus
  * @property {Object} offense.speed                               - Movement speeds
@@ -155,7 +158,7 @@ export default class CharacterSheetProcessor
  * @property {Object} offense.combatManeuverBonus                 - Combat maneuver bonus
  * @property {number} offense.combatManeuverBonus.total           - Total combat maneuver bonus
  * @property {number} offense.combatManeuverBonus.baseAttackBonus - Base attack bonus applied to combat maneuver bonus
- * @property {number} offense.combatManeuverBonus.strModifier     - Combat maneuver bonus strength modifier
+ * @property {number} offense.combatManeuverBonus.abilityModifier - Combat maneuver bonus ability modifier (strength)
  * @property {number} offense.combatManeuverBonus.sizeModifier    - Combat maneuver bonus size modifier
  * @property {number} offense.combatManeuverBonus.miscModifier    - Miscellaneous combat maneuver bonus modifier
  * @property {number} offense.combatManeuverBonus.tempModifier    - Temporary combat maneuver bonus modifier
@@ -173,12 +176,14 @@ export default class CharacterSheetProcessor
  */
 
 /**
+ * Character sheet saving throw data structure.
+ *
  * @typedef {Object} CharacterSheet.SavingThrow
  *
  * @property {number} total           - Total saving throw
  * @property {number} base            - Base save
  * @property {number} abilityModifier - Ability modifier added to saving throw
- * @property {number} magicModifier   - Magic saving throw modifier
- * @property {number} miscModifier    - Miscellaneous saving throw modifier
- * @property {number} tempModifier    - Temporary saving throw modifier
+ * @property {number} [magicModifier] - Magic saving throw modifier
+ * @property {number} [miscModifier]  - Miscellaneous saving throw modifier
+ * @property {number} [tempModifier]  - Temporary saving throw modifier
  */

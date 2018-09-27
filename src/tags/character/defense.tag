@@ -11,7 +11,12 @@
 
 			<label>
 				<span>Damage reduction</span>
-				<
+				<input type="number" name="damageReduction" min="0" max="100" step="1" value="{ defense.damageReduction }" onkeyup="{ edit }" onchange="{ edit }"/>
+			</label>
+
+			<label>
+				<span>Spell resistance</span>
+				<input type="number" name="spellResistance" min="0" max="100" step="1" value="{ defense.spellResistance }" onkeyup="{ edit }" onchange="{ edit }"/>
 			</label>
 		</p>
 
@@ -22,7 +27,7 @@
 			</label>
 			<input type="number" name="armorClass.armorBonus" min="0" max="100" step="1" value="{ defense.armorClass.armorBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.shieldBonus" min="0" max="100" step="1" value="{ defense.armorClass.shieldBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
-			<input type="number" name="armorClass.dexModifier" min="0" max="100" step="1" value="{ abilities[abilityMaps.defense.armorClass].modifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			<input type="number" name="armorClass.abilityModifier" min="0" max="100" step="1" value="{ abilities[abilityMaps.defense.armorClass].modifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			<input type="number" name="armorClass.sizeModifier" min="0" max="100" step="1" value="{ defense.armorClass.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.naturalArmor" min="0" max="100" step="1" value="{ defense.armorClass.naturalArmor }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="armorClass.deflection" min="0" max="100" step="1" value="{ defense.armorClass.deflection }" onkeyup="{ edit }" onchange="{ edit }"/>
