@@ -58,6 +58,25 @@
 			<input type="number" name="{ 'defense.saves.' + name + '.miscModifier' }" min="0" max="100" step="1" value="{ save.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			<input type="number" name="{ 'defense.saves.' + name + '.tempModifier' }" min="0" max="100" step="1" value="{ save.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 		</p>
+
+		<!-- TODO: Resistances, immunities -->
+
+		<p>
+			<label>
+				CMD
+				<input type="number" name="combatManeuverDefense.total" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.total }" onkeyup="{ edit }" onchange="{ edit }"/>
+			</label>
+			+ 10 +
+			<input type="number" name="combatManeuverDefense.baseAttackBonus" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.baseAttackBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
+			+
+			<input type="number" name="combatManeuverDefense.strModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.strModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			+
+			<input type="number" name="combatManeuverDefense.dexModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.dexModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			+
+			<input type="number" name="combatManeuverDefense.miscModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			+
+			<input type="number" name="combatManeuverDefense.tempModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+		</p>
 	</fieldset>
 
 	<script>
