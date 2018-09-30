@@ -49,7 +49,7 @@
 
 		<p each="{ save, name in defense.saves }">
 			<label>
-				<span>{ name }</span>
+				<span>{ util.titleCase(name) }</span>
 				<input type="number" name="{ 'defense.saves.' + name + '.total' }" min="0" max="100" value="{ save.total }" onkeyup="{ edit }" onchange="{ edit }"/>
 			</label>
 			<input type="number" name="{ 'defense.saves.' + name + '.base' }" min="0" max="100" step="1" value="{ save.base }" onkeyup="{ edit }" onchange="{ edit }"/>
@@ -63,7 +63,10 @@
 	<script>
 		import clamp from 'lodash/clamp';
 		import set from 'lodash/set';
+		import util from '../../mixins/util';
 		import { abilityMaps } from '../../data';
+
+		this.mixin(util);
 
 		this.min = Math.min;
 

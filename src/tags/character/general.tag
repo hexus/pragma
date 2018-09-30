@@ -4,15 +4,16 @@
 
 		<p each="{ value, name in general }">
 			<label>
-				{ titleCase(name) }
+				{ util.titleCase(name) }
 				<input type="text" name="{ name }" value="{ value }" onkeyup="{ edit }"/>
 			</label>
 		</p>
 	</fieldset>
 
 	<script>
-		import startCase from 'lodash/startCase';
-		import toLower from 'lodash/toLower';
+		import util from '../../mixins/util';
+
+		this.mixin(util);
 
 		this.general = this.opts.general;
 
