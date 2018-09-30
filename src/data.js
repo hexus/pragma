@@ -24,6 +24,8 @@ const data = {
 	
 	/**
 	 * Maps properties that propagate to other properties.
+	 *
+	 * The keys of this map denote properties that, as a result of propagation, should have disabled inputs.
 	 */
 	propagationMap: {
 		'defense.armorClass.abilityScore':             ['abilities.dex.tempScore', 'abilities.dex.score'],
@@ -37,7 +39,12 @@ const data = {
 		'offense.combatManeuverBonus.abilityModifier': ['abilities.str.tempScore', 'abilities.str.score'],
 		'offense.initiative.abilityModifier':          ['abilities.dex.tempScore', 'abilities.dex.score'],
 	},
-	// Default ability modifiers for different properties
+	/**
+	 * Default ability modifiers for different properties
+	 *
+	 * TODO: A potential alternative structure for a propagation map that's more readable, but requires more processing
+	 */
+	
 	abilityMaps: {
 		defense: {
 			armorClass: 'dex',
