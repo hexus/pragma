@@ -1,7 +1,10 @@
 import assign from 'lodash/assign';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import each from 'lodash/each';
 import merge from 'lodash/merge';
+import flatten from 'lodash/flatten';
+import { propagationMap } from '../data';
 
 /**
  * A character sheet processor.
@@ -18,6 +21,16 @@ export default class CharacterSheetProcessor
 	
 	}
 	
+	getPropagationMap(sheet)
+	{
+		// Merge the base propagation map with the character sheet's map
+		let map = merge(propagationMap, sheet.propagationMap || {});
+		
+		// TODO: Build dynamic propagations from bonuses
+		
+		return map;
+	}
+	
 	/**
 	 * Propagate values through a character sheet.
 	 *
@@ -25,7 +38,13 @@ export default class CharacterSheetProcessor
 	 */
 	propagate(sheet)
 	{
-		// TODO: Implement
+		let propagationMap = this.getPropagationMap(sheet);
+		
+		// TODO: Implement fully, using a map
+		set(sheet, 'defense.ac.abilityModifier', get(sheet, 'abilities.dex.modifier'));
+		set(sheet, 'defense.saves.fortitude.abilityModifier', get(sheet, 'abilities.con.modifier'));
+		set(sheet, 'defense.saves.reflex.abilityModifier', get(sheet, 'abilities.dex.modifier'));
+		set(sheet, 'defense.saves.will.abilityModifier', get(sheet, 'abilities.wis.modifier'));
 	}
 	
 	/**
@@ -36,6 +55,9 @@ export default class CharacterSheetProcessor
 	 */
 	process(character, sheet)
 	{
+		// Propagate the sheet data
+		this.propagate(sheet);
+		
 		// Update the character
 		this.update(character, sheet);
 		

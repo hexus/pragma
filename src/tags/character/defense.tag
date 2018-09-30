@@ -64,13 +64,10 @@
 		import clamp from 'lodash/clamp';
 		import set from 'lodash/set';
 		import util from '../../mixins/util';
-		import { abilityMaps } from '../../data';
 
 		this.mixin(util);
 
 		this.min = Math.min;
-
-		this.abilityMaps = abilityMaps;
 		this.defense = this.opts.defense;
 
 		this.edit = function (event) {

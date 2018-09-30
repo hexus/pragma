@@ -26,6 +26,7 @@
     "@babel/core": "7.0.0-beta.46",
     "@babel/preset-env": "7.0.0-beta.46",
     "babel-loader": "^8.0.0-beta.0",
+    "flat": "^4.1.0",
     "lodash": "^4.17.10",
     "riot": "^3.12.0",
     "riot-compiler": "^3.5.1",
