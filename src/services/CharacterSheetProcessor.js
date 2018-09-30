@@ -19,9 +19,17 @@ export default class CharacterSheetProcessor
 	}
 	
 	/**
-	 * Process the given character sheet data through a character model.
+	 * Propagate values through a character sheet.
 	 *
-	 * TODO: Typedef for sheet.
+	 * @param {CharacterSheet} sheet - The character sheet data
+	 */
+	propagate(sheet)
+	{
+		// TODO: Implement
+	}
+	
+	/**
+	 * Process the given character sheet data through a character model.
 	 *
 	 * @param {Character}      character - The character model
 	 * @param {CharacterSheet} sheet     - The character sheet data

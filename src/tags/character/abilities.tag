@@ -4,7 +4,7 @@
 
 		<p each="{ ability, name in abilities }">
 			<label>
-				<span>{ upperCase(name) }</span>
+				<span>{ util.upperCase(name) }</span>
 				<input type="number" name="{ name + '.score' }" min="0" max="60" step="1" value="{ ability.score }" onkeyup="{ edit }" onchange="{ edit }" />
 			</label>
 			<input type="number" name="{ name + '.modifier' }" min="-5" max="25" step="1" value="{ ability.modifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }" />
@@ -17,11 +17,11 @@
 		// input type=number fails to compile in a webpack production bundle;
 		// can't use one with an expression value attribute using default minification
 
-		import toUpper from 'lodash/toUpper';
+		import util from '../../mixins/util';
 		import set from 'lodash/set';
 		import clamp from 'lodash/clamp';
 
-		this.upperCase = toUpper;
+		this.mixin(util);
 
 		this.abilities = this.opts.abilities;
 
