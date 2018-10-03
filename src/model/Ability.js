@@ -34,7 +34,7 @@ export default class Ability
 	 */
 	set score(score)
 	{
-		this.abilityScore.score = score;
+		this.abilityScore.score = ~~score;
 	}
 	
 	/**
@@ -58,7 +58,7 @@ export default class Ability
 	 */
 	set temp(score)
 	{
-		this.tempScore.score = score;
+		this.tempScore.score = ~~score;
 	}
 	
 	/**

@@ -29,7 +29,7 @@
 			</label>
 		</fieldset>
 
-		<character character="{ sheet }" strict="{ sheet.strict }" onchange="{ () => {} }"></character>
+		<character character="{ sheet }" strict="{ sheet.strict }" onchange="{ onCharacterChange }"></character>
 	</virtual>
 
 	<script>
@@ -59,6 +59,10 @@
 		this.onStrictChange = function (event) {
 			this.sheet.strict = event.currentTarget.value;
 			this.process();
+		};
+
+		this.onCharacterChange = function (event) {
+			console.log(event);
 		};
 
 		// Event handlers
