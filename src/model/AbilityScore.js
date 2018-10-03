@@ -15,7 +15,7 @@ export default class AbilityScore
 		/**
 		 * @type {int}
 		 */
-		this.score = clamp(score, 1, 60);
+		this.score = clamp(~~score, 1, 60);
 	}
 	
 	/**
