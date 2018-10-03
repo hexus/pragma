@@ -28,16 +28,16 @@ const data = {
 	 * The keys of this map denote properties that, as a result of propagation, should have disabled inputs.
 	 */
 	propagationMap: {
-		'defense.armorClass.abilityScore':             ['abilities.dex.tempModifier', 'abilities.dex.modifier'], // TODO: swap temp and primary modifiers here, each is a default value for the next
+		'defense.armorClass.abilityScore':             ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
 		'defense.combatManeuverBonus.baseAttackBonus': 'offense.baseAttackBonus',
-		'defense.combatManeuverDefense.strModifier':   ['abilities.str.tempModifier', 'abilities.str.modifier'],
-		'defense.combatManeuverDefense.dexModifier':   ['abilities.dex.tempModifier', 'abilities.dex.modifier'],
-		'defense.saves.fortitude.abilityModifier':     ['abilities.con.tempModifier', 'abilities.con.modifier'],
-		'defense.saves.reflex.abilityModifier':        ['abilities.dex.tempModifier', 'abilities.dex.modifier'],
-		'defense.saves.will.abilityModifier':          ['abilities.wis.tempModifier', 'abilities.wis.modifier'],
+		'defense.combatManeuverDefense.strModifier':   ['abilities.str.modifier', 'abilities.str.tempModifier'],
+		'defense.combatManeuverDefense.dexModifier':   ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
+		'defense.saves.fortitude.abilityModifier':     ['abilities.con.modifier', 'abilities.con.tempModifier'],
+		'defense.saves.reflex.abilityModifier':        ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
+		'defense.saves.will.abilityModifier':          ['abilities.wis.modifier', 'abilities.wis.tempModifier', ],
 		'offense.combatManeuverBonus.baseAttackBonus': 'offense.baseAttackBonus',
-		'offense.combatManeuverBonus.abilityModifier': ['abilities.str.tempModifier', 'abilities.str.modifier'],
-		'offense.initiative.abilityModifier':          ['abilities.dex.tempModifier', 'abilities.dex.modifier'],
+		'offense.combatManeuverBonus.abilityModifier': ['abilities.str.modifier', 'abilities.str.tempModifier', ],
+		'offense.initiative.abilityModifier':          ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
 	},
 	/**
 	 * Default ability modifiers for different properties
