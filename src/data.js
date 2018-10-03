@@ -28,16 +28,16 @@ const data = {
 	 * The keys of this map denote properties that, as a result of propagation, should have disabled inputs.
 	 */
 	propagationMap: {
-		'defense.armorClass.abilityScore':             ['abilities.dex.tempScore', 'abilities.dex.score'],
+		'defense.armorClass.abilityScore':             ['abilities.dex.tempModifier', 'abilities.dex.modifier'], // TODO: swap temp and primary modifiers here, each is a default value for the next
 		'defense.combatManeuverBonus.baseAttackBonus': 'offense.baseAttackBonus',
-		'defense.combatManeuverDefense.strModifier':   ['abilities.str.tempScore', 'abilities.str.score'],
-		'defense.combatManeuverDefense.dexModifier':   ['abilities.dex.tempScore', 'abilities.dex.score'],
-		'defense.saves.fortitude.abilityModifier':     ['abilities.con.tempScore', 'abilities.con.score'],
-		'defense.saves.reflex.abilityModifier':        ['abilities.dex.tempScore', 'abilities.dex.score'],
-		'defense.saves.will.abilityModifier':          ['abilities.wis.tempScore', 'abilities.wis.score'],
+		'defense.combatManeuverDefense.strModifier':   ['abilities.str.tempModifier', 'abilities.str.modifier'],
+		'defense.combatManeuverDefense.dexModifier':   ['abilities.dex.tempModifier', 'abilities.dex.modifier'],
+		'defense.saves.fortitude.abilityModifier':     ['abilities.con.tempModifier', 'abilities.con.modifier'],
+		'defense.saves.reflex.abilityModifier':        ['abilities.dex.tempModifier', 'abilities.dex.modifier'],
+		'defense.saves.will.abilityModifier':          ['abilities.wis.tempModifier', 'abilities.wis.modifier'],
 		'offense.combatManeuverBonus.baseAttackBonus': 'offense.baseAttackBonus',
-		'offense.combatManeuverBonus.abilityModifier': ['abilities.str.tempScore', 'abilities.str.score'],
-		'offense.initiative.abilityModifier':          ['abilities.dex.tempScore', 'abilities.dex.score'],
+		'offense.combatManeuverBonus.abilityModifier': ['abilities.str.tempModifier', 'abilities.str.modifier'],
+		'offense.initiative.abilityModifier':          ['abilities.dex.tempModifier', 'abilities.dex.modifier'],
 	},
 	/**
 	 * Default ability modifiers for different properties
