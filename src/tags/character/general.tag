@@ -11,19 +11,26 @@
 	</fieldset>
 
 	<script>
+		import set from 'lodash/set';
 		import util from '../../mixins/util';
 
 		this.mixin(util);
 
+		this.prefix = this.opts.prefix || 'general.';
 		this.general = this.opts.general;
 
-		this.titleCase = function (string) {
-			return startCase(toLower(string));
-		};
-
 		this.edit = function (event) {
-			// Update the value
-			this.general[event.target.name] = event.target.value;
+			// Grab the input
+			let input = event.target;
+
+			// Update the current state
+			set(this.general, input.name, input.value);
+
+			// Dispatch an edit event
+			this.triggerDom('edit', {
+				name: this.prefix + input.name,
+				value: input.value
+			})
 		};
 	</script>
 </general>

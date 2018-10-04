@@ -15,7 +15,7 @@ export default class Ability
 		temp = temp || 0;
 
 		this.name = name;
-		this.shortName = name.substr(0, 3);
+		this.shortName = name.substr(0, 3).toLowerCase();
 
 		this.abilityScore = new AbilityScore(score);
 		this.tempScore = new AbilityScore(temp);
@@ -34,7 +34,7 @@ export default class Ability
 	 */
 	set score(score)
 	{
-		this.abilityScore.score = ~~score;
+		this.abilityScore.score = score;
 	}
 	
 	/**
@@ -58,7 +58,7 @@ export default class Ability
 	 */
 	set temp(score)
 	{
-		this.tempScore.score = ~~score;
+		this.tempScore.score = score;
 	}
 	
 	/**

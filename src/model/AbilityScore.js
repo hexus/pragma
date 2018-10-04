@@ -15,7 +15,7 @@ export default class AbilityScore
 		/**
 		 * @type {int}
 		 */
-		this.score = clamp(~~score, 1, 60);
+		this.score = clamp(score, 1, 60);
 	}
 	
 	/**
@@ -23,6 +23,9 @@ export default class AbilityScore
 	 */
 	get modifier()
 	{
+		if (!this.score)
+			return '';
+		
 		return Math.floor((this.score / 2) - 5);
 	}
 }

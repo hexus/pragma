@@ -60,18 +60,18 @@
 		<p each="{ save, name in defense.saves }">
 			<label>
 				<span>{ util.titleCase(name) }</span>
-				<input type="number" name="{ 'defense.saves.' + name + '.total' }" min="0" max="100" value="{ save.total }" onkeyup="{ edit }" onchange="{ edit }"/>
+				<input type="number" name="{ 'saves.' + name + '.total' }" min="0" max="100" value="{ save.total }" onkeyup="{ edit }" onchange="{ edit }"/>
 			</label>
 			+
-			<input type="number" name="{ 'defense.saves.' + name + '.base' }" min="0" max="100" step="1" value="{ save.base }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="{ 'saves.' + name + '.base' }" min="0" max="100" step="1" value="{ save.base }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
-			<input type="number" name="{ 'defense.saves.' + name + '.abilityModifier' }" min="0" max="100" step="1" value="{ save.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			<input type="number" name="{ 'saves.' + name + '.abilityModifier' }" min="0" max="100" step="1" value="{ save.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
-			<input type="number" name="{ 'defense.saves.' + name + '.magicModifier' }" min="0" max="100" step="1" value="{ save.magicModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="{ 'saves.' + name + '.magicModifier' }" min="0" max="100" step="1" value="{ save.magicModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
-			<input type="number" name="{ 'defense.saves.' + name + '.miscModifier' }" min="0" max="100" step="1" value="{ save.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="{ 'saves.' + name + '.miscModifier' }" min="0" max="100" step="1" value="{ save.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
-			<input type="number" name="{ 'defense.saves.' + name + '.tempModifier' }" min="0" max="100" step="1" value="{ save.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="{ 'saves.' + name + '.tempModifier' }" min="0" max="100" step="1" value="{ save.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 		</p>
 
 		<!-- TODO: Resistances, immunities -->
@@ -95,26 +95,35 @@
 	</fieldset>
 
 	<script>
-		import clamp from 'lodash/clamp';
 		import set from 'lodash/set';
 		import util from '../../mixins/util';
 
 		this.mixin(util);
 
 		this.min = Math.min;
+
+		this.prefix = this.opts.prefix || 'defense.';
 		this.defense = this.opts.defense;
 
 		this.edit = function (event) {
+			// Grab the input element
 			let input = event.target;
 
-			input.value = input.value !== '' ? clamp(input.value, input.min, input.max) : '';
+			// Sanitize the value
+			input.value = this.util.clamp(input.value, input.min, input.max);
 
+			// Update the current state
 			set(this.defense, input.name, input.value);
 
-			this.triggerDom('change');
+			// Dispatch an edit event
+			this.triggerDom('edit', {
+				name: this.prefix + input.name,
+				value: input.value
+			});
 		};
 
 		this.on('update', function () {
+			this.prefix = this.opts.prefix || 'defense.';
 			this.defense = this.opts.defense;
 		});
 	</script>

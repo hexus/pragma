@@ -9,18 +9,27 @@ export default {
 	/**
 	 * Trigger a DOM event on the root element of the tag..
 	 *
-	 * @param {string} eventName - The name of the event to fire
+	 * @param {string}       eventName      - The name of the event to fire
+	 * @param {Event|Object} [event]        - The event object to dispatch, or data to attach to the created event.
+	 * @param {boolean}      [bubbles=true] - Whether the event should bubble up the DOM.
 	 */
-	triggerDom: function (eventName) {
-		let event;
+	triggerDom: function (eventName, event, bubbles) {
+		bubbles = bubbles !== undefined ? bubbles : true;
 		
-		if (typeof Event === 'function') {
-			// Standard browsers
-			event = new Event(eventName);
-		} else {
-			// IE 9 ~ 11
-			event = document.createEvent('Event');
-			event.initEvent(eventName, true, true);
+		// Create the event if one isn't given
+		if (!event || !(event instanceof Event)) {
+			if (typeof Event === 'function') {
+				// Standard browsers
+				event = new CustomEvent(eventName, {
+					bubbles: bubbles,
+					cancelable: true,
+					detail: event
+				});
+			} else {
+				// IE 9 ~ 11
+				event = document.createEvent('Event');
+				event.initEvent(eventName, true, true);
+			}
 		}
 		
 		this.root.dispatchEvent(event);

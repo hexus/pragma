@@ -29,7 +29,7 @@
 			</label>
 		</fieldset>
 
-		<character character="{ sheet }" strict="{ sheet.strict }" onchange="{ onCharacterChange }"></character>
+		<character character="{ sheet }" strict="{ sheet.strict }" onedit="{ onCharacterEdit }"></character>
 	</virtual>
 
 	<script>
@@ -46,6 +46,7 @@
 
 		let character = state.character || factory.create();
 
+		// TODO: Separate out a processed sheet and a display sheet
 		this.sheet = state.sheet || {};
 
 		// Methods
@@ -61,7 +62,7 @@
 			this.process();
 		};
 
-		this.onCharacterChange = function (event) {
+		this.onCharacterEdit = function (event) {
 			console.log(event);
 		};
 

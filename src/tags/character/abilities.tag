@@ -19,23 +19,31 @@
 
 		import util from '../../mixins/util';
 		import set from 'lodash/set';
-		import clamp from 'lodash/clamp';
 
 		this.mixin(util);
 
+		this.prefix = this.opts.prefix || 'abilities.';
 		this.abilities = this.opts.abilities;
 
 		this.edit = function (event) {
+			// Grab the input element
 			let input = event.target;
 
-			input.value = input.value !== '' ? clamp(input.value, input.min, input.max) : '';
+			// Sanitize the value
+			input.value = this.util.clamp(input.value, input.min, input.max);
 
+			// Update the current state
 			set(this.abilities, input.name, input.value);
 
-			this.triggerDom('change');
+			// Dispatch an edit event
+			this.triggerDom('edit', {
+				name: this.prefix + input.name,
+				value: input.value
+			});
 		};
 
 		this.on('update', function () {
+			this.opts.prefix || 'abilities.';
 			this.abilities = this.opts.abilities;
 		});
 	</script>

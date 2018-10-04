@@ -1,17 +1,20 @@
 <character>
 	<general general="{ character.general }"></general>
-	<abilities abilities="{ character.abilities }" strict="{ opts.strict }" onchange="{ change }"></abilities>
-	<defense defense="{ character.defense }"  strict="{ opts.strict }" onchange="{ change }"></defense>
+	<!-- TODO: Classes -->
+	<abilities abilities="{ character.abilities }" strict="{ opts.strict }" onedit="{ edit }"></abilities>
+	<defense defense="{ character.defense }"  strict="{ opts.strict }" onedit="{ edit }"></defense>
 
 	<script>
 		import './character/general.tag';
 		import './character/abilities.tag';
 		import './character/defense.tag';
 
+		this.prefix = 'character.';
 		this.character = this.opts.character;
 
-		this.change = function () {
-			this.triggerDom('change');
+		this.edit = function (event) {
+			// Prefix the character sheet property name for parent listeners
+			event.detail.name = this.prefix + event.detail.name;
 		};
 
 		this.on('update', function () {
