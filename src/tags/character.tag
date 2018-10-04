@@ -9,13 +9,7 @@
 		import './character/abilities.tag';
 		import './character/defense.tag';
 
-		this.prefix = 'character.';
 		this.character = this.opts.character;
-
-		this.edit = function (event) {
-			// Prefix the character sheet property name for parent listeners
-			event.detail.name = this.prefix + event.detail.name;
-		};
 
 		this.on('update', function () {
 			this.character = this.opts.character;

@@ -18,18 +18,11 @@ export default {
 		
 		// Create the event if one isn't given
 		if (!event || !(event instanceof Event)) {
-			if (typeof Event === 'function') {
-				// Standard browsers
-				event = new CustomEvent(eventName, {
-					bubbles: bubbles,
-					cancelable: true,
-					detail: event
-				});
-			} else {
-				// IE 9 ~ 11
-				event = document.createEvent('Event');
-				event.initEvent(eventName, true, true);
-			}
+			event = new CustomEvent(eventName, {
+				bubbles: bubbles,
+				cancelable: true,
+				detail: event
+			});
 		}
 		
 		this.root.dispatchEvent(event);
