@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import each from 'lodash/each';
 import merge from 'lodash/merge';
-import flatten from 'lodash/flatten';
+import flatten from 'flat'; // TODO: Unflatten too?
 import { propagationMap } from '../data';
 
 /**
@@ -55,14 +55,14 @@ export default class CharacterSheetProcessor
 	 */
 	process(character, sheet)
 	{
-		// Propagate the sheet data
-		this.propagate(sheet);
-		
 		// Update the character
 		this.update(character, sheet);
 		
 		// Apply new sheet data
 		merge(sheet, this.extract(character));
+		
+		// Propagate the sheet data
+		this.propagate(sheet);
 	}
 	
 	/**

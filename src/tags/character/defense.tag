@@ -113,7 +113,7 @@
 			input.value = this.util.clamp(input.value, input.min, input.max);
 
 			// Update the current state
-			set(this.defense, input.name, input.value);
+			//set(this.defense, input.name, input.value);
 
 			// Dispatch an edit event
 			this.triggerDom('edit', {

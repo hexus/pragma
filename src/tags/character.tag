@@ -1,8 +1,8 @@
 <character>
 	<general general="{ character.general }"></general>
 	<!-- TODO: Classes -->
-	<abilities abilities="{ character.abilities }" strict="{ opts.strict }" onedit="{ edit }"></abilities>
-	<defense defense="{ character.defense }"  strict="{ opts.strict }" onedit="{ edit }"></defense>
+	<abilities abilities="{ character.abilities }" strict="{ opts.strict }"></abilities>
+	<defense defense="{ character.defense }"  strict="{ opts.strict }"></defense>
 
 	<script>
 		import './character/general.tag';

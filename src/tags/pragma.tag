@@ -34,8 +34,10 @@
 
 	<script>
 		import './character.tag';
+		import clone from 'lodash/cloneDeep';
+		import set from 'lodash/set';
 
-		// Variables and properties
+		// Application state, services and domain logic
 		let app = this.opts.app;
 
 		let state = app.state;
@@ -46,11 +48,12 @@
 
 		let character = state.character || factory.create();
 
-		// TODO: Separate out a processed sheet and a display sheet
-		this.sheet = state.sheet || {};
+		this.sheet = clone(state.sheet);
 
 		// Methods
 		this.process = function () {
+			//this.sheet = clone(state.sheet);
+
 			if (this.sheet.strict) {
 				processor.process(character, this.sheet);
 			}
@@ -64,6 +67,8 @@
 
 		this.onCharacterEdit = function (event) {
 			console.log(event);
+			set(state.sheet, event.detail.name, event.detail.value);
+			set(this.sheet, event.detail.name, event.detail.value);
 		};
 
 		// Event handlers
@@ -80,7 +85,6 @@
 			this.store = null;
 			this.character = null;
 			this.sheet = null;
-			this.change = null;
 		});
 	</script>
 </pragma>
