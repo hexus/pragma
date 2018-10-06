@@ -69,6 +69,8 @@
 			console.log(event);
 			set(state.sheet, event.detail.name, event.detail.value);
 			set(this.sheet, event.detail.name, event.detail.value);
+
+			// TODO: Timeout for updating store.sheet with state.sheet
 		};
 
 		// Event handlers

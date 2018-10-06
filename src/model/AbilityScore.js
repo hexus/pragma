@@ -19,12 +19,12 @@ export default class AbilityScore
 	}
 	
 	/**
-	 * @returns {int}
+	 * @returns {?int}
 	 */
 	get modifier()
 	{
-		if (!this.score)
-			return '';
+		if (this.score === null)
+			return null;
 		
 		return Math.floor((this.score / 2) - 5);
 	}

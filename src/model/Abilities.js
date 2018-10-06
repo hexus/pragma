@@ -6,6 +6,8 @@ import Ability from './Ability';
 export default class Abilities
 {
 	/**
+	 * Create a new set of character abilities.
+	 *
 	 * @param {int} str - Strength score
 	 * @param {int} dex - Dexterity score
 	 * @param {int} con - Constitution score

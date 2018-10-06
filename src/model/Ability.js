@@ -6,6 +6,8 @@ import AbilityScore from './AbilityScore';
 export default class Ability
 {
 	/**
+	 * Create a new character ability.
+	 *
 	 * @param {string} name  - Ability name
 	 * @param {int}    score - Base ability score
 	 * @param {int}    temp  - Temporary score
