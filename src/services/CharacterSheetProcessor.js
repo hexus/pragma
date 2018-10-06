@@ -3,7 +3,6 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import each from 'lodash/each';
 import merge from 'lodash/merge';
-import flatten from 'flat'; // TODO: Unflatten too?
 import { propagationMap } from '../data';
 
 /**
@@ -21,14 +20,25 @@ export default class CharacterSheetProcessor
 	
 	}
 	
+	/**
+	 * Get the propagation map for character sheet values.
+	 *
+	 * Keyed by target property path, where values are a single or multiple
+	 * source property paths.
+	 *
+	 * Defines how values are propagated through a character sheet.
+	 *
+	 * Propagations can be overridden by the sheet's propagationMap property.
+	 *
+	 * @param {CharacterSheet} sheet
+	 * @return {Object} TODO: Simple typedef?
+	 */
 	getPropagationMap(sheet)
 	{
 		// Merge the base propagation map with the character sheet's map
-		let map = merge(propagationMap, sheet.propagationMap || {});
+		return merge(propagationMap, sheet.propagationMap);
 		
 		// TODO: Build dynamic propagations from bonuses
-		
-		return map;
 	}
 	
 	/**
@@ -38,13 +48,28 @@ export default class CharacterSheetProcessor
 	 */
 	propagate(sheet)
 	{
+		let target, source;
 		let propagationMap = this.getPropagationMap(sheet);
 		
-		// TODO: Implement fully, using a map
-		set(sheet, 'defense.ac.abilityModifier', get(sheet, 'abilities.dex.modifier'));
-		set(sheet, 'defense.saves.fortitude.abilityModifier', get(sheet, 'abilities.con.modifier'));
-		set(sheet, 'defense.saves.reflex.abilityModifier', get(sheet, 'abilities.dex.modifier'));
-		set(sheet, 'defense.saves.will.abilityModifier', get(sheet, 'abilities.wis.modifier'));
+		for (target in propagationMap) {
+			source = propagationMap[target];
+			
+			if (typeof source === 'string') {
+				set(sheet, target, get(sheet, source));
+				continue;
+			}
+			
+			if (Array.isArray(source) && source.length > 0) {
+				let i;
+				let value = null;
+				
+				for (i = 0; i < source.length; i++) {
+					value = get(sheet, source[i]) || value;
+				}
+				
+				set(sheet, target, value);
+			}
+		}
 	}
 	
 	/**
@@ -192,6 +217,8 @@ export default class CharacterSheetProcessor
  * @property {number} offense.combatManeuverBonus.sizeModifier    - Combat maneuver bonus size modifier
  * @property {number} offense.combatManeuverBonus.miscModifier    - Miscellaneous combat maneuver bonus modifier
  * @property {number} offense.combatManeuverBonus.tempModifier    - Temporary combat maneuver bonus modifier
+ *
+ * @property {Object} propagationMap                              - Propagation overrides
  */
 
 /**

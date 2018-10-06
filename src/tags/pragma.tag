@@ -70,7 +70,7 @@
 			set(state.sheet, event.detail.name, event.detail.value);
 			set(this.sheet, event.detail.name, event.detail.value);
 
-			// TODO: Timeout for updating store.sheet with state.sheet
+			// TODO: Timeout to update store.sheet with cloned state.sheet
 		};
 
 		// Event handlers

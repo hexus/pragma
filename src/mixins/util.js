@@ -38,6 +38,17 @@ export default {
 		 */
 		clamp: function (value, min, max) {
 			return value !== '' ? clamp(value, min, max) : '';
+		},
+		
+		/**
+		 * Determine whether a value is numeric.
+		 *
+		 * @param {*} value
+		 * @return boolean
+		 */
+		isNumeric: function (value) {
+			return (typeof value === 'number' || typeof value === 'string') &&
+				!isNaN(parseFloat(value)) && isFinite(value);
 		}
 	}
 };

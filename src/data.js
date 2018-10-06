@@ -28,7 +28,7 @@ const data = {
 	 * The keys of this map denote properties that, as a result of propagation, should have disabled inputs.
 	 */
 	propagationMap: {
-		'defense.armorClass.abilityScore':             ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
+		'defense.armorClass.abilityModifier':          ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
 		'defense.combatManeuverBonus.baseAttackBonus': 'offense.baseAttackBonus',
 		'defense.combatManeuverDefense.strModifier':   ['abilities.str.modifier', 'abilities.str.tempModifier'],
 		'defense.combatManeuverDefense.dexModifier':   ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
