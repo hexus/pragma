@@ -56,17 +56,34 @@
 
 			if (this.sheet.strict) {
 				processor.process(character, this.sheet);
+			} else {
+				processor.propagate(this.sheet);
 			}
 		};
 
 		// DOM handlers
+
+		/**
+		 * Update the processing mode of the sheet and reprocess it.
+		 *
+		 * @param {CustomEvent} event
+		 */
 		this.onStrictChange = function (event) {
 			this.sheet.strict = event.currentTarget.value;
 			this.process();
 		};
 
+		/**
+		 * Update the state sheet and display sheet when a character sheet
+		 * property changes.
+		 *
+		 * Start a timeout for a store sheet update.
+		 *
+		 * @param {CustomEvent} event
+		 */
 		this.onCharacterEdit = function (event) {
 			console.log(event);
+
 			set(state.sheet, event.detail.name, event.detail.value);
 			set(this.sheet, event.detail.name, event.detail.value);
 

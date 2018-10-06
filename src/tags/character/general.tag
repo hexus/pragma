@@ -24,10 +24,11 @@
 			let input = event.target;
 
 			// Update the current state
-			//set(this.general, input.name, input.value);
+			set(this.general, input.name, input.value);
 
 			// Dispatch an edit event
 			this.triggerDom('edit', {
+				input: input,
 				name: this.prefix + input.name,
 				value: input.value
 			})

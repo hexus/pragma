@@ -51,6 +51,7 @@ export default class CharacterSheetProcessor
 		let target, source;
 		let propagationMap = this.getPropagationMap(sheet);
 		
+		// TODO: Clean up
 		for (target in propagationMap) {
 			source = propagationMap[target];
 			
@@ -80,13 +81,17 @@ export default class CharacterSheetProcessor
 	 */
 	process(character, sheet)
 	{
+		// Propagate the sheet data
+		this.propagate(sheet);
+		
 		// Update the character
 		this.update(character, sheet);
 		
 		// Apply new sheet data
 		merge(sheet, this.extract(character));
 		
-		// Propagate the sheet data
+		// Propagate the sheet data again for convenience while developing
+		// TODO: Remove this line
 		this.propagate(sheet);
 	}
 	
