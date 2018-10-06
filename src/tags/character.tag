@@ -2,12 +2,14 @@
 	<general general="{ character.general }"></general>
 	<!-- TODO: Classes -->
 	<abilities abilities="{ character.abilities }" strict="{ opts.strict }"></abilities>
-	<defense defense="{ character.defense }"  strict="{ opts.strict }"></defense>
+	<defense defense="{ character.defense }" strict="{ opts.strict }"></defense>
+	<offense offense="{ character.offense }" strict="{ opts.strict}"></offense>
 
 	<script>
 		import './character/general.tag';
 		import './character/abilities.tag';
 		import './character/defense.tag';
+		import './character/offense.tag';
 
 		this.character = this.opts.character;
 
