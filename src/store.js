@@ -46,6 +46,8 @@ export default {
 			defense: {
 				hitPoints: {
 					total: 52,
+					base: 52,
+					tempModifier: 0,
 					current: 52,
 					nonLethalDamage: 0
 				},
@@ -58,7 +60,7 @@ export default {
 					abilityModifier: +1, // Dex
 					sizeModifier: 0,
 					naturalArmor: 0,
-					deflection: 0,
+					deflectionModifier: 0,
 					miscModifier: 0,
 					tempModifier: 0,
 				},

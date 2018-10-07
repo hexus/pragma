@@ -4,15 +4,17 @@
 export default class General
 {
 	/**
+	 * Create a new set of general character information.
+	 *
 	 * @param {string} name
-	 * @param {string} gender
-	 * @param {string} age
-	 * @param {string} height
-	 * @param {string} hair
-	 * @param {string} eyes
-	 * @param {string} home
-	 * @param {string} deity
-	 * @param {string[]} extra
+	 * @param {string} [gender]
+	 * @param {string} [age]
+	 * @param {string} [height]
+	 * @param {string} [hair]
+	 * @param {string} [eyes]
+	 * @param {string} [home]
+	 * @param {string} [deity]
+	 * @param {string[]} [extra]
 	 */
 	constructor(name, gender, age, height, hair, eyes, home, deity, extra)
 	{

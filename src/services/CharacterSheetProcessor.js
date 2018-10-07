@@ -98,8 +98,8 @@ export default class CharacterSheetProcessor
 	/**
 	 * Update a character model from the given sheet data.
 	 *
-	 * @param {Character} character - The character model
-	 * @param {Object}    sheet     - The sheet data
+	 * @param {Character} character - The character model to update.
+	 * @param {Object}    sheet     - The sheet data to update from.
 	 */
 	update(character, sheet)
 	{
@@ -111,18 +111,41 @@ export default class CharacterSheetProcessor
 			ability.score = get(sheet, `abilities.${name}.score`);
 			ability.temp = get(sheet, `abilities.${name}.temp`);
 		});
+		
+		// Defense
+		character.defense.hitPoints.base         = sheet.defense.hitPoints.base;
+		character.defense.hitPoints.tempModifier = sheet.defense.hitPoints.tempModifier;
+		character.defense.hitPoints.current      = sheet.defense.hitPoints.current;
+		
+		character.defense.armorClass.armorBonus         = sheet.defense.armorClass.armorBonus;
+		character.defense.armorClass.shieldBonus        = sheet.defense.armorClass.shieldBonus;
+		character.defense.armorClass.sizeModifier       = sheet.defense.armorClass.sizeModifier;
+		character.defense.armorClass.naturalArmor       = sheet.defense.armorClass.naturalArmor;
+		character.defense.armorClass.deflectionModifier = sheet.defense.armorClass.deflectionModifier;
+		character.defense.armorClass.miscModifier       = sheet.defense.armorClass.miscModifier;
+		character.defense.armorClass.tempModifier       = sheet.defense.armorClass.tempModifier;
 	}
 	
 	/**
 	 * Extract sheet data from a character model.
 	 *
-	 * @param {Character} character
+	 * TODO: It would be AWESOME if these could become a straight up list for get/set.
+	 *
+	 * @param {Character}      character - The character model to extract from.
+	 * @param {CharacterSheet} [sheet]   - Optional sheet data to extract to.
 	 */
-	extract(character)
+	extract(character, sheet)
 	{
-		let sheet = {
+		/**
+		 * @type {CharacterSheet}
+		 */
+		sheet = merge({
 			abilities: {},
-		};
+			defense: {
+				hitPoints: {},
+				armorClass: {}
+			}
+		}, sheet);
 		
 		// Abilities
 		each(character.abilities, (ability, name) => {
@@ -132,6 +155,24 @@ export default class CharacterSheetProcessor
 			sheet.abilities[name].temp = ability.temp;
 			sheet.abilities[name].tempModifier = ability.tempModifier;
 		});
+		
+		// Defense
+		sheet.defense.hitPoints.total        = character.defense.hitPoints.total;
+		sheet.defense.hitPoints.base         = character.defense.hitPoints.base;
+		sheet.defense.hitPoints.tempModifier = character.defense.hitPoints.tempModifier;
+		sheet.defense.hitPoints.current      = character.defense.hitPoints.current;
+		
+		sheet.defense.armorClass.total              = character.defense.armorClass.total;
+		sheet.defense.armorClass.touch              = character.defense.armorClass.touch;
+		sheet.defense.armorClass.flatFooted         = character.defense.armorClass.flatFooted;
+		sheet.defense.armorClass.armorBonus         = character.defense.armorClass.armorBonus;
+		sheet.defense.armorClass.shieldBonus        = character.defense.armorClass.shieldBonus;
+		sheet.defense.armorClass.abilityModifier    = character.defense.armorClass.abilityModifier;
+		sheet.defense.armorClass.sizeModifier       = character.defense.armorClass.sizeModifier;
+		sheet.defense.armorClass.naturalArmor       = character.defense.armorClass.naturalArmor;
+		sheet.defense.armorClass.deflectionModifier = character.defense.armorClass.deflectionModifier;
+		sheet.defense.armorClass.miscModifier       = character.defense.armorClass.miscModifier;
+		sheet.defense.armorClass.tempModifier       = character.defense.armorClass.tempModifier;
 		
 		return sheet;
 	}
@@ -165,35 +206,37 @@ export default class CharacterSheetProcessor
  * @property {CharacterSheet.AbilityScore}   wis       - Wisdom ability score
  * @property {CharacterSheet.AbilityScore}   cha       - Charisma ability score
  *
- * @property {Object} defense                            - Defense statistics
- * @property {Object} defense.hitPoints                  - Hit points
- * @property {number} defense.hitPoints.total            - Total available hit points
- * @property {number} defense.hitPoints.current          - Current hit points
- * @property {number} defense.hitPoints.nonLethalDamage  - Non-lethal damage points
- * @property {Object} defense.armorClass                 - Armor class
- * @property {number} defense.armorClass.total           - Total armor class
- * @property {number} defense.armorClass.touch           - Touch armor class
- * @property {number} defense.armorClass.flatFooted      - Flat-footed armor class
- * @property {number} defense.armorClass.armorBonus      - Armor bonus to armor class
- * @property {number} defense.armorClass.shieldBonus     - Shield bonus to armor class
- * @property {number} defense.armorClass.abilityModifier - Ability modifier added to armor class (dexterity)
- * @property {number} defense.armorClass.sizeModifier    - Size modifier added to armor class
- * @property {number} defense.armorClass.naturalArmor    - Natural armor added to armor class
- * @property {number} defense.armorClass.deflection      - Deflection armor class
- * @property {number} defense.armorClass.miscModifier    - Miscellaneous armor class modifier
- * @property {number} defense.armorClass.tempModifier    - Temporary armor class modifier
- * @property {number} defense.damageReduction            - Damage reduction
- * @property {number} defense.spellResistance            - Spell resistance
- * @property {SavingThrow[]} defense.saves               - Saving throws
- * @property {SavingThrow}   defense.saves.fortitude     - Fortitude saving throw
- * @property {SavingThrow}   defense.saves.reflex        - Reflex saving throw
- * @property {SavingThrow}   defense.saves.will          - Will saving throw
- * @property {Object} defense.resistances                - Damage resistances
- * @property {number} [defense.resistances.cold]         - Cold resistance
- * @property {number} [defense.resistances.fire]         - Fire resistance
- * @property {number} [defense.resistances.electricity]  - Electricity resistance
- * @property {number} [defense.resistances.sonic]        - Sonic resistance
- * @property {number} [defense.resistances.acid]         - Acid resistance
+ * @property {Object} defense                               - Defense statistics
+ * @property {Object} defense.hitPoints                     - Hit points
+ * @property {number} defense.hitPoints.total               - Total available hit points
+ * @property {number} defense.hitPoints.base                - Base available hit points
+ * @property {number} [defense.hitPoints.tempModifier]      - Temporary total hit points modifier
+ * @property {number} defense.hitPoints.current             - Current hit points
+ * @property {number} defense.hitPoints.nonLethalDamage     - Non-lethal damage points
+ * @property {Object} defense.armorClass                    - Armor class
+ * @property {number} defense.armorClass.total              - Total armor class
+ * @property {number} defense.armorClass.touch              - Touch armor class
+ * @property {number} defense.armorClass.flatFooted         - Flat-footed armor class
+ * @property {number} defense.armorClass.armorBonus         - Armor bonus to armor class
+ * @property {number} defense.armorClass.shieldBonus        - Shield bonus to armor class
+ * @property {number} defense.armorClass.abilityModifier    - Ability modifier added to armor class (dexterity)
+ * @property {number} defense.armorClass.sizeModifier       - Size modifier added to armor class
+ * @property {number} defense.armorClass.naturalArmor       - Natural armor added to armor class
+ * @property {number} defense.armorClass.deflectionModifier - Deflection armor class
+ * @property {number} defense.armorClass.miscModifier       - Miscellaneous armor class modifier
+ * @property {number} defense.armorClass.tempModifier       - Temporary armor class modifier
+ * @property {number} defense.damageReduction               - Damage reduction
+ * @property {number} defense.spellResistance               - Spell resistance
+ * @property {SavingThrow[]} defense.saves                  - Saving throws
+ * @property {SavingThrow}   defense.saves.fortitude        - Fortitude saving throw
+ * @property {SavingThrow}   defense.saves.reflex           - Reflex saving throw
+ * @property {SavingThrow}   defense.saves.will             - Will saving throw
+ * @property {Object} defense.resistances                   - Damage resistances
+ * @property {number} [defense.resistances.cold]            - Cold resistance
+ * @property {number} [defense.resistances.fire]            - Fire resistance
+ * @property {number} [defense.resistances.electricity]     - Electricity resistance
+ * @property {number} [defense.resistances.sonic]           - Sonic resistance
+ * @property {number} [defense.resistances.acid]            - Acid resistance
  * @property {Object} defense.combatManeuverDefense                 - Combat maneuver defense
  * @property {number} defense.combatManeuverDefense.total           - Total combat maneuver defense
  * @property {number} defense.combatManeuverDefense.baseAttackBonus - Combat maneuver defense base attack bonus

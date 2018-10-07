@@ -6,11 +6,13 @@ export default class Character
 	/**
 	 * @param {General} general
 	 * @param {Abilities} abilities
+	 * @param {Defense} defense
 	 */
-	constructor(general, abilities)
+	constructor(general, abilities, defense)
 	{
 		this.general = general;
 		this.abilities = abilities;
+		this.defense = defense;
 	}
 	
 	get name()

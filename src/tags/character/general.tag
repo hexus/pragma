@@ -11,6 +11,7 @@
 	</fieldset>
 
 	<script>
+		import get from 'lodash/get';
 		import set from 'lodash/set';
 		import util from '../../mixins/util';
 
@@ -22,6 +23,10 @@
 		this.edit = function (event) {
 			// Grab the input
 			let input = event.target;
+
+			// Skip unchanged values
+			if (get(this.abilities, input.name) === input.value)
+				return;
 
 			// Update the current state
 			set(this.general, input.name, input.value);

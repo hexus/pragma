@@ -28,17 +28,17 @@
 				<input type="number" name="armorClass.total" min="-100" max="100" step="1" value="{ defense.armorClass.total }" onkeyup="{ edit }" onchange="{ edit }"/>
 			</label>
 			= 10 +
-			<input type="number" name="armorClass.armorBonus" min="0" max="100" step="1" value="{ defense.armorClass.armorBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="armorClass.armorBonus" min="-100" max="100" step="1" value="{ defense.armorClass.armorBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
-			<input type="number" name="armorClass.shieldBonus" min="0" max="100" step="1" value="{ defense.armorClass.shieldBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="armorClass.shieldBonus" min="-100" max="100" step="1" value="{ defense.armorClass.shieldBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
 			<input type="number" name="armorClass.abilityModifier" min="-60" max="60" step="1" value="{ defense.armorClass.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
 			<input type="number" name="armorClass.sizeModifier" min="-100" max="100" step="1" value="{ defense.armorClass.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
-			<input type="number" name="armorClass.naturalArmor" min="0" max="100" step="1" value="{ defense.armorClass.naturalArmor }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="armorClass.naturalArmor" min="-100" max="100" step="1" value="{ defense.armorClass.naturalArmor }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
-			<input type="number" name="armorClass.deflection" min="0" max="100" step="1" value="{ defense.armorClass.deflection }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="armorClass.deflectionModifier" min="-100" max="100" step="1" value="{ defense.armorClass.deflectionModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
 			<input type="number" name="armorClass.miscModifier" min="-100" max="100" step="1" value="{ defense.armorClass.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
@@ -95,6 +95,7 @@
 	</fieldset>
 
 	<script>
+		import get from 'lodash/get';
 		import set from 'lodash/set';
 		import util from '../../mixins/util';
 
@@ -108,6 +109,10 @@
 		this.edit = function (event) {
 			// Grab the input element
 			let input = event.target;
+
+			// Skip unchanged values
+			if (get(this.abilities, input.name) === input.value)
+				return;
 
 			// Sanitize the value
 			input.value = this.util.clamp(input.value, input.min, input.max);

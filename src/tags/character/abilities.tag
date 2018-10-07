@@ -14,10 +14,11 @@
 	</fieldset>
 
 	<script>
-		// input type=number fails to compile in a webpack production bundle;
-		// can't use one with an expression value attribute using default minification
+		// <input type=number/> fails to compile in a webpack production bundle;
+		// can't use one with an expression value attribute, using default minification
 
 		import util from '../../mixins/util';
+		import get from 'lodash/get';
 		import set from 'lodash/set';
 
 		this.mixin(util);
@@ -29,7 +30,11 @@
 			// Grab the input element
 			let input = event.target;
 
-			// Sanitize the value
+			// Skip unchanged values
+			if (get(this.abilities, input.name) === input.value)
+				return;
+
+			// Sanitize the new value
 			input.value = this.util.clamp(input.value, input.min, input.max);
 
 			// Update the current state

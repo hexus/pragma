@@ -84,15 +84,21 @@
 		this.onCharacterEdit = function (event) {
 			console.log(event);
 
-			set(state.sheet, event.detail.name, event.detail.value);
-			set(this.sheet, event.detail.name, event.detail.value);
+			let { name, value, input } = event.detail;
+
+			// Cast value based on input type TODO: Cast on dispatch, include rawValue property
+			if (input.type === 'number')
+				value = parseFloat(value);
+
+			set(state.sheet, name, value);
+			set(this.sheet, name, value);
 
 			// TODO: Timeout to update store.sheet with cloned state.sheet
 		};
 
 		// Event handlers
 		this.on('mount', function () {
-			this.process();
+			this.update();
 		});
 
 		this.on('update', function () {
