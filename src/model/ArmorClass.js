@@ -45,6 +45,11 @@ export default class ArmorClass
 		return this.size;
 	}
 	
+	/**
+	 * TODO: Character Size class (remove this method)
+	 *
+	 * @param {int} value
+	 */
 	set sizeModifier(value)
 	{
 		this.size = value;
@@ -58,7 +63,7 @@ export default class ArmorClass
 	get total()
 	{
 		return 10 +
-			this.armorBonus + this.shieldBonus + this.abilityModifier + this.size + this.naturalArmor +
+			this.armorBonus + this.shieldBonus + this.abilityModifier + this.sizeModifier + this.naturalArmor +
 			this.deflectionModifier + this.miscModifier + this.tempModifier;
 	}
 	

@@ -4,9 +4,15 @@
 		<p>
 			<label>
 				<span>HP</span>
-				<input type="number" name="hitPoints.total" min="0" max="1000" step="1" value="{ defense.hitPoints.total }" onkeyup="{ edit }" onchange="{ edit }"/>
+				<input type="number" name="hitPoints.current" min="-15" max="{ defense.hitPoints.total }" step="1" value="{ defense.hitPoints.current }" onkeyup="{ edit }" onchange="{ edit }"/>
 			</label>
-			<input type="number" name="hitPoints.current" min="-15" max="{ defense.hitPoints.total }" step="1" value="{ defense.hitPoints.current }" onkeyup="{ edit }" onchange="{ edit }"/>
+			/
+			<input type="number" name="hitPoints.total" min="1" max="1000" step="1" value="{ defense.hitPoints.total }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			=
+			<input type="number" name="hitPoints.base" min="1" max="1000" step="1" value="{ defense.hitPoints.base }" onkeyup="{ edit }" onchange="{ edit }"/>
+			+
+			<input type="number" name="hitPoints.tempModifier" min="-100" max="100" step="1" value="{ defense.hitPoints.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+
 			<input type="number" name="hitPoints.nonLethalDamage" min="0" max="100" value="{ defense.hitPoints.nonLethalDamage }" onkeyup="{ edit }" onchange="{ edit }"/>
 		</p>
 
@@ -79,18 +85,20 @@
 		<p>
 			<label>
 				CMD
-				<input type="number" name="combatManeuverDefense.total" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.total }" onkeyup="{ edit }" onchange="{ edit }"/>
+				<input type="number" name="combatManeuverDefense.total" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.total }" onkeyup="{ edit }" onchange="{ edit }"/>
 			</label>
 			= 10 +
-			<input type="number" name="combatManeuverDefense.baseAttackBonus" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.baseAttackBonus }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="combatManeuverDefense.baseAttackBonus" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.baseAttackBonus }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
-			<input type="number" name="combatManeuverDefense.strModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.strModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			<input type="number" name="combatManeuverDefense.strModifier" min="-60" max="60" step="1" value="{ defense.combatManeuverDefense.strModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
-			<input type="number" name="combatManeuverDefense.dexModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.dexModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+			<input type="number" name="combatManeuverDefense.dexModifier" min="-60" max="60" step="1" value="{ defense.combatManeuverDefense.dexModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
-			<input type="number" name="combatManeuverDefense.miscModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="combatManeuverDefense.sizeModifier" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
-			<input type="number" name="combatManeuverDefense.tempModifier" min="0" max="100" step="1" value="{ defense.combatManeuverDefense.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="combatManeuverDefense.miscModifier" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			+
+			<input type="number" name="combatManeuverDefense.tempModifier" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 		</p>
 	</fieldset>
 

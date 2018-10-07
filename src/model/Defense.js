@@ -14,7 +14,7 @@ export default class Defense
 	 * @param {int}                   [damageReduction]
 	 * @param {int}                   [spellResistance]
 	 */
-	constructor(hitPoints, armorClass, damageReduction, spellResistance, saves, resistances, combatManeuverDefense)
+	constructor(hitPoints, armorClass, saves, resistances, combatManeuverDefense, damageReduction, spellResistance)
 	{
 		this.hitPoints = hitPoints;
 		this.armorClass = armorClass;

@@ -4,6 +4,8 @@ import Abilities from "../model/Abilities";
 import Defense from '../model/Defense';
 import HitPoints from '../model/HitPoints';
 import ArmorClass from '../model/ArmorClass';
+import SavingThrows from '../model/SavingThrows';
+import CombatManeuverDefense from "../model/CombatManeuverDefense";
 
 /**
  * A Character factory.
@@ -27,9 +29,9 @@ export default class CharacterFactory
 				new ArmorClass(
 					0, 0, abilities.dex, 0, 0, 0, 0, 0
 				),
+				new SavingThrows(abilities, 0, 0, 0),
 				null,
-				null,
-				null
+				new CombatManeuverDefense(0, abilities.str, abilities.dex, 0, 0, 0)
 			)
 		);
 	}

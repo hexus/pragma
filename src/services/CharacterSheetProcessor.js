@@ -98,8 +98,8 @@ export default class CharacterSheetProcessor
 	/**
 	 * Update a character model from the given sheet data.
 	 *
-	 * @param {Character} character - The character model to update.
-	 * @param {Object}    sheet     - The sheet data to update from.
+	 * @param {Character}      character - The character model to update.
+	 * @param {CharacterSheet} sheet     - The sheet data to update from.
 	 */
 	update(character, sheet)
 	{
@@ -109,7 +109,7 @@ export default class CharacterSheetProcessor
 		// Abilities
 		each(character.abilities, (ability, name) => {
 			ability.score = get(sheet, `abilities.${name}.score`);
-			ability.temp = get(sheet, `abilities.${name}.temp`);
+			ability.temp  = get(sheet, `abilities.${name}.temp`);
 		});
 		
 		// Defense
@@ -124,6 +124,18 @@ export default class CharacterSheetProcessor
 		character.defense.armorClass.deflectionModifier = sheet.defense.armorClass.deflectionModifier;
 		character.defense.armorClass.miscModifier       = sheet.defense.armorClass.miscModifier;
 		character.defense.armorClass.tempModifier       = sheet.defense.armorClass.tempModifier;
+		
+		each(character.defense.saves, (save, name) => {
+			save.base          = get(sheet, `defense.saves.${name}.base`);
+			save.magicModifier = get(sheet, `defense.saves.${name}.base`);
+			save.miscModifier  = get(sheet, `defense.saves.${name}.base`);
+			save.tempModifier  = get(sheet, `defense.saves.${name}.base`);
+		});
+		
+		character.defense.combatManeuverDefense.baseAttackBonus = sheet.offense.baseAttackBonus;
+		character.defense.combatManeuverDefense.sizeModifier    = sheet.defense.combatManeuverDefense.sizeModifier;
+		character.defense.combatManeuverDefense.miscModifier    = sheet.defense.combatManeuverDefense.miscModifier;
+		character.defense.combatManeuverDefense.tempModifier    = sheet.defense.combatManeuverDefense.tempModifier;
 	}
 	
 	/**
@@ -137,22 +149,24 @@ export default class CharacterSheetProcessor
 	extract(character, sheet)
 	{
 		/**
-		 * @type {CharacterSheet}
+		 * @type {CharacterSheet} sheet
 		 */
 		sheet = merge({
 			abilities: {},
 			defense: {
 				hitPoints: {},
-				armorClass: {}
+				armorClass: {},
+				saves: {},
+				combatManeuverDefense: {}
 			}
 		}, sheet);
 		
 		// Abilities
 		each(character.abilities, (ability, name) => {
-			sheet.abilities[name] = {};
-			sheet.abilities[name].score = ability.score;
-			sheet.abilities[name].modifier = ability.modifier;
-			sheet.abilities[name].temp = ability.temp;
+			sheet.abilities[name]              = sheet.abilities[name] || {};
+			sheet.abilities[name].score        = ability.score;
+			sheet.abilities[name].modifier     = ability.modifier;
+			sheet.abilities[name].temp         = ability.temp;
 			sheet.abilities[name].tempModifier = ability.tempModifier;
 		});
 		
@@ -173,6 +187,23 @@ export default class CharacterSheetProcessor
 		sheet.defense.armorClass.deflectionModifier = character.defense.armorClass.deflectionModifier;
 		sheet.defense.armorClass.miscModifier       = character.defense.armorClass.miscModifier;
 		sheet.defense.armorClass.tempModifier       = character.defense.armorClass.tempModifier;
+		
+		each(character.defense.saves, (save, name) => {
+			sheet.defense.saves[name]                 = sheet.defense.saves[name] || {};
+			sheet.defense.saves[name].total           = save.total;
+			sheet.defense.saves[name].base            = save.base;
+			sheet.defense.saves[name].abilityModifier = save.abilityModifier;
+			sheet.defense.saves[name].miscModifier    = save.miscModifier;
+			sheet.defense.saves[name].tempModifier    = save.tempModifier;
+		});
+		
+		sheet.defense.combatManeuverDefense.total           = character.defense.combatManeuverDefense.total;
+		sheet.defense.combatManeuverDefense.baseAttackBonus = character.defense.combatManeuverDefense.baseAttackBonus;
+		sheet.defense.combatManeuverDefense.strModifier     = character.defense.combatManeuverDefense.strModifier;
+		sheet.defense.combatManeuverDefense.dexModifier     = character.defense.combatManeuverDefense.dexModifier;
+		sheet.defense.combatManeuverDefense.sizeModifier    = character.defense.combatManeuverDefense.sizeModifier;
+		sheet.defense.combatManeuverDefense.miscModifier    = character.defense.combatManeuverDefense.miscModifier;
+		sheet.defense.combatManeuverDefense.tempModifier    = character.defense.combatManeuverDefense.tempModifier;
 		
 		return sheet;
 	}
