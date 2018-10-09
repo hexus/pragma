@@ -7,6 +7,8 @@ export default class Character
 	 * @param {General} general
 	 * @param {Abilities} abilities
 	 * @param {Defense} defense
+	 * @param {Offense} offense
+	 * @param {Skills} skills
 	 */
 	constructor(general, abilities, defense)
 	{
