@@ -87,9 +87,10 @@
 
 			let { name, value, input } = event.detail;
 
-			// TODO: Cast on dispatch, include rawValue property
-			if (input.type === 'number')
-				value = parseFloat(value);
+			// TODO: Cast on dispatch, include rawValue property, clean this up!
+			if (input.type === 'number') {
+				value = !isNaN(parseFloat(value)) ? parseFloat(value) : value;
+			}
 
 			set(state.sheet, name, value);
 			set(this.sheet, name, value);
