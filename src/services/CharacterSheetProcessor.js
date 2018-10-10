@@ -90,21 +90,29 @@ export default class CharacterSheetProcessor
 		// Apply new sheet data
 		merge(sheet, this.extract(character));
 		
-		// Propagate the sheet data again for convenience while developing
-		// TODO: Remove this line
+		// Propagate the sheet data again for convenience while developing;
+		// allows us to see propagated values without them being modelled
+		// TODO: Remove this when modelling is complete
 		this.propagate(sheet);
 	}
 	
 	/**
 	 * Update a character model from the given sheet data.
 	 *
+	 * // TODO: It would be AWESOME if these could become a straight up list for get/set.
+	 *
 	 * @param {Character}      character - The character model to update.
 	 * @param {CharacterSheet} sheet     - The sheet data to update from.
 	 */
 	update(character, sheet)
 	{
+		sheet = this.prepareSheet(sheet);
+		
 		// General
 		assign(character.general, sheet.general);
+		
+		// Size
+		character.size.type = sheet.size.type;
 		
 		// Abilities
 		each(character.abilities, (ability, name) => {
@@ -119,7 +127,6 @@ export default class CharacterSheetProcessor
 		
 		character.defense.armorClass.armorBonus         = sheet.defense.armorClass.armorBonus;
 		character.defense.armorClass.shieldBonus        = sheet.defense.armorClass.shieldBonus;
-		character.defense.armorClass.sizeModifier       = sheet.defense.armorClass.sizeModifier;
 		character.defense.armorClass.naturalArmor       = sheet.defense.armorClass.naturalArmor;
 		character.defense.armorClass.deflectionModifier = sheet.defense.armorClass.deflectionModifier;
 		character.defense.armorClass.miscModifier       = sheet.defense.armorClass.miscModifier;
@@ -133,7 +140,6 @@ export default class CharacterSheetProcessor
 		});
 		
 		character.defense.combatManeuverDefense.baseAttackBonus = sheet.offense.baseAttackBonus;
-		character.defense.combatManeuverDefense.sizeModifier    = sheet.defense.combatManeuverDefense.sizeModifier;
 		character.defense.combatManeuverDefense.miscModifier    = sheet.defense.combatManeuverDefense.miscModifier;
 		character.defense.combatManeuverDefense.tempModifier    = sheet.defense.combatManeuverDefense.tempModifier;
 	}
@@ -148,18 +154,20 @@ export default class CharacterSheetProcessor
 	 */
 	extract(character, sheet)
 	{
+		sheet = this.prepareSheet(sheet);
+		
 		/**
 		 * @type {CharacterSheet} sheet
 		 */
-		sheet = merge({
-			abilities: {},
-			defense: {
-				hitPoints: {},
-				armorClass: {},
-				saves: {},
-				combatManeuverDefense: {}
-			}
-		}, sheet);
+		
+		// Size
+		sheet.size.type            = character.size.type;
+		sheet.size.modifier        = character.size.modifier;
+		sheet.size.specialModifier = character.size.specialModifier;
+		sheet.size.flyModifier     = character.size.flyModifier;
+		sheet.size.stealthModifier = character.size.stealthModifier;
+		sheet.size.space           = character.size.space;
+		sheet.size.reach           = character.size.reach;
 		
 		// Abilities
 		each(character.abilities, (ability, name) => {
@@ -207,35 +215,74 @@ export default class CharacterSheetProcessor
 		
 		return sheet;
 	}
+	
+	/**
+	 * Populate a sheet object with any missing properties and data.
+	 *
+	 * Generates a new character sheet structure if no sheet is provided.
+	 *
+	 * Ensures that the appropriate properties are set up for conveniently
+	 * extracting sheet data from a character model.
+	 *
+	 * In effect, a character sheet without any leaf nodes.
+	 *
+	 * @param {CharacterSheet} [sheet] - The sheet to populate.
+	 * @return {CharacterSheet}
+	 */
+	prepareSheet(sheet)
+	{
+		// Tasty merge sandwich
+		return merge(sheet, {
+			general: {},
+			size: {},
+			abilities: {},
+			defense: {
+				hitPoints: {},
+				armorClass: {},
+				saves: {},
+				combatManeuverDefense: {}
+			}
+		}, sheet);
+	}
 }
 
 /**
  * Character sheet data structure.
  *
+ * // TODO: Rename general to background?
+ *
  * @typedef {Object} CharacterSheet
  *
- * // TODO: Rename general to background?
- * @property {Object} general                  - General character statistics
- * @property {string} general.name             - Character name
- * @property {string} [general.alignment]      - Character alignment
- * @property {number} [general.age]            - Character age, in years
- * @property {string} [general.gender]         - Character gender
- * @property {string} [general.height]         - Character standing height
- * @property {string} [general.weight]         - Character weight
- * @property {string} [general.hair]           - Character hair color
- * @property {string} [general.eyes]           - Character eye color
- * @property {string} [general.home]           - Character homeland
+ * @property {Object} general              - General character statistics
+ * @property {string} general.name         - Character name
+ * @property {string} [general.alignment]  - Character alignment
+ * @property {number} [general.age]        - Character age, in years
+ * @property {string} [general.gender]     - Character gender
+ * @property {string} [general.height]     - Character standing height
+ * @property {string} [general.weight]     - Character weight
+ * @property {string} [general.hair]       - Character hair color
+ * @property {string} [general.eyes]       - Character eye color
+ * @property {string} [general.home]       - Character homeland
  *
- * @property {string} race                     - Character race
- * @property {string} class                    - Character class
+ * @property {Object} size                 - Character size
+ * @property {string} size.type            - Size type
+ * @property {number} size.modifier        - Size modifier
+ * @property {number} size.specialModifier - Special size modifier
+ * @property {number} size.flyModifier     - Fly skill modifier
+ * @property {number} size.stealthModifier - Stealth skill modifier
+ * @property {number} size.space           - Space occupied in feet
+ * @property {number} size.reach           - Natural reach distance in feet
  *
- * @property {CharacterSheet.AbilityScore[]} abilities - Character ability scores
- * @property {CharacterSheet.AbilityScore}   str       - Strength ability score
- * @property {CharacterSheet.AbilityScore}   dex       - Dexterity ability score
- * @property {CharacterSheet.AbilityScore}   con       - Constitution ability score
- * @property {CharacterSheet.AbilityScore}   int       - Intelligence ability score
- * @property {CharacterSheet.AbilityScore}   wis       - Wisdom ability score
- * @property {CharacterSheet.AbilityScore}   cha       - Charisma ability score
+ * @property {string} race                 - Character race
+ * @property {string} class                - Character class
+ *
+ * @property {CharacterSheet.AbilityScore[]} abilities      - Character ability scores
+ * @property {CharacterSheet.AbilityScore}   abilities.str  - Strength ability score
+ * @property {CharacterSheet.AbilityScore}   abilities.dex  - Dexterity ability score
+ * @property {CharacterSheet.AbilityScore}   abilities.con  - Constitution ability score
+ * @property {CharacterSheet.AbilityScore}   abilities.int  - Intelligence ability score
+ * @property {CharacterSheet.AbilityScore}   abilities.wis  - Wisdom ability score
+ * @property {CharacterSheet.AbilityScore}   abilities.cha  - Charisma ability score
  *
  * @property {Object} defense                               - Defense statistics
  * @property {Object} defense.hitPoints                     - Hit points

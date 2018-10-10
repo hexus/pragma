@@ -23,11 +23,21 @@ export default class SavingThrow
 		this.tempModifier = tempModifier || 0;
 	}
 	
+	/**
+	 * TODO: Refactor abilities to provide this value easily
+	 *
+	 * @returns {number}
+	 */
 	get abilityModifier()
 	{
 		return this.ability.tempModifier || this.ability.modifier;
 	}
 	
+	/**
+	 * Get the total saving throw score.
+	 *
+	 * @returns {number}
+	 */
 	get total()
 	{
 		return this.base + this.abilityModifier + this.magicModifier + this.miscModifier + this.tempModifier;

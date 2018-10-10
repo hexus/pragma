@@ -34,7 +34,7 @@ export default class Size
 	 */
 	get type()
 	{
-		return sizes[this._type] ? type : 'medium';
+		return sizes[this._type] ? this._type : 'medium';
 	}
 	
 	/**
@@ -110,7 +110,7 @@ export default class Size
 	}
 	
 	/**
-	 * Get the reach of this character size in feet.
+	 * Get the distance this character size can reach in feet.
 	 *
 	 * @returns {number}
 	 */

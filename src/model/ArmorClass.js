@@ -6,21 +6,21 @@ export default class ArmorClass
 	/**
 	 * Create a new character armor class score.
 	 *
-	 * @param {int}     armorBonus         - AC bonus from armor.
-	 * @param {int}     shieldBonus        - AC bonus from shields.
-	 * @param {Ability} ability            - The ability that affects armor class.
-	 * @param {int}     size               - The character's size bonus. TODO: Character Size class
-	 * @param {int}     naturalArmor       - AC bonus from natural armor.
-	 * @param {int}     deflectionModifier - Deflection AC score.
-	 * @param {int}     miscModifier       - Miscellaneous AC modifier.
-	 * @param {int}     tempModifier       - Temporary AC modifier.
+	 * @param {Ability} ability              - The ability that affects armor class.
+	 * @param {Size}    size                 - The character's size.
+	 * @param {int}     [armorBonus]         - AC bonus from armor.
+	 * @param {int}     [shieldBonus]        - AC bonus from shields.
+	 * @param {int}     [naturalArmor]       - AC bonus from natural armor.
+	 * @param {int}     [deflectionModifier] - Deflection AC score.
+	 * @param {int}     [miscModifier]       - Miscellaneous AC modifier.
+	 * @param {int}     [tempModifier]       - Temporary AC modifier.
 	 */
-	constructor(armorBonus, shieldBonus, ability, size, naturalArmor, deflectionModifier, miscModifier, tempModifier)
+	constructor(ability, size, armorBonus, shieldBonus, naturalArmor, deflectionModifier, miscModifier, tempModifier)
 	{
+		this.ability = ability;
+		this.size = size;
 		this.armorBonus = armorBonus || 0;
 		this.shieldBonus = shieldBonus || 0;
-		this.ability = ability;
-		this.size = size || 0;
 		this.naturalArmor = naturalArmor || 0;
 		this.deflectionModifier = deflectionModifier || 0;
 		this.miscModifier = miscModifier || 0;
@@ -28,7 +28,11 @@ export default class ArmorClass
 	}
 	
 	/**
+	 * Ability modifier.
+	 *
 	 * TODO: Refactor abilities to provide this value easily
+	 *
+	 * @return {int}
 	 */
 	get abilityModifier()
 	{
@@ -36,23 +40,13 @@ export default class ArmorClass
 	}
 	
 	/**
-	 * TODO: Character Size class (return this.size.modifier)
+	 * Size modifier.
 	 *
 	 * @return {int}
 	 */
 	get sizeModifier()
 	{
-		return this.size;
-	}
-	
-	/**
-	 * TODO: Character Size class (remove this method)
-	 *
-	 * @param {int} value
-	 */
-	set sizeModifier(value)
-	{
-		this.size = value;
+		return this.size.modifier;
 	}
 	
 	/**

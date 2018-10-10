@@ -4,17 +4,23 @@
 export default class Character
 {
 	/**
-	 * @param {General} general
+	 * Create a new character.
+	 *
+	 * @param {General}   general
+	 * @param {Size}      size
 	 * @param {Abilities} abilities
-	 * @param {Defense} defense
-	 * @param {Offense} offense
-	 * @param {Skills} skills
+	 * @param {Defense}   defense
+	 * @param {Offense}   offense
+	 * @param {Skills}    skills
 	 */
-	constructor(general, abilities, defense)
+	constructor(general, size, abilities, defense, offense, skills)
 	{
-		this.general = general;
+		this.general   = general;
+		this.size      = size;
 		this.abilities = abilities;
-		this.defense = defense;
+		this.defense   = defense;
+		this.offense   = offense;
+		this.skills    = skills;
 	}
 	
 	get name()

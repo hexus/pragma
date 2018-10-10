@@ -6,12 +6,14 @@ export default class CombatManeuverDefense
 	/**
 	 * Create a new combat maneuver defense score.
 	 *
-	 * @param {int}     baseAttackBonus - Base attack bonus
-	 * @param {Ability} str             - Strength ability
-	 * @param {Ability} dex             - Dexterity ability
-	 * @param {int}     size            - Size modifier
-	 * @param {int}     [miscModifier]  - Miscellaneous CMD modifier
-	 * @param {int}     [tempModifier]  - Temporary CMD modifier
+	 * TODO: BAB object with a score attached. References for the win.
+	 *
+	 * @param {int}     baseAttackBonus - Base attack bonus.
+	 * @param {Ability} str             - Strength ability.
+	 * @param {Ability} dex             - Dexterity ability.
+	 * @param {Size}    size            - Character size.
+	 * @param {int}     [miscModifier]  - Miscellaneous CMD modifier.
+	 * @param {int}     [tempModifier]  - Temporary CMD modifier.
 	 */
 	constructor(baseAttackBonus, str, dex, size, miscModifier, tempModifier)
 	{
@@ -23,24 +25,34 @@ export default class CombatManeuverDefense
 		this.tempModifier = tempModifier;
 	}
 	
+	/**
+	 * TODO: Refactor abilities to provide this value easily
+	 *
+	 * @returns {number}
+	 */
 	get strModifier()
 	{
 		return this.str.tempModifier || this.str.modifier;
 	}
 	
+	/**
+	 * TODO: Refactor abilities to provide this value easily
+	 *
+	 * @returns {number}
+	 */
 	get dexModifier()
 	{
 		return this.dex.tempModifier || this.dex.modifier;
 	}
 	
+	/**
+	 * Special size modifier.
+	 *
+	 * @returns {number}
+	 */
 	get sizeModifier()
 	{
-		return this.size;
-	}
-	
-	set sizeModifier(value)
-	{
-		this.size = value;
+		return this.size.specialModifier;
 	}
 	
 	get total()

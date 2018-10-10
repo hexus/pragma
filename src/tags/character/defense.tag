@@ -40,7 +40,7 @@
 			+
 			<input type="number" name="armorClass.abilityModifier" min="-60" max="60" step="1" value="{ defense.armorClass.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
-			<input type="number" name="armorClass.sizeModifier" min="-100" max="100" step="1" value="{ defense.armorClass.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="armorClass.sizeModifier" min="-100" max="100" step="1" value="{ defense.armorClass.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
 			<input type="number" name="armorClass.naturalArmor" min="-100" max="100" step="1" value="{ defense.armorClass.naturalArmor }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+
@@ -94,7 +94,7 @@
 			+
 			<input type="number" name="combatManeuverDefense.dexModifier" min="-60" max="60" step="1" value="{ defense.combatManeuverDefense.dexModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
-			<input type="number" name="combatManeuverDefense.sizeModifier" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			<input type="number" name="combatManeuverDefense.sizeModifier" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.sizeModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
 			+
 			<input type="number" name="combatManeuverDefense.miscModifier" min="-100" max="100" step="1" value="{ defense.combatManeuverDefense.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
 			+

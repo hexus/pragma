@@ -1,7 +1,7 @@
 export default {
 	characters: {
 		1: {
-			strict: true,
+			processing: 'processed',
 			general: {
 				name: 'Shade',
 				alignment: 'Chaotic Neutral',

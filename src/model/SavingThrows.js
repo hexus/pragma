@@ -11,7 +11,7 @@ export default class SavingThrows
 	 * @param {Abilities} abilities - Character abilities
 	 * @param {int}       fort      - Base fortitude save
 	 * @param {int}       ref       - Base reflex save
-	 * @param {int}      will      - Base will save
+	 * @param {int}       will      - Base will save
 	 */
 	constructor(abilities, fort, ref, will)
 	{

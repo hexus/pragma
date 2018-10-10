@@ -32,12 +32,15 @@ export default {
 		 * Clamp a value but allow it to remain an empty string.
 		 *
 		 * @param {string|number} value
-		 * @param {number}        min
-		 * @param {number}        max
+		 * @param {string|number} min
+		 * @param {string|number} max
 		 * @return {string|number}
 		 */
 		clamp: function (value, min, max) {
-			return value !== '' ? clamp(value, min, max) : '';
+			if (value === '')
+				return '';
+			
+			return clamp(value, min, max);
 		},
 		
 		/**
