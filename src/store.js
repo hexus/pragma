@@ -131,11 +131,7 @@ export default {
 					tempModifier: 0
 				}
 			},
-			bonuses: {
-				abilities: [
-				
-				]
-			}
+			bonuses: []
 		},
 		2: {
 			strict: true,

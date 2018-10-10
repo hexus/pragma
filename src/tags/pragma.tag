@@ -18,10 +18,10 @@
 				Permissive <!-- Free editing -->
 			</label>
 
-			<label>
-				<input type="radio" name="processing" checked="{ sheet.processing === 'propagated' }" value="propagated" onchange="{ onProcessingChange }"/>
-				Propagated <!-- Value propagation -->
-			</label>
+			<!--<label>-->
+				<!--<input type="radio" name="processing" checked="{ sheet.processing === 'propagated' }" value="propagated" onchange="{ onProcessingChange }"/>-->
+				<!--Propagated &lt;!&ndash; Value propagation &ndash;&gt;-->
+			<!--</label>-->
 
 			<label>
 				<input type="radio" name="processing" checked="{ sheet.processing === 'processed' }" value="processed" onchange="{ onProcessingChange }"/>
@@ -37,26 +37,27 @@
 		import clone from 'lodash/cloneDeep';
 		import set from 'lodash/set';
 
-		// Application state, services and domain logic
+		// Application
 		let app = this.opts.app;
 
+		// State
 		let state = app.state;
 		let store = app.store;
 
+		// Services
 		let factory = app.services.factory;
 		let processor = app.services.processor;
 
+		// Domain model
 		let character = state.character || factory.create();
-
-		this.sheet = clone(state.sheet);
 
 		// Methods
 		this.process = function () {
-			//this.sheet = clone(state.sheet);
+			this.sheet = clone(state.sheet);
 
 			if (this.sheet.processing === 'processed') {
 				processor.process(character, this.sheet);
-			} else if (this.sheet.strict === 'propagated') {
+			} else if (this.sheet.processing === 'propagated') {
 				processor.propagate(this.sheet);
 			}
 		};
@@ -71,8 +72,6 @@
 		this.onProcessingChange = function (event) {
 			state.sheet.processing = event.currentTarget.value;
 			this.sheet.processing = event.currentTarget.value;
-
-			this.process();
 		};
 
 		/**
@@ -86,9 +85,11 @@
 		this.onCharacterEdit = function (event) {
 			console.log(event);
 
-			let { name, value } = event.detail;
+			let { name, value, input } = event.detail;
 
 			// TODO: Cast on dispatch, include rawValue property
+			if (input.type === 'number')
+				value = parseFloat(value);
 
 			set(state.sheet, name, value);
 			set(this.sheet, name, value);

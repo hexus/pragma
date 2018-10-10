@@ -78,6 +78,7 @@ export default class CharacterSheetProcessor
 	 *
 	 * @param {Character}      character - The character model
 	 * @param {CharacterSheet} sheet     - The character sheet data
+	 * @return {CharacterSheet}
 	 */
 	process(character, sheet)
 	{
@@ -94,6 +95,8 @@ export default class CharacterSheetProcessor
 		// allows us to see propagated values without them being modelled
 		// TODO: Remove this when modelling is complete
 		this.propagate(sheet);
+		
+		return sheet;
 	}
 	
 	/**
@@ -134,9 +137,9 @@ export default class CharacterSheetProcessor
 		
 		each(character.defense.saves, (save, name) => {
 			save.base          = get(sheet, `defense.saves.${name}.base`);
-			save.magicModifier = get(sheet, `defense.saves.${name}.base`);
-			save.miscModifier  = get(sheet, `defense.saves.${name}.base`);
-			save.tempModifier  = get(sheet, `defense.saves.${name}.base`);
+			save.magicModifier = get(sheet, `defense.saves.${name}.magicModifier`);
+			save.miscModifier  = get(sheet, `defense.saves.${name}.miscModifier`);
+			save.tempModifier  = get(sheet, `defense.saves.${name}.tempModifier`);
 		});
 		
 		character.defense.combatManeuverDefense.baseAttackBonus = sheet.offense.baseAttackBonus;
