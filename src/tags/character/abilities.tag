@@ -14,8 +14,8 @@
 	</fieldset>
 
 	<script>
-		// <input type=number/> fails to compile in a webpack production bundle;
-		// can't use one with an expression value attribute, using default minification
+		// <input type="number" value="{ expression }"/> fails to compile in a webpack production bundle;
+		// can't use one with an expression value attribute while using default minification
 
 		import util from '../../mixins/util';
 		import get from 'lodash/get';
