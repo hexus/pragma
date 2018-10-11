@@ -10,6 +10,8 @@ const data = {
 	
 	/**
 	 * Creature sizes data set.
+	 *
+	 * @see {@link http://www.d20pfsrd.com/basics-ability-scores/glossary/#Size}
 	 */
 	sizes: {
 		fine: {
