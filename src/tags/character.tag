@@ -1,6 +1,6 @@
 <character>
 	<general general="{ character.general }"></general>
-	<!-- TODO: Size -->
+	<size type="{ character.size.type }"></size>
 	<!-- TODO: Classes -->
 	<abilities abilities="{ character.abilities }" strict="{ opts.strict }"></abilities>
 	<defense defense="{ character.defense }" strict="{ opts.strict }"></defense>
@@ -9,6 +9,7 @@
 
 	<script>
 		import './character/general.tag';
+		import './character/size.tag';
 		import './character/abilities.tag';
 		import './character/defense.tag';
 		import './character/offense.tag';

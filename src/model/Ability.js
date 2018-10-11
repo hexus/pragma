@@ -1,7 +1,10 @@
 import AbilityScore from './AbilityScore';
+import { util } from '../mixins/util';
 
 /**
  * A character ability.
+ *
+ * TODO: Refactor to just have baseScore and tempBonus properties
  */
 export default class Ability
 {
@@ -43,6 +46,14 @@ export default class Ability
 	 * @returns {int}
 	 */
 	get modifier()
+	{
+		return util.isNumeric(this.tempScore) ? this.tempModifier : this.baseModifier;
+	}
+	
+	/**
+	 * @returns {int}
+	 */
+	get baseModifier()
 	{
 		return this.abilityScore.modifier;
 	}

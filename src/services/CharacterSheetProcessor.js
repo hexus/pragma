@@ -21,6 +21,19 @@ export default class CharacterSheetProcessor
 	}
 	
 	/**
+	 * Build a propagation map from any bonuses that affect propagations.
+	 *
+	 * @param {CharacterSheet} sheet
+	 * @returns {Object}
+	 */
+	buildBonusPropagationMap(sheet)
+	{
+		// TODO: Build dynamic propagations from bonuses, when bonuses are a thing
+		
+		return {};
+	}
+	
+	/**
 	 * Get the propagation map for character sheet values.
 	 *
 	 * Keyed by target property path, where values are a single or multiple
@@ -35,10 +48,8 @@ export default class CharacterSheetProcessor
 	 */
 	getPropagationMap(sheet)
 	{
-		// Merge the base propagation map with the character sheet's map
-		return merge(propagationMap, sheet.propagationMap);
-		
-		// TODO: Build dynamic propagations from bonuses
+		// Merge the base map, character sheet map and bonuses map
+		return merge(propagationMap, sheet.propagationMap, this.buildBonusPropagationMap(sheet));
 	}
 	
 	/**
@@ -55,17 +66,26 @@ export default class CharacterSheetProcessor
 		for (target in propagationMap) {
 			source = propagationMap[target];
 			
+			// String values are a simple copy
 			if (typeof source === 'string') {
 				set(sheet, target, get(sheet, source));
 				continue;
 			}
 			
+			// With arrays, we load each value consecutively, checking whether
+			// they actually are values and using the last that we find
 			if (Array.isArray(source) && source.length > 0) {
 				let i;
 				let value = null;
+				let nextValue = null;
 				
 				for (i = 0; i < source.length; i++) {
-					value = get(sheet, source[i]) || value;
+					nextValue = get(sheet, source[i]);
+					
+					// Use the next value found if it's actually a value (if it's not ugly)
+					if (nextValue !== undefined && nextValue !== null && !isNaN(nextValue)) {
+						value = nextValue;
+					}
 				}
 				
 				set(sheet, target, value);

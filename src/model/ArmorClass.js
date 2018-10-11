@@ -30,13 +30,11 @@ export default class ArmorClass
 	/**
 	 * Ability modifier.
 	 *
-	 * TODO: Refactor abilities to provide this value easily
-	 *
 	 * @return {int}
 	 */
 	get abilityModifier()
 	{
-		return this.ability.tempModifier || this.ability.modifier;
+		return this.ability.modifier;
 	}
 	
 	/**

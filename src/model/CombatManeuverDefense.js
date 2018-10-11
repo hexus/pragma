@@ -26,23 +26,23 @@ export default class CombatManeuverDefense
 	}
 	
 	/**
-	 * TODO: Refactor abilities to provide this value easily
+	 * Strength modifier.
 	 *
 	 * @returns {number}
 	 */
 	get strModifier()
 	{
-		return this.str.tempModifier || this.str.modifier;
+		return this.str.modifier;
 	}
 	
 	/**
-	 * TODO: Refactor abilities to provide this value easily
+	 * Dexterity modifier.
 	 *
 	 * @returns {number}
 	 */
 	get dexModifier()
 	{
-		return this.dex.tempModifier || this.dex.modifier;
+		return this.dex.modifier;
 	}
 	
 	/**

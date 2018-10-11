@@ -24,13 +24,13 @@ export default class SavingThrow
 	}
 	
 	/**
-	 * TODO: Refactor abilities to provide this value easily
+	 * Ability modifier.
 	 *
 	 * @returns {number}
 	 */
 	get abilityModifier()
 	{
-		return this.ability.tempModifier || this.ability.modifier;
+		return this.ability.modifier;
 	}
 	
 	/**

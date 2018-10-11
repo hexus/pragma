@@ -98,7 +98,7 @@
 			// TODO: Timeout to update store.sheet with cloned state.sheet
 		};
 
-		// Event handlers
+		// Observables
 		this.on('mount', function () {
 			this.update();
 		});

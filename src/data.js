@@ -64,7 +64,7 @@ const data = {
 			flyModifier:     -2,
 			stealthModifier: -4,
 			space:           0.5,
-			reach:           0
+			reach:           10
 		},
 		huge: {
 			name:            'Huge',
@@ -73,7 +73,7 @@ const data = {
 			flyModifier:     -4,
 			stealthModifier: -8,
 			space:           0.5,
-			reach:           0
+			reach:           15
 		},
 		gargantuan: {
 			name:            'Gargantuan',
@@ -82,7 +82,7 @@ const data = {
 			flyModifier:     -6,
 			stealthModifier: -12,
 			space:           0.5,
-			reach:           0
+			reach:           20
 		},
 		colossal: {
 			name:            'Colossal',
@@ -91,7 +91,7 @@ const data = {
 			flyModifier:     -8,
 			stealthModifier: -16,
 			space:           0.5,
-			reach:           0
+			reach:           30
 		}
 	},
 	

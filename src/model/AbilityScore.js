@@ -1,4 +1,5 @@
 import clamp from 'lodash/clamp';
+import { util } from '../mixins/util';
 
 /**
  * A character ability score.
@@ -15,7 +16,7 @@ export default class AbilityScore
 		/**
 		 * @type {?int}
 		 */
-		this.score = score ? clamp(score, -60, 60) : null;
+		this.score = util.isNumeric(score) ? clamp(score, -60, 60) : null;
 	}
 	
 	/**
@@ -23,9 +24,14 @@ export default class AbilityScore
 	 */
 	get modifier()
 	{
-		if (!this.score)
+		if (!util.isNumeric(this.score))
 			return null;
 		
-		return Math.floor((this.score / 2) - 5);
+		let modifier = Math.floor((this.score / 2) - 5);
+		
+		if (!util.isNumeric(modifier))
+			return null;
+		
+		return modifier;
 	}
 }
