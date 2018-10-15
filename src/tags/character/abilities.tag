@@ -2,15 +2,25 @@
 	<fieldset>
 		<legend>Abilities</legend>
 
-		<p each="{ ability, name in abilities }">
-			<label>
-				<span>{ util.upperCase(name) }</span>
-				<input type="number" name="{ name + '.score' }" min="0" max="60" step="1" value="{ ability.score }" onkeyup="{ edit }" onchange="{ edit }" />
-			</label>
-			<input type="number" name="{ name + '.modifier' }" min="-5" max="25" step="1" value="{ ability.modifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }" />
-			<input type="number" name="{ name + '.temp' }" min="0" max="60" step="1" value="{ ability.temp }" onkeyup="{ edit }" onchange="{ edit }" />
-			<input type="number" name="{ name + '.tempModifier' }" min="-5" max="25" step="1" value="{ ability.tempModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }" />
-		</p>
+		<table>
+			<tr each="{ ability, name in abilities }">
+				<th>
+					<span>{ util.upperCase(name) }</span>
+				</th>
+				<td>
+					<input type="number" name="{ name + '.score' }" min="0" max="60" step="1" value="{ ability.score }" onkeyup="{ edit }" onchange="{ edit }" />
+				</td>
+				<td>
+					<input type="number" name="{ name + '.modifier' }" min="-5" max="25" step="1" value="{ ability.modifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }" />
+				</td>
+				<td>
+					<input type="number" name="{ name + '.temp' }" min="0" max="60" step="1" value="{ ability.temp }" onkeyup="{ edit }" onchange="{ edit }" />
+				</td>
+				<td>
+					<input type="number" name="{ name + '.tempModifier' }" min="-5" max="25" step="1" value="{ ability.tempModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }" />
+				</td>
+			</tr>
+		</table>
 	</fieldset>
 
 	<script>
