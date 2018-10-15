@@ -93,9 +93,24 @@ export default {
 					}
 				},
 				resistances: {
-					cold: 5,
-					fire: 5,
-					electricity: 15
+					cold: {
+						total: 5,
+						base: 5,
+						miscModifier: 0,
+						tempModifier: 0
+					},
+					fire: {
+						total: 5,
+						base: 5,
+						miscModifier: 5,
+						tempModifier: 5
+					},
+					electricity: {
+						total: 15,
+						base: 5,
+						miscModifier: 0,
+						tempModifier: 0
+					}
 				},
 				combatManeuverDefense: {
 					total: 14,

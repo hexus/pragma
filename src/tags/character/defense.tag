@@ -63,24 +63,46 @@
 			</label>
 		</p>
 
-		<p each="{ save, name in defense.saves }">
-			<label>
-				<span>{ util.titleCase(name) }</span>
-				<input type="number" name="{ 'saves.' + name + '.total' }" min="0" max="100" value="{ save.total }" onkeyup="{ edit }" onchange="{ edit }"/>
-			</label>
-			=
-			<input type="number" name="{ 'saves.' + name + '.base' }" min="0" max="100" step="1" value="{ save.base }" onkeyup="{ edit }" onchange="{ edit }"/>
-			+
-			<input type="number" name="{ 'saves.' + name + '.abilityModifier' }" min="-60" max="60" step="1" value="{ save.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
-			+
-			<input type="number" name="{ 'saves.' + name + '.magicModifier' }" min="0" max="100" step="1" value="{ save.magicModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
-			+
-			<input type="number" name="{ 'saves.' + name + '.miscModifier' }" min="0" max="100" step="1" value="{ save.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
-			+
-			<input type="number" name="{ 'saves.' + name + '.tempModifier' }" min="0" max="100" step="1" value="{ save.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
-		</p>
+		<fieldset>
+			<!-- TODO: Some kind of table, methinks -->
+			<legend>Saving throws</legend>
+
+			<p each="{ save, name in defense.saves }">
+				<label>
+					<span>{ util.titleCase(name) }</span>
+					<input type="number" name="{ 'saves.' + name + '.total' }" min="0" max="100" value="{ save.total }" onkeyup="{ edit }" onchange="{ edit }"/>
+				</label>
+				=
+				<input type="number" name="{ 'saves.' + name + '.base' }" min="-100" max="100" step="1" value="{ save.base }" onkeyup="{ edit }" onchange="{ edit }"/>
+				+
+				<input type="number" name="{ 'saves.' + name + '.abilityModifier' }" min="-60" max="60" step="1" value="{ save.abilityModifier }" onkeyup="{ edit }" onchange="{ edit }" disabled="{ opts.strict }"/>
+				+
+				<input type="number" name="{ 'saves.' + name + '.magicModifier' }" min="-100" max="100" step="1" value="{ save.magicModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+				+
+				<input type="number" name="{ 'saves.' + name + '.miscModifier' }" min="-100" max="100" step="1" value="{ save.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+				+
+				<input type="number" name="{ 'saves.' + name + '.tempModifier' }" min="-100" max="100" step="1" value="{ save.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+			</p>
+		</fieldset>
 
 		<!-- TODO: Resistances, immunities -->
+		<fieldset>
+			<legend>Resistances, immunities and vulnerabilities</legend>
+			<virtual if="{ defense.resistances }">
+				<p each="{ resistance, name in defense.resistances }">
+					<label>
+						<span>{ util.titleCase(name) }</span>
+						<input type="number" name="{ 'resistances.' + name + '.total'}" min="0" max="100" step="1" value="{ resistance.total }" onkeyup="{ edit }" onchange="{ edit }"/>
+					</label>
+					=
+					<input type="number" name="{ 'resistances.' + name + '.base'}" min="-100" max="100" step="1" value="{ resistance.base }" onkeyup="{ edit }" onchange="{ edit }"/>
+					+
+					<input type="number" name="{ 'resistances.' + name + '.miscModifier'}" min="-100" max="100" step="1" value="{ resistance.miscModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+					+
+					<input type="number" name="{ 'resistances.' + name + '.tempModifier'}" min="-100" max="100" step="1" value="{ resistance.tempModifier }" onkeyup="{ edit }" onchange="{ edit }"/>
+				</p>
+			</virtual>
+		</fieldset>
 
 		<p>
 			<label>
