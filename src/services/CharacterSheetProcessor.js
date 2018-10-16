@@ -122,7 +122,7 @@ export default class CharacterSheetProcessor
 	/**
 	 * Update a character model from the given sheet data.
 	 *
-	 * // TODO: It would be AWESOME if these could become a straight up list for get/set.
+	 * TODO: It would be AWESOME if these could become a straight up list for get/set.
 	 *
 	 * @param {Character}      character - The character model to update.
 	 * @param {CharacterSheet} sheet     - The sheet data to update from.

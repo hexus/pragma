@@ -64,7 +64,6 @@
 		</p>
 
 		<fieldset>
-			<!-- TODO: Some kind of table, methinks -->
 			<legend>Saving throws</legend>
 
 			<table>
@@ -94,9 +93,8 @@
 			</table>
 		</fieldset>
 
-		<!-- TODO: Resistances, immunities -->
 		<fieldset>
-			<legend>Resistances, immunities and vulnerabilities</legend>
+			<legend>Resistances</legend>
 			<table if="{ defense.resistances }">
 				<tr each="{ resistance, name in defense.resistances }">
 					<th>
@@ -117,6 +115,8 @@
 				</tr>
 			</table>
 		</fieldset>
+
+		<!-- TODO: Immunities & vulnerabilities -->
 
 		<p>
 			<label>

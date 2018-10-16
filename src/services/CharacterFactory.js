@@ -6,6 +6,7 @@ import Defense from '../model/Defense';
 import HitPoints from '../model/HitPoints';
 import ArmorClass from '../model/ArmorClass';
 import SavingThrows from '../model/SavingThrows';
+import Resistances from '../model/Resistances';
 import CombatManeuverDefense from "../model/CombatManeuverDefense";
 
 /**
@@ -33,7 +34,7 @@ export default class CharacterFactory
 					abilities.dex, size, 0, 0, 0, 0, 0, 0
 				),
 				new SavingThrows(abilities, 0, 0, 0),
-				null,
+				new Resistances(),
 				new CombatManeuverDefense(0, abilities.str, abilities.dex, size, 0, 0)
 			),
 			null,

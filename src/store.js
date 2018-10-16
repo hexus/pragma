@@ -106,8 +106,14 @@ export default {
 						tempModifier: 5
 					},
 					electricity: {
-						total: 15,
+						total: 25,
 						base: 5,
+						miscModifier: 20,
+						tempModifier: 0
+					},
+					acid: {
+						total: 0,
+						base: 0,
 						miscModifier: 0,
 						tempModifier: 0
 					}
