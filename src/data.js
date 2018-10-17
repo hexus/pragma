@@ -1,6 +1,11 @@
-//import Class from './domain/Class';
+import dictionary from './data/dictionary';
 
 const data = {
+	/**
+	 * Character sheet property dictionary.
+	 */
+	dictionary: dictionary,
+	
 	/**
 	 * Character classes data set.
 	 */

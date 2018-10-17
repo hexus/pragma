@@ -1,3 +1,5 @@
+import buildDictionaryFrom from '../model/functions/buildDictionaryFrom';
+
 /**
  * TODO: Worth splitting these out to separate files and composing them here, then processing, regardless of settling on flat or nested structure.
  * TODO: Consider defining UI layout somewhere else.
@@ -76,6 +78,10 @@ const properties = [
 		name: 'Abilities'
 	},
 	{
+		path: 'abilities.str',
+		name: 'Strength'
+	},
+	{
 		path: 'abilities.str.score'
 		// TODO: Derivations when base score is a thing
 	},
@@ -86,6 +92,10 @@ const properties = [
 			value:     'abilityModifier',
 			arguments: ['abilities.str.score']
 		}
+	},
+	{
+		path: 'abilities.dex',
+		name: 'Dexterity'
 	},
 	{
 		path: 'abilities.dex.score'
@@ -100,6 +110,10 @@ const properties = [
 		}
 	},
 	{
+		path: 'abilities.con',
+		name: 'Constitution'
+	},
+	{
 		path: 'abilities.con.score'
 		// TODO: Derivations when base score is a thing
 	},
@@ -110,6 +124,10 @@ const properties = [
 			value:     'abilityModifier',
 			arguments: ['abilities.con.score']
 		}
+	},
+	{
+		path: 'abilities.int',
+		name: 'Intelligence'
 	},
 	{
 		path: 'abilities.int.score'
@@ -124,6 +142,10 @@ const properties = [
 		}
 	},
 	{
+		path: 'abilities.wis',
+		name: 'Wisdom'
+	},
+	{
 		path: 'abilities.wis.score'
 		// TODO: Derivations when base score is a thing
 	},
@@ -134,6 +156,10 @@ const properties = [
 			value:     'abilityModifier',
 			arguments: ['abilities.wis.score']
 		}
+	},
+	{
+		path: 'abilities.cha',
+		name: 'Charisma'
 	},
 	{
 		path: 'abilities.cha.score'
@@ -148,6 +174,12 @@ const properties = [
 		}
 	},
 	{
+		path: 'defense',
+		type: 'group',
+		name: 'Defense',
+		descriptions: 'Defense statistics'
+	},
+	{
 		path: 'defense.hitPoints',
 		type: 'group',
 		name: 'Hit Points'
@@ -157,7 +189,7 @@ const properties = [
 		derivation: {
 			type:      'interpolated',
 			value:     'min',
-			arguments: ['self', 'defense.hitPoints.total']
+			arguments: ['this', 'defense.hitPoints.total']
 		}
 	},
 	{
@@ -186,16 +218,7 @@ const properties = [
  * @see CharacterSheet
  * @type {Dictionary}
  */
-const dictionary = {};
-
-// Generate a flat dictionary from the properties
-// TODO: DictionaryProcessor class
-for (let i = 0; i < properties.length; i++) {
-	if (!properties[i] || !properties[i].path)
-		continue;
-	
-	dictionary[properties[i].path] = properties[i];
-}
+const dictionary = buildDictionaryFrom(properties);
 
 export default dictionary;
 
