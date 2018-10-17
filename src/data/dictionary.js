@@ -155,6 +155,9 @@ export default dictionary;
  * e.g:
  * property {string} name
  * property {string} description
+ * property {boolean} [set=false] - whether this is a set of dictionaries
+ * property {string} [focus] - path of property to focus the group on (ability score or AC for example, which could group by derivation)
+ * property {string|string[]} [subFocus] - paths of properties to sit next to the focus property (ability modifier for example)
  * property {Dictionary|DictionaryItems} items
  *
  * @typedef {Array<DictionaryItem>} Dictionary
@@ -171,7 +174,7 @@ export default dictionary;
  * @property {string}     [name]        - The property's name. Defaults to a title-case translation of the path's leaf.
  * @property {string}     [elaboration] - An elaboration on the property's name. Defaults to `null`.
  * @property {string}     [description] - The property's description. Defaults to `null`.
- * @property {boolean}    [store]       - Whether to store the property. Defaults to `true`.
+ * @property {boolean}    [store=true]  - Whether to store the property. Defaults to `true`.
  * @property {*}          [default]     - The property's default value. Defaults as appropriate to the type.
  * @property {Derivation} [derivation]  - The property's processing definition. If one exists, this property won't have an editable input.
  * @property {number}     [min]         - The minimum value of the property if the type is `'number'`.
