@@ -167,12 +167,13 @@ export default dictionary;
  *
  * @property {string}     path          - The path fragment that matches this property.
  * @property {string}     [type]        - The type of the property. Defaults to `'number'`.
- * @property {string}     [input]       - The preferred input type of the property, if any. 'none' shows the value without an input, 'hidden' hides this property.
+ * @property {string}     [input]       - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.
  * @property {string}     [name]        - The property's name. Defaults to a title-case translation of the path's leaf.
  * @property {string}     [elaboration] - An elaboration on the property's name. Defaults to `null`.
- * @property {string}     [description] - The property's description. Defaults to 'null'.
+ * @property {string}     [description] - The property's description. Defaults to `null`.
+ * @property {boolean}    [store]       - Whether to store the property. Defaults to `true`.
  * @property {*}          [default]     - The property's default value. Defaults as appropriate to the type.
- * @property {Derivation} [derivation]  - The property's processing definition.
+ * @property {Derivation} [derivation]  - The property's processing definition. If one exists, this property won't have an editable input.
  * @property {number}     [min]         - The minimum value of the property if the type is `'number'`.
  * @property {number}     [max]         - The maximum value of the property if the type is `'number'`.
  * @property {number}     [step]        - The step value of the property if the type is `'number'`.

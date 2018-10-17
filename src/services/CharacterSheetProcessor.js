@@ -10,7 +10,7 @@ import { propagationMap } from '../data/maps';
  *
  * Processes sheets through a character model.
  *
- * TODO: Interpolate > Propagate > Summate > Interpolate
+ * TODO: Propagate > Summate > Interpolate
  */
 export default class CharacterSheetProcessor
 {
