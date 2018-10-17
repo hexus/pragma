@@ -3,6 +3,7 @@
  *
  * Adapted from cognitom's Riot mixin pack.
  *
+ * @mixin
  * @see {@link https://github.com/cognitom/riot-mixin-pack}
  */
 export default {

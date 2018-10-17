@@ -54,6 +54,9 @@ const util = {
 	}
 };
 
+/**
+ * @mixin
+ */
 export default {
 	util: util
 };

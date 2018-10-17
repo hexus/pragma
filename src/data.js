@@ -110,27 +110,6 @@ const data = {
 	spells: {
 	
 	},
-	
-	/**
-	 * Property propagation map.
-	 *
-	 * Maps properties that propagate to other properties.
-	 *
-	 * Keys are target properties, and values are one or more source properties.
-	 *
-	 * The keys of this map happen to denote properties that, as a result of propagation, should have disabled inputs.
-	 */
-	propagationMap: {
-		'defense.armorClass.abilityModifier':          ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
-		'defense.combatManeuverDefense.strModifier':   ['abilities.str.modifier', 'abilities.str.tempModifier'],
-		'defense.combatManeuverDefense.dexModifier':   ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
-		'defense.saves.fortitude.abilityModifier':     ['abilities.con.modifier', 'abilities.con.tempModifier'],
-		'defense.saves.reflex.abilityModifier':        ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
-		'defense.saves.will.abilityModifier':          ['abilities.wis.modifier', 'abilities.wis.tempModifier', ],
-		'offense.combatManeuverBonus.baseAttackBonus': 'offense.baseAttackBonus',
-		'offense.combatManeuverBonus.abilityModifier': ['abilities.str.modifier', 'abilities.str.tempModifier', ],
-		'offense.initiative.abilityModifier':          ['abilities.dex.modifier', 'abilities.dex.tempModifier'],
-	}
 };
 
 export default data;

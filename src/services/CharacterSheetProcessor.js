@@ -3,12 +3,14 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import each from 'lodash/each';
 import merge from 'lodash/merge';
-import { propagationMap } from '../data';
+import { propagationMap } from '../data/maps';
 
 /**
  * A character sheet processor.
  *
  * Processes sheets through a character model.
+ *
+ * TODO: Interpolate > Propagate > Summate > Interpolate
  */
 export default class CharacterSheetProcessor
 {
@@ -272,7 +274,7 @@ export default class CharacterSheetProcessor
 /**
  * Character sheet data structure.
  *
- * // TODO: Rename general to background?
+ * // TODO: Rename general to background, profile or basics?
  *
  * @typedef {Object} CharacterSheet
  *

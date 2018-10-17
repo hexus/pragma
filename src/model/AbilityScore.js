@@ -1,4 +1,5 @@
 import clamp from 'lodash/clamp';
+import abilityModifier from './functions/abilityModifier';
 import { util } from '../mixins/util';
 
 /**
@@ -24,14 +25,6 @@ export default class AbilityScore
 	 */
 	get modifier()
 	{
-		if (!util.isNumeric(this.score))
-			return null;
-		
-		let modifier = Math.floor((this.score / 2) - 5);
-		
-		if (!util.isNumeric(modifier))
-			return null;
-		
-		return modifier;
+		return abilityModifier(this.score);
 	}
 }
