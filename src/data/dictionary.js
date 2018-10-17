@@ -1,16 +1,14 @@
 /**
- * A dictionary containing information about each property in a character sheet.
- *
- * Used for generating character sheets, processing maps and UI.
- *
- * TODO: Worth splitting these out and merging here, then processing, regardless of settling on flat or nested structure.
- *
- * @see CharacterSheet
- * @type {Dictionary}
+ * TODO: Worth splitting these out to separate files and composing them here, then processing, regardless of settling on flat or nested structure.
+ * TODO: Consider defining UI layout somewhere else.
  */
-import abilityModifier from "../model/functions/abilityModifier";
-
-const dictionary = [
+const properties = [
+	{
+		path:        'general',
+		type:        'group',
+		name:        'General',
+		description: 'General character information'
+	},
 	{
 		path:        'general.name',
 		type:        'string',
@@ -73,6 +71,11 @@ const dictionary = [
 		description: "The character's class"
 	},
 	{
+		path: 'abilities',
+		type: 'group',
+		name: 'Abilities'
+	},
+	{
 		path: 'abilities.str.score'
 		// TODO: Derivations when base score is a thing
 	},
@@ -80,7 +83,7 @@ const dictionary = [
 		path:       'abilities.str.modifier',
 		derivation: {
 			type:      'interpolated',
-			value:     abilityModifier,
+			value:     'abilityModifier',
 			arguments: ['abilities.str.score']
 		}
 	},
@@ -92,7 +95,7 @@ const dictionary = [
 		path:       'abilities.dex.modifier',
 		derivation: {
 			type:      'interpolated',
-			value:     abilityModifier,
+			value:     'abilityModifier',
 			arguments: ['abilities.dex.score']
 		}
 	},
@@ -104,7 +107,7 @@ const dictionary = [
 		path:       'abilities.con.modifier',
 		derivation: {
 			type:      'interpolated',
-			value:     abilityModifier,
+			value:     'abilityModifier',
 			arguments: ['abilities.con.score']
 		}
 	},
@@ -116,7 +119,7 @@ const dictionary = [
 		path:       'abilities.int.modifier',
 		derivation: {
 			type:      'interpolated',
-			value:     abilityModifier,
+			value:     'abilityModifier',
 			arguments: ['abilities.int.score']
 		}
 	},
@@ -128,7 +131,7 @@ const dictionary = [
 		path:       'abilities.wis.modifier',
 		derivation: {
 			type:      'interpolated',
-			value:     abilityModifier,
+			value:     'abilityModifier',
 			arguments: ['abilities.wis.score']
 		}
 	},
@@ -140,11 +143,59 @@ const dictionary = [
 		path:       'abilities.cha.modifier',
 		derivation: {
 			type:      'interpolated',
-			value:     abilityModifier,
+			value:     'abilityModifier',
 			arguments: ['abilities.cha.score']
 		}
 	},
+	{
+		path: 'defense.hitPoints',
+		type: 'group',
+		name: 'Hit Points'
+	},
+	{
+		path:       'defense.hitPoints.current',
+		derivation: {
+			type:      'interpolated',
+			value:     'min',
+			arguments: ['self', 'defense.hitPoints.total']
+		}
+	},
+	{
+		path:       'defense.hitPoints.total',
+		derivation: {
+			type:  'summated',
+			value: ['defense.hitPoints.base', 'defense.hitPoints.tempModifier']
+		}
+	},
+	{
+		path: 'defense.hitPoints.base',
+	},
+	{
+		path: 'defense.hitPoints.tempModifier'
+	},
+	{
+		path: 'defense.hitPoints.nonLethalDamage'
+	}
 ];
+
+/**
+ * A dictionary containing information about each property in a character sheet.
+ *
+ * Used for generating character sheets, processing maps and UI.
+ *
+ * @see CharacterSheet
+ * @type {Dictionary}
+ */
+const dictionary = {};
+
+// Generate a flat dictionary from the properties
+// TODO: DictionaryProcessor class
+for (let i = 0; i < properties.length; i++) {
+	if (!properties[i] || !properties[i].path)
+		continue;
+	
+	dictionary[properties[i].path] = properties[i];
+}
 
 export default dictionary;
 
@@ -160,7 +211,7 @@ export default dictionary;
  * property {string|string[]} [subFocus] - paths of properties to sit next to the focus property (ability modifier for example)
  * property {Dictionary|DictionaryItems} items
  *
- * @typedef {Array<DictionaryItem>} Dictionary
+ * @typedef {Object.<string, DictionaryItem>} Dictionary
  */
 
 /**
@@ -177,8 +228,8 @@ export default dictionary;
  * @property {boolean}    [store=true]  - Whether to store the property. Defaults to `true`.
  * @property {*}          [default]     - The property's default value. Defaults as appropriate to the type.
  * @property {Derivation} [derivation]  - The property's processing definition. If one exists, this property won't have an editable input.
- * @property {number}     [min]         - The minimum value of the property if the type is `'number'`.
- * @property {number}     [max]         - The maximum value of the property if the type is `'number'`.
+ * @property {number}     [min=-100]    - The minimum value of the property if the type is `'number'`. Defaults to -100.
+ * @property {number}     [max=100]     - The maximum value of the property if the type is `'number'`. Defaults to 100.
  * @property {number}     [step]        - The step value of the property if the type is `'number'`.
  */
 
