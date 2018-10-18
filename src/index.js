@@ -5,6 +5,7 @@ import './tags/playground.tag';
 
 import CharacterFactory from './services/CharacterFactory';
 import CharacterSheetProcessor from "./services/CharacterSheetProcessor";
+import PropertyProcessor from './services/PropertyProcessor';
 
 import data from './data';
 import store from './store';
@@ -21,7 +22,8 @@ let app = {
 	store: store,
 	services: {
 		factory: new CharacterFactory(),
-		processor: new CharacterSheetProcessor()
+		processor: new CharacterSheetProcessor(),
+		propertyProcessor: new PropertyProcessor()
 	}
 };
 

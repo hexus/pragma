@@ -1,10 +1,10 @@
-import dictionary from './data/dictionary';
+import properties from './data/properties';
 
 const data = {
 	/**
 	 * Character sheet property dictionary.
 	 */
-	dictionary: dictionary,
+	properties: properties,
 	
 	/**
 	 * Character classes data set.

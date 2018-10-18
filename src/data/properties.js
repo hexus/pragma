@@ -1,8 +1,14 @@
-import buildDictionaryFrom from '../model/functions/buildDictionaryFrom';
-
 /**
- * TODO: Worth splitting these out to separate files and composing them here, then processing, regardless of settling on flat or nested structure.
- * TODO: Consider defining UI layout somewhere else.
+ * A set of properties that define the structure of a Pathfinder Character Sheet.
+ *
+ * Used for generating character sheets, processing maps and UI.
+ *
+ * TODO: Worth splitting these out to separate files and composing them here.
+ * TODO: Consider defining UI layout somewhere else... maybe.
+ *
+ * @see {PropertyProcessor} for the {Property} schema
+ * @see CharacterSheet
+ * @type {Property[]}
  */
 const properties = [
 	{
@@ -60,6 +66,7 @@ const properties = [
 		description: "The character's eye color"
 	},
 	{
+		// TODO: This will need elaborating into multiple properties later on
 		path:        'race',
 		type:        'string',
 		name:        'Race',
@@ -79,6 +86,7 @@ const properties = [
 	},
 	{
 		path: 'abilities.str',
+		type: 'set',
 		name: 'Strength'
 	},
 	{
@@ -174,10 +182,10 @@ const properties = [
 		}
 	},
 	{
-		path: 'defense',
-		type: 'group',
-		name: 'Defense',
-		descriptions: 'Defense statistics'
+		path:         'defense',
+		type:         'group',
+		name:         'Defense',
+		description: 'Defense statistics'
 	},
 	{
 		path: 'defense.hitPoints',
@@ -210,60 +218,4 @@ const properties = [
 	}
 ];
 
-/**
- * A dictionary containing information about each property in a character sheet.
- *
- * Used for generating character sheets, processing maps and UI.
- *
- * @see CharacterSheet
- * @type {Dictionary}
- */
-const dictionary = buildDictionaryFrom(properties);
-
-export default dictionary;
-
-/**
- * A dictionary containing information about each property in a character sheet.
- *
- * TODO: Nested dictionaries to describe each section, or a separate dictionary?
- * e.g:
- * property {string} name
- * property {string} description
- * property {boolean} [set=false] - whether this is a set of dictionaries
- * property {string} [focus] - path of property to focus the group on (ability score or AC for example, which could group by derivation)
- * property {string|string[]} [subFocus] - paths of properties to sit next to the focus property (ability modifier for example)
- * property {Dictionary|DictionaryItems} items
- *
- * @typedef {Object.<string, DictionaryItem>} Dictionary
- */
-
-/**
- * The description of a character sheet property.
- *
- * @typedef {Object} DictionaryItem
- *
- * @property {string}     path          - The path fragment that matches this property.
- * @property {string}     [type]        - The type of the property. Defaults to `'number'`.
- * @property {string}     [input]       - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.
- * @property {string}     [name]        - The property's name. Defaults to a title-case translation of the path's leaf.
- * @property {string}     [elaboration] - An elaboration on the property's name. Defaults to `null`.
- * @property {string}     [description] - The property's description. Defaults to `null`.
- * @property {boolean}    [store=true]  - Whether to store the property. Defaults to `true`.
- * @property {*}          [default]     - The property's default value. Defaults as appropriate to the type.
- * @property {Derivation} [derivation]  - The property's processing definition. If one exists, this property won't have an editable input.
- * @property {number}     [min=-100]    - The minimum value of the property if the type is `'number'`. Defaults to -100.
- * @property {number}     [max=100]     - The maximum value of the property if the type is `'number'`. Defaults to 100.
- * @property {number}     [step]        - The step value of the property if the type is `'number'`.
- */
-
-/**
- * The derivation definition of a character sheet property.
- *
- * Describes how to derive the property's final value.
- *
- * @typedef {Object} Derivation
- *
- * @property {string}                type        - The derivation type. 'propagate', 'summate' or 'interpolate'.
- * @property {Function|array|string} value       - The derivation value. Describes how to propagate, summate or interpolate the value.
- * @property {Array<number|string>}  [arguments] - Constant values and property paths to become arguments to the derivation function, if the value is a function. Defaults to the entire character sheet.
- */
+export default properties;
