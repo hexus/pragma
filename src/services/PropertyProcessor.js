@@ -1,5 +1,8 @@
 import merge from 'lodash/merge';
+import defaults from 'lodash/defaultsDeep';
 import clone from 'lodash/cloneDeep';
+import get from 'lodash/get';
+import defaultTo from 'lodash/defaultTo';
 import { util } from '../mixins/util';
 import identity from 'lodash/identity';
 import sum from '../functions/sum';
@@ -15,7 +18,12 @@ import buildTreeFrom from '../functions/buildTreeFrom';
  */
 export default class PropertyProcessor
 {
-	constructor()
+	/**
+	 * Create a new property processor.
+	 *
+	 * @param {Object.<string, Function>} derivations - Functions to make available for property value derivations.
+	 */
+	constructor(derivations)
 	{
 		/**
 		 * Default values for each property type.
@@ -43,11 +51,22 @@ export default class PropertyProcessor
 		 *
 		 * @type {Object.<string, Function>}
 		 */
-		this.derivations = {
+		this.derivations = merge({
 			'copy': identity,
 			'sum': sum,
-			'min': min
+			'min': min,
+			'interpolate': identity // TODO: Actual interpolation/templating
+		}, derivations);
+		
+		/**
+		 * Typecasting functions.
+		 *
+		 * @type {Object.<string, Function>}
+		 */
+		this.casts = {
+			'number': x => parseFloat(x) || 0
 		};
+		
 	}
 	
 	/**
@@ -74,27 +93,14 @@ export default class PropertyProcessor
 			}
 			
 			// Tasty merge sandwiches, to retain the original reference
-			property = merge(property, this.defaultValues['*'], clone(property));
+			property = defaults(property, this.defaultValues['*']);
 			
 			if (this.defaultValues[property.type]) {
-				property = merge(property, this.defaultValues[property.type], clone(property));
+				property = defaults(property, this.defaultValues[property.type]);
 			}
 		}
 		
 		return properties;
-	}
-	
-	/**
-	 * Cast a value based on the property it belongs to.
-	 *
-	 * @param {Property} property
-	 * @param {*} value
-	 */
-	castValue(property, value)
-	{
-		// TODO: Implement
-
-		return value;
 	}
 	
 	/**
@@ -116,10 +122,43 @@ export default class PropertyProcessor
 	 *
 	 * @param {Property} property
 	 * @param {Object} data
+	 * @return {*} The derived value
 	 */
 	deriveValue(property, data)
 	{
+		let derivation = property.derivation;
+		let derivationArguments = derivation.arguments || [];
+		
+		let validFunction = !this.derivations[derivation.function] ||
+			typeof this.derivations[derivation.function] !== 'function';
+		
+		if (!validFunction) {
+			return defaultTo(property.default, null);
+		}
+		
+		// TODO: Extract argument processing, derive arguments from '{this}', etc.
+		let a, args = [];
+		
+		for (a = 0; a < derivationArguments.length; a++) {
+			args[a] = get(data, derivationArguments[a]);
+		}
+		
+		let value = this.derivations[derivation.function](...args);
+		
+		return defaultTo(value, defaultTo(property.default, null));
+	}
 	
+	/**
+	 * Cast a value based on the property it belongs to.
+	 *
+	 * @param {Property} property
+	 * @param {*} value
+	 */
+	castValue(property, value)
+	{
+		// TODO: Implement
+		
+		return value;
 	}
 	
 	buildDictionaryFrom(properties)
@@ -175,7 +214,6 @@ export default class PropertyProcessor
  *
  * @typedef {Object} Derivation
  *
- * @property {string}                type        - The derivation type. 'propagate', 'summate' or 'interpolate'.
- * @property {array|string}          value       - The derivation value. Describes how to propagate, summate or interpolate the value.
- * @property {Array<number|string>}  [arguments] - Constant values and property paths to become arguments to the derivation function, if the value is a function. Defaults to the entire character sheet.
+ * @property {string}                function    - The name of the function to apply.
+ * @property {Array<number|string>}  [arguments] - Constant values and property paths to become arguments to the function.
  */

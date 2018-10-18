@@ -13,7 +13,7 @@
 const properties = [
 	{
 		path:        'general',
-		type:        'group',
+		type:        'section',
 		name:        'General',
 		description: 'General character information'
 	},
@@ -82,12 +82,12 @@ const properties = [
 	},
 	{
 		path: 'abilities',
-		type: 'group',
+		type: 'section',
 		name: 'Abilities'
 	},
 	{
 		path: 'abilities.str',
-		type: 'set',
+		type: 'group',
 		name: 'Strength'
 	},
 	{
@@ -97,13 +97,13 @@ const properties = [
 	{
 		path:       'abilities.str.modifier',
 		derivation: {
-			type:      'interpolated',
-			value:     'abilityModifier',
+			function:  'abilityModifier',
 			arguments: ['abilities.str.score']
 		}
 	},
 	{
 		path: 'abilities.dex',
+		type: 'group',
 		name: 'Dexterity'
 	},
 	{
@@ -113,13 +113,13 @@ const properties = [
 	{
 		path:       'abilities.dex.modifier',
 		derivation: {
-			type:      'interpolated',
-			value:     'abilityModifier',
+			function:  'abilityModifier',
 			arguments: ['abilities.dex.score']
 		}
 	},
 	{
 		path: 'abilities.con',
+		type: 'group',
 		name: 'Constitution'
 	},
 	{
@@ -129,13 +129,13 @@ const properties = [
 	{
 		path:       'abilities.con.modifier',
 		derivation: {
-			type:      'interpolated',
-			value:     'abilityModifier',
+			function:  'abilityModifier',
 			arguments: ['abilities.con.score']
 		}
 	},
 	{
 		path: 'abilities.int',
+		type: 'group',
 		name: 'Intelligence'
 	},
 	{
@@ -145,13 +145,13 @@ const properties = [
 	{
 		path:       'abilities.int.modifier',
 		derivation: {
-			type:      'interpolated',
-			value:     'abilityModifier',
+			function:  'abilityModifier',
 			arguments: ['abilities.int.score']
 		}
 	},
 	{
 		path: 'abilities.wis',
+		type: 'group',
 		name: 'Wisdom'
 	},
 	{
@@ -161,13 +161,13 @@ const properties = [
 	{
 		path:       'abilities.wis.modifier',
 		derivation: {
-			type:      'interpolated',
-			value:     'abilityModifier',
+			function:  'abilityModifier',
 			arguments: ['abilities.wis.score']
 		}
 	},
 	{
 		path: 'abilities.cha',
+		type: 'group',
 		name: 'Charisma'
 	},
 	{
@@ -177,14 +177,13 @@ const properties = [
 	{
 		path:       'abilities.cha.modifier',
 		derivation: {
-			type:      'interpolated',
-			value:     'abilityModifier',
+			function:  'abilityModifier',
 			arguments: ['abilities.cha.score']
 		}
 	},
 	{
 		path:        'defense',
-		type:        'group',
+		type:        'section',
 		name:        'Defense',
 		description: 'Defense statistics'
 	},
@@ -196,16 +195,15 @@ const properties = [
 	{
 		path:       'defense.hitPoints.current',
 		derivation: {
-			type:      'interpolated',
-			value:     'min',
-			arguments: ['this', 'defense.hitPoints.total']
+			function:  'min',
+			arguments: ['defense.hitPoints.current', 'defense.hitPoints.total']
 		}
 	},
 	{
 		path:       'defense.hitPoints.total',
 		derivation: {
-			type:  'summated',
-			value: ['defense.hitPoints.base', 'defense.hitPoints.tempModifier']
+			function:  'sum',
+			arguments: ['defense.hitPoints.base', 'defense.hitPoints.tempModifier']
 		}
 	},
 	{
