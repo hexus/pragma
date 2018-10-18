@@ -1,7 +1,5 @@
 <playground>
-	<h3>Tree</h3>
-
-	<tree children="{ tree.children }"></tree>
+	<tree children="{ tree.children }" data="{ sheet }"></tree>
 
 	<script>
 		import './tree.tag';
@@ -17,6 +15,8 @@
 		let tree = processor.buildTreeFrom(dictionary);
 
 		this.tree = tree;
+
+		this.sheet = app.state.sheet;
 
 		console.log(this);
 	</script>
