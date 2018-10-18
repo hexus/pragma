@@ -6,7 +6,7 @@
 
 		const app = this.opts.app;
 
-		let properties = this.opts.app.data.properties;
+		let properties = app.data.properties;
 		let processor = app.services.propertyProcessor;
 
 		// TODO: Could just be one method couldn't it...
@@ -17,6 +17,17 @@
 		this.tree = tree;
 
 		this.sheet = app.state.sheet;
+
+		this.edit = function (event) {
+			let { path, value } = event.detail;
+
+			let property = dictionary[path];
+
+			// Processing
+			value = processor.deriveValue(property, value, this.sheet);
+
+			set(this.sheet, path, value);
+		};
 
 		console.log(this);
 	</script>

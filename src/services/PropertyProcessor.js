@@ -1,6 +1,5 @@
 import merge from 'lodash/merge';
 import defaults from 'lodash/defaultsDeep';
-import clone from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import defaultTo from 'lodash/defaultTo';
 import { util } from '../mixins/util';
@@ -61,6 +60,8 @@ export default class PropertyProcessor
 		/**
 		 * Typecasting functions.
 		 *
+		 * TODO: Strong casting functions
+		 *
 		 * @type {Object.<string, Function>}
 		 */
 		this.casts = {
@@ -120,20 +121,28 @@ export default class PropertyProcessor
 	/**
 	 * Derive a property's value from some data.
 	 *
-	 * @param {Property} property
-	 * @param {Object} data
+	 * @param {Property} property - The property to derive a value for
+	 * @param {*} value - The current value of the property
+	 * @param {Object} data - The data to derive derivation arguments from
 	 * @return {*} The derived value
 	 */
-	deriveValue(property, data)
+	deriveValue(property, value, data)
 	{
+		value = this.castValue(property, value);
+		
+		// Casting is all we need if there's no derivation function
+		if (!property.derivation)
+			return value;
+		
 		let derivation = property.derivation;
 		let derivationArguments = derivation.arguments || [];
 		
 		let validFunction = !this.derivations[derivation.function] ||
 			typeof this.derivations[derivation.function] !== 'function';
 		
+		// Awkward case of an invalid function
 		if (!validFunction) {
-			return defaultTo(property.default, null);
+			return defaultTo(value, defaultTo(property.default, null));
 		}
 		
 		// TODO: Extract argument processing, derive arguments from '{this}', etc.
@@ -143,7 +152,7 @@ export default class PropertyProcessor
 			args[a] = get(data, derivationArguments[a]);
 		}
 		
-		let value = this.derivations[derivation.function](...args);
+		value = this.derivations[derivation.function](...args);
 		
 		return defaultTo(value, defaultTo(property.default, null));
 	}
@@ -156,7 +165,8 @@ export default class PropertyProcessor
 	 */
 	castValue(property, value)
 	{
-		// TODO: Implement
+		// TODO: Implement based on property type, input type, etc.
+		// TODO: Maybe map castings to arrays that come from multi-selects
 		
 		return value;
 	}
@@ -171,7 +181,7 @@ export default class PropertyProcessor
 		return buildTreeFrom(dictionary);
 	}
 	
-	flatten(tree)
+	flattenToDictionary(tree)
 	{
 		// TODO: Implement
 	}
