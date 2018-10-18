@@ -7,7 +7,7 @@
  * TODO: Consider defining UI layout somewhere else... maybe.
  *
  * @see {PropertyProcessor} for the {Property} schema
- * @see CharacterSheet
+ * @see {CharacterSheet} for the data schema
  * @type {Property[]}
  */
 const properties = [
@@ -27,7 +27,8 @@ const properties = [
 		path:        'general.alignment',
 		type:        'string',
 		name:        'Alignment',
-		description: "The character's general and moral attitude"
+		description: "The character's general and moral attitude",
+		default:     'Chaotic Neutral'
 	},
 	{
 		path:        'general.age',
@@ -182,9 +183,9 @@ const properties = [
 		}
 	},
 	{
-		path:         'defense',
-		type:         'group',
-		name:         'Defense',
+		path:        'defense',
+		type:        'group',
+		name:        'Defense',
 		description: 'Defense statistics'
 	},
 	{

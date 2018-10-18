@@ -10,7 +10,7 @@
 
 				<virtual if="{ !child.children }">
 					<div>
-						<input name="{ child.path }" />
+						<input name="{ child.path }" value="{ child.default }" />
 					</div>
 				</virtual>
 			</fieldset>
@@ -19,9 +19,9 @@
 		<virtual if="{ depth > 0 }">
 			<p>
 				<label>
-					<span>{ '>'.repeat(depth) } { child.name || child.path }</span>
+					<span>{ '&nbsp; '.repeat(depth - 1) } { child.name || child.path }</span>
 					<virtual if="{ !child.children }">
-						<input name="{ child.path }">
+						<input name="{ child.path }" value="{ child.default }" disabled="{ !!child.derivation }">
 					</virtual>
 				</label>
 			</p>
@@ -35,7 +35,5 @@
 	<script>
 		this.children = this.opts.children || [];
 		this.depth = parseInt(this.opts.depth) || 0;
-
-		console.log(this.children);
 	</script>
 </tree>

@@ -5,10 +5,14 @@ import clamp from 'lodash/clamp';
 
 /**
  * Utility functions mixin for Riot tags.
+ *
+ * TODO: Extract these and just compose them here for the mixin.
  */
 const util = {
 	/**
 	 * Convert a string to title case.
+	 *
+	 * TODO: This could really be enhanced!
 	 *
 	 * @param {string} string
 	 * @return {string}

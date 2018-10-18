@@ -16,7 +16,7 @@ export default function (dictionary) {
 	}
 	
 	let path, property, lastDotIndex, parentPath, parent;
-
+	
 	// Link up properties to their parents, placing any properties without
 	// parents into the children of our tree
 	for (path in dictionary) {

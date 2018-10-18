@@ -12,6 +12,7 @@
 		let processor = app.services.propertyProcessor;
 
 		// TODO: Could just be one method couldn't it...
+		properties = processor.process(properties);
 		let dictionary = processor.buildDictionaryFrom(properties);
 		let tree = processor.buildTreeFrom(dictionary);
 

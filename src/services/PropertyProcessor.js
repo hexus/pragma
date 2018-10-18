@@ -1,3 +1,6 @@
+import merge from 'lodash/merge';
+import clone from 'lodash/cloneDeep';
+import { util } from '../mixins/util';
 import identity from 'lodash/identity';
 import sum from '../functions/sum';
 import min from '../functions/min';
@@ -56,7 +59,27 @@ export default class PropertyProcessor
 	 */
 	process(properties)
 	{
-		// TODO: Implement
+		if (!properties || !properties.length) {
+			return properties;
+		}
+		
+		let i, property;
+		
+		for (i = 0; i < properties.length; i++) {
+			property = properties[i];
+			
+			// Derive a name TODO: Improve, obv
+			if (!property.name) {
+				property.name = this.deriveName(property);
+			}
+			
+			// Tasty merge sandwiches, to retain the original reference
+			property = merge(property, this.defaultValues['*'], clone(property));
+			
+			if (this.defaultValues[property.type]) {
+				property = merge(property, this.defaultValues[property.type], clone(property));
+			}
+		}
 		
 		return properties;
 	}
@@ -72,6 +95,20 @@ export default class PropertyProcessor
 		// TODO: Implement
 
 		return value;
+	}
+	
+	/**
+	 * Derive a property's name from its path.
+	 *
+	 * @param {Property} property
+	 * @return {string} The derived name
+	 */
+	deriveName(property)
+	{
+		let path = property.path;
+		let lastDotIndex = path.lastIndexOf('.');
+		
+		return util.titleCase(path.substring(lastDotIndex + 1));
 	}
 	
 	/**
@@ -110,6 +147,8 @@ export default class PropertyProcessor
 /**
  * A property description.
  *
+ * TODO: Think about multiple selection. A lot.
+ *
  * @typedef {Object} Property
  *
  * @property {string}     path          - The path fragment that matches this property.
@@ -119,8 +158,11 @@ export default class PropertyProcessor
  * @property {string}     [elaboration] - An elaboration on the property's name. Defaults to `null`.
  * @property {string}     [description] - The property's description. Defaults to `null`.
  * @property {boolean}    [store=true]  - Whether to store the property. Defaults to `true`.
- * @property {*}          [default]     - The property's default value. Defaults as appropriate to the type.
+ * @property {boolean}    [disabled=false] - Whether the property is disabled. Implied if derivation is set.
+ * @property {*}          [default]     - The property's default value. Defaults as appropriate to the `type`.
  * @property {Derivation} [derivation]  - The property's processing definition. If one exists, this property won't have an editable input.
+ * @property {string}     [sanitizer]   - The property's sanitization function.
+ * @property {string}     [validator]   - The property's validation function. Defaults as appropriate to the `type`.
  * @property {number}     [min=-100]    - The minimum value of the property if the type is `'number'`. Defaults to -100.
  * @property {number}     [max=100]     - The maximum value of the property if the type is `'number'`. Defaults to 100.
  * @property {number}     [step]        - The step value of the property if the type is `'number'`.
