@@ -1,5 +1,5 @@
 <playground>
-	<tree children="{ tree.children }" data="{ sheet }"></tree>
+	<tree children="{ tree.children }" data="{ sheet }" onedit="{ edit }"></tree>
 
 	<script>
 		import './tree.tag';

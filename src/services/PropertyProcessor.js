@@ -190,21 +190,24 @@ export default class PropertyProcessor
  *
  * @typedef {Object} Property
  *
- * @property {string}     path          - The path fragment that matches this property.
- * @property {string}     [type]        - The type of the property. Defaults to `'number'`.
- * @property {string}     [input]       - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.
- * @property {string}     [name]        - The property's name. Defaults to a title-case translation of the path's leaf.
- * @property {string}     [elaboration] - An elaboration on the property's name. Defaults to `null`.
- * @property {string}     [description] - The property's description. Defaults to `null`.
- * @property {boolean}    [store=true]  - Whether to store the property. Defaults to `true`.
- * @property {boolean}    [disabled=false] - Whether the property is disabled. Implied if derivation is set.
- * @property {*}          [default]     - The property's default value. Defaults as appropriate to the `type`.
- * @property {Derivation} [derivation]  - The property's processing definition. If one exists, this property won't have an editable input.
- * @property {string}     [sanitizer]   - The property's sanitization function.
- * @property {string}     [validator]   - The property's validation function. Defaults as appropriate to the `type`.
- * @property {number}     [min=-100]    - The minimum value of the property if the type is `'number'`. Defaults to -100.
- * @property {number}     [max=100]     - The maximum value of the property if the type is `'number'`. Defaults to 100.
- * @property {number}     [step]        - The step value of the property if the type is `'number'`.
+ * @property {string}      path             - The path fragment that matches this property.
+ * @property {string|int}  parent           - The path fragment or ID that matches this property's parent, if any.
+ * @property {string}      [type]           - The type of the property. Defaults to `'number'`.
+ * @property {string}      [input]          - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.
+ * @property {string}      [name]           - The property's name. Defaults to a title-case translation of the path's leaf.
+ * @property {string}      [elaboration]    - An elaboration on the property's name. Defaults to `null`.
+ * @property {string}      [description]    - The property's description. Defaults to `null`.
+ * @property {boolean}     [store=true]     - Whether to store the property. Defaults to `true`.
+ * @property {boolean}     [disabled=false] - Whether the property is disabled. Implied if derivation is set.
+ * @property {*}           [default]        - The property's default value. Defaults as appropriate to the `type`.
+ * @property {Derivation}  [derivation]     - The property's processing definition. If one exists, this property won't have an editable input.
+ * @property {string}      [sanitizer]      - The property's sanitization function.
+ * @property {string}      [validator]      - The property's validation function. Defaults as appropriate to the `type`.
+ * @property {number}      [min=-100]       - The minimum value of the property if the type is `'number'`. Defaults to -100.
+ * @property {number}      [max=100]        - The maximum value of the property if the type is `'number'`. Defaults to 100.
+ * @property {number}      [step]           - The step value of the property if the type is `'number'`.
+ * @property {Property[]}  [children]       - Child properties.
+ * @property {Property}    [template]       - Template property for creating more children
  */
 
 /**
