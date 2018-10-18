@@ -1,11 +1,20 @@
 <property>
+	<yield/>
 	<script>
-		import './inputs/string.tag';
-		import './inputs/number.tag';
-		import './inputs/section.tag';
+		import './input/string.tag';
+		import './input/number.tag';
+		import './input/section.tag';
 
-		console.log(this.opts);
+		this.children = opts.property ? opts.property.children : [];
 
-		riot.mount(this.root, this.opts.property.type, this.opts.property);
+		if (opts.property && opts.property.type) {
+			let tagAvailable = riot.util.tags.selectTags().search('"' + opts.property.type + '"') >= 0;
+
+			let tag = tagAvailable ? opts.property.type : 'section';
+
+			console.log(opts.property.type, tag);
+
+			riot.mount(this.root, tag, this.opts.property);
+		}
 	</script>
 </property>

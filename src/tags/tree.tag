@@ -1,6 +1,11 @@
 <tree>
-	<virtual each="{ child, index in children }">
-		<property property="{ child }"></property>
+	<virtual each="{ child in children }">
+		<property property="{ child }">
+
+			{ JSON.stringify(children) }
+
+			<tree children="{ children }"></tree>
+		</property>
 	</virtual>
 
 	<script>
