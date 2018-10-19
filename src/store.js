@@ -13,7 +13,9 @@ export default {
 				eyes: 'Black',
 				home: 'Enaevia'
 			},
-			race: 'Tiefling',
+			race: {
+				name: 'Tiefling'
+			},
 			classes: {
 				list:[
 					{
@@ -62,6 +64,7 @@ export default {
 					total: 20,
 					touch: 11,
 					flatFooted: 15,
+					// TODO: Move the below into defense.bonuses?
 					armorBonus: 3,
 					shieldBonus: 2,
 					abilityModifier: +1, // Dex

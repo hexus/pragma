@@ -251,6 +251,107 @@ const properties = [
 	},
 	{
 		path: 'defense.hitPoints.nonLethalDamage'
+	},
+	{
+		path: 'defense.armorClass',
+		type: 'group',
+		name: 'AC'
+	},
+	{
+		path:       'defense.armorClass.total',
+		name: 'Armor Class',
+		derivation: {
+			function:  'sum',
+			arguments: [
+				'defense.armorClass.armorBonus',
+				'defense.armorClass.shieldBonus',
+				'defense.armorClass.abilityModifier',
+				'defense.armorClass.sizeModifier',
+				'defense.armorClass.naturalArmor',
+				'defense.armorClass.deflectionModifier',
+				'defense.armorClass.miscModifier',
+				'defense.armorClass.tempModifier'
+			]
+		}
+	},
+	{
+		path: 'defense.armorClass.touch',
+		derivation: {
+			function:  'sum',
+			arguments: [
+				'defense.armorClass.abilityModifier',
+				'defense.armorClass.sizeModifier',
+				'defense.armorClass.deflectionModifier',
+				'defense.armorClass.miscModifier',
+				'defense.armorClass.tempModifier'
+			]
+		}
+	},
+	{
+		path: 'defense.armorClass.flatFooted',
+		name: 'Flat-footed Armor Class',
+		derivation: {
+			function:  'sum',
+			arguments: [
+				'defense.armorClass.armorBonus',
+				'defense.armorClass.shieldBonus',
+				'defense.armorClass.sizeModifier',
+				'defense.armorClass.naturalArmor',
+				'defense.armorClass.deflectionModifier',
+				'defense.armorClass.miscModifier',
+				'defense.armorClass.tempModifier'
+			]
+		}
+	},
+	{
+		path: 'defense.armorClass.armorBonus',
+	},
+	{
+		path: 'defense.armorClass.shieldBonus'
+	},
+	{
+		path: 'defense.armorClass.abilityModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['abilities.dex.modifier']
+		}
+	},
+	{
+		path: 'defense.armorClass.sizeModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['size.modifier']
+		}
+	},
+	{
+		path: 'defense.armorClass.naturalArmor'
+	},
+	{
+		path: 'defense.armorClass.deflectionModifier'
+	},
+	{
+		path: 'defense.armorClass.miscModifier'
+	},
+	{
+		path: 'defense.armorClass.tempModifier'
+	},
+	{
+		path: 'defense.damageReduction'
+	},
+	{
+		path: 'defense.spellReduction'
+	},
+	{
+		path: 'defense.saves',
+		name: 'Saving throws',
+		type: 'section'
+	},
+	{
+		path: 'defense.saves.fortitude',
+		type: 'group'
+	},
+	{
+		path: 'defense.saves.fortitude.total'
 	}
 ];
 

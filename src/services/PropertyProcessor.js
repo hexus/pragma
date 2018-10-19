@@ -201,7 +201,7 @@ export default class PropertyProcessor
  * @typedef {Object} Property
  *
  * @property {string}      path             - The path that matches this property.
- * @property {string|int}  [parent]         - The path or ID that matches this property's parent, if any.
+ * @property {string|int}  [parent]         - The path for this property's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
  * @property {string}      pathFragment     - The path fragment used to compose the property's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to name
  * @property {string}      [type]           - The type of the property. Defaults to `'number'`.
  * @property {string}      [input]          - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.

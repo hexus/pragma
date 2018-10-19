@@ -66,7 +66,7 @@ export default class ArmorClass
 	 */
 	get touch()
 	{
-		return this.total - this.armorBonus - this.naturalArmor;
+		return this.total - this.armorBonus - this.shieldBonus - this.naturalArmor;
 	}
 	
 	/**
