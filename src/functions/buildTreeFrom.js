@@ -28,14 +28,19 @@ export default function (dictionary) {
 		}
 		
 		// Ascertain a parent
-		lastDotIndex = property.path.lastIndexOf('.');
+		parent = property.parent;
 		
-		if (lastDotIndex < 1) {
-			parentPath = null;
-			parent = tree;
-		} else {
-			parentPath = property.path.substring(lastDotIndex, 0);
-			parent = dictionary[parentPath];
+		// TODO: Extract this block?
+		if (!property.parent) {
+			lastDotIndex = property.path.lastIndexOf('.');
+			
+			if (lastDotIndex < 1) {
+				parentPath = null;
+				parent     = tree;
+			} else {
+				parentPath = property.path.substring(lastDotIndex, 0);
+				parent     = dictionary[parentPath];
+			}
 		}
 		
 		// Sorry, you're an orphan, you don't get into the tree

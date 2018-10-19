@@ -259,7 +259,7 @@ const properties = [
 	},
 	{
 		path:       'defense.armorClass.total',
-		name: 'Armor Class',
+		name:       'Armor Class',
 		derivation: {
 			function:  'sum',
 			arguments: [
@@ -275,7 +275,7 @@ const properties = [
 		}
 	},
 	{
-		path: 'defense.armorClass.touch',
+		path:       'defense.armorClass.touch',
 		derivation: {
 			function:  'sum',
 			arguments: [
@@ -288,8 +288,8 @@ const properties = [
 		}
 	},
 	{
-		path: 'defense.armorClass.flatFooted',
-		name: 'Flat-footed Armor Class',
+		path:       'defense.armorClass.flatFooted',
+		name:       'Flat-footed Armor Class',
 		derivation: {
 			function:  'sum',
 			arguments: [
@@ -310,16 +310,16 @@ const properties = [
 		path: 'defense.armorClass.shieldBonus'
 	},
 	{
-		path: 'defense.armorClass.abilityModifier',
+		path:       'defense.armorClass.abilityModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['abilities.dex.modifier']
 		}
 	},
 	{
-		path: 'defense.armorClass.sizeModifier',
+		path:       'defense.armorClass.sizeModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['size.modifier']
 		}
 	},
@@ -352,6 +352,130 @@ const properties = [
 	},
 	{
 		path: 'defense.saves.fortitude.total'
+	},
+	{
+		path: 'defense.saves.fortitude.base'
+	},
+	{
+		path:       'defense.saves.fortitude.abilityModifier',
+		derivation: {
+			function:  'copy',
+			arguments: ['abilities.modifier.con']
+		}
+	},
+	{
+		path: 'defense.saves.fortitude.magicModifier'
+	},
+	{
+		path: 'defense.saves.fortitude.miscModifier'
+	},
+	{
+		path: 'defense.saves.fortitude.tempModifier'
+	},
+	{
+		path: 'defense.saves.reflex',
+		type: 'group'
+	},
+	{
+		path: 'defense.saves.reflex.total'
+	},
+	{
+		path: 'defense.saves.reflex.base'
+	},
+	{
+		path:       'defense.saves.reflex.abilityModifier',
+		derivation: {
+			function:  'copy',
+			arguments: ['abilities.modifier.dex']
+		}
+	},
+	{
+		path: 'defense.saves.reflex.magicModifier'
+	},
+	{
+		path: 'defense.saves.reflex.miscModifier'
+	},
+	{
+		path: 'defense.saves.reflex.tempModifier'
+	},
+	{
+		path: 'defense.saves.will',
+		type: 'group'
+	},
+	{
+		path: 'defense.saves.will.total'
+	},
+	{
+		path: 'defense.saves.will.base'
+	},
+	{
+		path:       'defense.saves.will.abilityModifier',
+		derivation: {
+			function:  'copy',
+			arguments: ['abilities.modifier.wis']
+		}
+	},
+	{
+		path: 'defense.saves.will.magicModifier'
+	},
+	{
+		path: 'defense.saves.will.miscModifier'
+	},
+	{
+		path: 'defense.saves.will.tempModifier'
+	},
+	{
+		path: 'defense.combatManeuverDefense',
+		type: 'group'
+	},
+	{
+		path: 'defense.combatManeuverDefense.total',
+		derivation: {
+			function: 'sum',
+			arguments: [
+				10,
+				'defense.combatManeuverDefense.baseAttackBonus',
+				'defense.combatManeuverDefense.strModifier',
+				'defense.combatManeuverDefense.dexModifier',
+				'defense.combatManeuverDefense.sizeModifier',
+				'defense.combatManeuverDefense.miscModifier',
+				'defense.combatManeuverDefense.tempModifier'
+			]
+		}
+	},
+	{
+		path: 'defense.combatManeuverDefense.baseAttackBonus',
+		derivation: {
+			function: 'copy',
+			arguments: ['offense.baseAttackBonus']
+		}
+	},
+	{
+		path: 'defense.combatManeuverDefense.strModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['abilities.str.modifier']
+		}
+	},
+	{
+		path: 'defense.combatManeuverDefense.dexModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['abilities.dex.modifier']
+		}
+	},
+	{
+		path: 'defense.combatManeuverDefense.sizeModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['size.modifier']
+		}
+	},
+	{
+		path: 'defense.combatManeuverDefense.miscModifier'
+	},
+	{
+		path: 'defense.combatManeuverDefense.tempModifier'
 	}
 ];
 

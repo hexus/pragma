@@ -14,6 +14,8 @@ import buildTreeFrom from '../functions/buildTreeFrom';
  *
  * Expands property lists to trees. Processes property derivations from source
  * data.
+ *
+ * TODO: Rename to FieldProcessor
  */
 export default class PropertyProcessor
 {
@@ -197,6 +199,7 @@ export default class PropertyProcessor
  * A property description.
  *
  * TODO: Think about multiple selection. A lot.
+ * TODO: Rename to field.
  *
  * @typedef {Object} Property
  *
