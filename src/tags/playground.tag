@@ -19,6 +19,8 @@
 		this.sheet = app.state.sheet;
 
 		this.edit = function (event) {
+			console.log('playground edit event', event);
+
 			let { path, value } = event.detail;
 
 			let property = dictionary[path];

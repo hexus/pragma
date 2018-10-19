@@ -1,20 +1,29 @@
 <property>
-	<yield/>
 	<script>
 		import './input/string.tag';
 		import './input/number.tag';
 		import './input/section.tag';
+		import './input/group.tag';
 
-		this.children = opts.property ? opts.property.children : [];
+		let property = opts.property;
 
-		if (opts.property && opts.property.type) {
-			let tagAvailable = riot.util.tags.selectTags().search('"' + opts.property.type + '"') >= 0;
 
-			let tag = tagAvailable ? opts.property.type : 'section';
+		// Determine the tag
+		let tag = property ? property.type : null;
 
-			console.log(opts.property.type, tag);
+		// Set a default tag
+		if (!tag && property && property.children)
+			tag = 'section';
 
-			riot.mount(this.root, tag, this.opts.property);
+		// Determine whether the tag is available
+		let tagAvailable = tag ? riot.util.tags.selectTags().search('"' + tag + '"') >= 0 : false;
+
+		this.childTag = tag;
+
+		if (tagAvailable) {
+			riot.mount(this.root, tag, opts.property);
+		} else {
+			this.children = opts.property ? opts.property.children : [];
 		}
 	</script>
 </property>

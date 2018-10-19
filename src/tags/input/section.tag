@@ -1,6 +1,7 @@
 <section>
-	<fieldset>
-		<legend>{ opts.name }</legend>
+	<fieldset name="{ opts.property.path }">
+		<legend>{ opts.property.name }</legend>
+		{ console.log(this) }
 		<yield/>
 	</fieldset>
 </section>

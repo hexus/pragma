@@ -2507,6 +2507,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _dat
 
 /***/ }),
 
+/***/ "./src/tags/input/group.tag":
+/*!**********************************!*\
+  !*** ./src/tags/input/group.tag ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('group', '<div> {opts.property.name} <yield></yield> </div>', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/input/group.tag?");
+
+/***/ }),
+
 /***/ "./src/tags/input/number.tag":
 /*!***********************************!*\
   !*** ./src/tags/input/number.tag ***!
@@ -2514,7 +2525,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _dat
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('number', '<input name=\"{opts.name}\" min=\"{opts.min}\" max=\"{opts.max}\" step=\"{opts.step}\" riot-value=\"{opts.value}\" type=\"{\\'number\\'}\">', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/input/number.tag?");
+eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('number', '{console.log(\\'numberopts\\', opts)} <input name=\"{opts.property.path}\" min=\"{opts.property.min}\" max=\"{opts.property.max}\" step=\"{opts.property.step}\" riot-value=\"{opts.riotValue}\" disabled=\"{!!opts.property.derivation}\" type=\"{\\'number\\'}\">', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/input/number.tag?");
 
 /***/ }),
 
@@ -2525,7 +2536,7 @@ eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/rio
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('section', '<fieldset> <legend>{opts.name}</legend> <yield></yield> </fieldset>', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/input/section.tag?");
+eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('section', '<fieldset name=\"{opts.property.path}\"> <legend>{opts.property.name}</legend> {console.log(this)} <yield></yield> </fieldset>', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/input/section.tag?");
 
 /***/ }),
 
@@ -2536,7 +2547,7 @@ eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/rio
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('string', '<input type=\"text\" name=\"{opts.name}\" riot-value=\"{opts.value}\">', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/input/string.tag?");
+eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('string', '<input type=\"text\" name=\"{opts.property.path}\" riot-value=\"{opts.riotValue}\" disabled=\"{!!opts.property.derivation}\">', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/input/string.tag?");
 
 /***/ }),
 
@@ -2548,7 +2559,7 @@ eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/rio
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _tree_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tree.tag */ \"./src/tags/tree.tag\");\n\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    \nriot.tag2('playground', '<tree children=\"{tree.children}\" data=\"{sheet}\" onedit=\"{edit}\"></tree>', '', '', function(opts) {\nconst app = this.opts.app;\nlet properties = app.data.properties;\nlet processor = app.services.propertyProcessor; // TODO: Could just be one method couldn't it...\n\nproperties = processor.process(properties);\nlet dictionary = processor.buildDictionaryFrom(properties);\nlet tree = processor.buildTreeFrom(dictionary);\nthis.tree = tree;\nthis.sheet = app.state.sheet;\n\nthis.edit = function (event) {\n  let {\n    path,\n    value\n  } = event.detail;\n  let property = dictionary[path]; // Processing\n\n  value = processor.deriveValue(property, value, this.sheet);\n  set(this.sheet, path, value);\n};\n\nconsole.log(this);\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/playground.tag?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _tree_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tree.tag */ \"./src/tags/tree.tag\");\n\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    \nriot.tag2('playground', '<tree children=\"{tree.children}\" data=\"{sheet}\" onedit=\"{edit}\"></tree>', '', '', function(opts) {\nconst app = this.opts.app;\nlet properties = app.data.properties;\nlet processor = app.services.propertyProcessor; // TODO: Could just be one method couldn't it...\n\nproperties = processor.process(properties);\nlet dictionary = processor.buildDictionaryFrom(properties);\nlet tree = processor.buildTreeFrom(dictionary);\nthis.tree = tree;\nthis.sheet = app.state.sheet;\n\nthis.edit = function (event) {\n  console.log('playground edit event', event);\n  let {\n    path,\n    value\n  } = event.detail;\n  let property = dictionary[path]; // Processing\n\n  value = processor.deriveValue(property, value, this.sheet);\n  set(this.sheet, path, value);\n};\n\nconsole.log(this);\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/playground.tag?");
 
 /***/ }),
 
@@ -2572,7 +2583,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _cha
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _input_string_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./input/string.tag */ \"./src/tags/input/string.tag\");\n/* harmony import */ var _input_string_tag__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_input_string_tag__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _input_number_tag__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./input/number.tag */ \"./src/tags/input/number.tag\");\n/* harmony import */ var _input_number_tag__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_input_number_tag__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _input_section_tag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./input/section.tag */ \"./src/tags/input/section.tag\");\n/* harmony import */ var _input_section_tag__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_input_section_tag__WEBPACK_IMPORTED_MODULE_2__);\n\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    \n\n\nriot.tag2('property', '<yield></yield>', '', '', function(opts) {\nthis.children = opts.property ? opts.property.children : [];\n\nif (opts.property && opts.property.type) {\n  let tagAvailable = riot.util.tags.selectTags().search('\"' + opts.property.type + '\"') >= 0;\n  let tag = tagAvailable ? opts.property.type : 'section';\n  console.log(opts.property.type, tag);\n  riot.mount(this.root, tag, this.opts.property);\n}\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/property.tag?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _input_string_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./input/string.tag */ \"./src/tags/input/string.tag\");\n/* harmony import */ var _input_string_tag__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_input_string_tag__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _input_number_tag__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./input/number.tag */ \"./src/tags/input/number.tag\");\n/* harmony import */ var _input_number_tag__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_input_number_tag__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _input_section_tag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./input/section.tag */ \"./src/tags/input/section.tag\");\n/* harmony import */ var _input_section_tag__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_input_section_tag__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _input_group_tag__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./input/group.tag */ \"./src/tags/input/group.tag\");\n/* harmony import */ var _input_group_tag__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_input_group_tag__WEBPACK_IMPORTED_MODULE_3__);\n\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    \n\n\n\nriot.tag2('property', '', '', '', function(opts) {\nlet property = opts.property; // Determine the tag\n\nlet tag = property ? property.type : null; // Set a default tag\n\nif (!tag && property && property.children) tag = 'section'; // Determine whether the tag is available\n\nlet tagAvailable = tag ? riot.util.tags.selectTags().search('\"' + tag + '\"') >= 0 : false;\nthis.childTag = tag;\n\nif (tagAvailable) {\n  riot.mount(this.root, tag, opts.property);\n} else {\n  this.children = opts.property ? opts.property.children : [];\n}\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/property.tag?");
 
 /***/ }),
 
@@ -2584,7 +2595,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _inp
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _property_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./property.tag */ \"./src/tags/property.tag\");\n/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/get */ \"./node_modules/lodash/get.js\");\n/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_get__WEBPACK_IMPORTED_MODULE_1__);\n\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    \n\nriot.tag2('tree', '<virtual each=\"{child in children}\"> <property property=\"{child}\"> {JSON.stringify(children)} <tree children=\"{children}\"></tree> </property> </virtual>', '', '', function(opts) {\nthis.get = lodash_get__WEBPACK_IMPORTED_MODULE_1___default.a;\nthis.children = this.opts.children || [];\nthis.depth = parseInt(this.opts.depth) || 0;\nthis.data = this.opts.data || {};\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/tree.tag?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _property_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./property.tag */ \"./src/tags/property.tag\");\n/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/get */ \"./node_modules/lodash/get.js\");\n/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_get__WEBPACK_IMPORTED_MODULE_1__);\n\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    \n\nriot.tag2('tree', '<virtual each=\"{child in children}\"> <span data-is=\"{child.type}\" property=\"{child}\" riot-value=\"{get(data, child.path, child.default)}\" data=\"{data}\"> <tree children=\"{opts.property.children}\" data=\"{parent.data}\"></tree> </span> </virtual>', '', '', function(opts) {\nthis.get = lodash_get__WEBPACK_IMPORTED_MODULE_1___default.a;\nthis.children = this.opts.children || [];\nthis.depth = parseInt(this.opts.depth) || 0;\nthis.data = this.opts.data || {};\n});\n\n    \n  \n\n//# sourceURL=webpack://pragma/./src/tags/tree.tag?");
 
 /***/ })
 

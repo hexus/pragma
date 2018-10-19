@@ -1,11 +1,8 @@
 <tree>
 	<virtual each="{ child in children }">
-		<property property="{ child }">
-
-			{ JSON.stringify(children) }
-
-			<tree children="{ children }"></tree>
-		</property>
+		<span data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }" data="{ data }">
+			<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
+		</span>
 	</virtual>
 
 	<script>
