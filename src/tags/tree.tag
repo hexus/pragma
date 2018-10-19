@@ -1,8 +1,8 @@
 <tree>
 	<virtual each="{ child in children }">
-		<child data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }">
-			<tree class="" children="{ opts.property.children }" data="{ parent.data }"></tree>
-		</child>
+		<tree-child data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }">
+			<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
+		</tree-child>
 	</virtual>
 
 	<script>
