@@ -28,10 +28,11 @@ export default function (dictionary) {
 		}
 		
 		// Ascertain a parent
-		parent = property.parent;
 		
 		// TODO: Extract this block?
-		if (!property.parent) {
+		if (property.parent) {
+			parent = dictionary[property.parent];
+		} else {
 			lastDotIndex = property.path.lastIndexOf('.');
 			
 			if (lastDotIndex < 1) {
