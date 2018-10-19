@@ -6,6 +6,7 @@ import './tags/playground.tag';
 import CharacterFactory from './services/CharacterFactory';
 import CharacterSheetProcessor from "./services/CharacterSheetProcessor";
 import PropertyProcessor from './services/PropertyProcessor';
+import abilityModifier from './model/functions/abilityModifier';
 
 import data from './data';
 import store from './store';
@@ -23,7 +24,9 @@ let app = {
 	services: {
 		factory: new CharacterFactory(),
 		processor: new CharacterSheetProcessor(),
-		propertyProcessor: new PropertyProcessor()
+		propertyProcessor: new PropertyProcessor({
+			abilityModifier: abilityModifier
+		})
 	}
 };
 

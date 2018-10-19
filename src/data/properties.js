@@ -67,18 +67,55 @@ const properties = [
 		description: "The character's eye color"
 	},
 	{
-		// TODO: This will need elaborating into multiple properties later on
 		path:        'race',
-		type:        'string',
+		type:        'section',
 		name:        'Race',
 		description: "The character's race"
 	},
 	{
-		// TODO: This will need elaborating into multiple properties later on
-		path:        'class',
+		path:        'race.name',
 		type:        'string',
-		name:        'Class',
-		description: "The character's class"
+		description: "The name of the race"
+	},
+	{
+		path:        'classes',
+		type:        'section',
+		name:        'Classes',
+		description: "The character's classes"
+	},
+	{
+		path:     'classes.list',
+		type:     'list',
+		name:     'Class list',
+		template: {
+			name:     'Class',
+			type:     'group',
+			children: [
+				{
+					pathFragment: 'name',
+					type:         'string',
+					name:         'Class name'
+				},
+				{
+					pathFragment: 'levels',
+					name:         'Levels'
+				}
+			]
+		},
+	},
+	{
+		path: 'classes.list.0',
+		type: 'group',
+		name: 'Class'
+	},
+	{
+		path: 'classes.list.0.name',
+		type: 'string',
+		name: 'Class name'
+	},
+	{
+		path: 'classes.list.0.levels',
+		name: 'Levels'
 	},
 	{
 		path: 'abilities',

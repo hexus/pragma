@@ -3,6 +3,11 @@
 
 	<script>
 		import './tree.tag';
+		import './input/number.tag';
+		import './input/string.tag';
+		import './input/section.tag';
+		import './input/group.tag';
+		import './input/list.tag';
 
 		const app = this.opts.app;
 

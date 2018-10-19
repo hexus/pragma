@@ -200,11 +200,12 @@ export default class PropertyProcessor
  *
  * @typedef {Object} Property
  *
- * @property {string}      path             - The path fragment that matches this property.
- * @property {string|int}  parent           - The path fragment or ID that matches this property's parent, if any.
+ * @property {string}      path             - The path that matches this property.
+ * @property {string|int}  [parent]         - The path or ID that matches this property's parent, if any.
+ * @property {string}      pathFragment     - The path fragment used to compose the property's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to name
  * @property {string}      [type]           - The type of the property. Defaults to `'number'`.
  * @property {string}      [input]          - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.
- * @property {string}      [name]           - The property's name. Defaults to a title-case translation of the path's leaf.
+ * @property {string}      [name]           - The property's name. Defaults to a title-case translation of the path's leaf. TODO: Rename to label
  * @property {string}      [elaboration]    - An elaboration on the property's name. Defaults to `null`.
  * @property {string}      [description]    - The property's description. Defaults to `null`.
  * @property {boolean}     [store=true]     - Whether to store the property. Defaults to `true`.
@@ -217,7 +218,7 @@ export default class PropertyProcessor
  * @property {number}      [max=100]        - The maximum value of the property if the type is `'number'`. Defaults to 100.
  * @property {number}      [step]           - The step value of the property if the type is `'number'`.
  * @property {Property[]}  [children]       - Child properties.
- * @property {Property}    [template]       - Template property for creating more children
+ * @property {Property|Property[]} [template] - Template property for creating more children for `'list'` or `'table'` property types.
  */
 
 /**

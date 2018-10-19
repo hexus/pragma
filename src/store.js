@@ -14,7 +14,14 @@ export default {
 				home: 'Enaevia'
 			},
 			race: 'Tiefling',
-			class: 'Sorcerer',
+			classes: {
+				list:[
+					{
+						name: 'Sorcerer',
+						levels: 10
+					}
+				]
+			},
 			abilities: {
 				str: {
 					score: 8,
