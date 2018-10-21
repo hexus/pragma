@@ -72,7 +72,7 @@ export default {
 					naturalArmor: 0,
 					deflectionModifier: 0,
 					miscModifier: 0,
-					tempModifier: 0,
+					tempModifier: 4,
 				},
 				damageReduction: 0,
 				spellResistance: 0,

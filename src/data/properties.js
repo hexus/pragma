@@ -263,6 +263,7 @@ const properties = [
 		derivation: {
 			function:  'sum',
 			arguments: [
+				10,
 				'defense.armorClass.armorBonus',
 				'defense.armorClass.shieldBonus',
 				'defense.armorClass.abilityModifier',
@@ -279,6 +280,7 @@ const properties = [
 		derivation: {
 			function:  'sum',
 			arguments: [
+				10,
 				'defense.armorClass.abilityModifier',
 				'defense.armorClass.sizeModifier',
 				'defense.armorClass.deflectionModifier',
@@ -293,6 +295,7 @@ const properties = [
 		derivation: {
 			function:  'sum',
 			arguments: [
+				10,
 				'defense.armorClass.armorBonus',
 				'defense.armorClass.shieldBonus',
 				'defense.armorClass.sizeModifier',
@@ -339,7 +342,7 @@ const properties = [
 		path: 'defense.damageReduction'
 	},
 	{
-		path: 'defense.spellReduction'
+		path: 'defense.spellResistance'
 	},
 	{
 		path: 'defense.saves',

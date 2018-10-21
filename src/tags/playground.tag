@@ -9,6 +9,8 @@
 		import './input/group.tag';
 		import './input/list.tag';
 
+		import set from 'lodash/set';
+
 		const app = this.opts.app;
 
 		let properties = app.data.properties;
@@ -26,14 +28,13 @@
 		this.edit = function (event) {
 			console.log('playground edit event', event);
 
-			let { path, value } = event.detail;
+			let { name, value } = event.detail;
 
-			let property = dictionary[path];
+			let property = dictionary[name];
 
-			// Processing
-			value = processor.deriveValue(property, value, this.sheet);
+			processor.updateValue(dictionary, this.sheet, property, value);
 
-			set(this.sheet, path, value);
+			console.log(name, value);
 		};
 
 		console.log(this);
