@@ -6,11 +6,11 @@
  * TODO: Worth splitting these out to separate files and composing them here.
  * TODO: Consider defining UI layout somewhere else... maybe.
  *
- * @see {PropertyProcessor} for the {Property} schema
+ * @see {FormProcessor} for the {Field} schema
  * @see {CharacterSheet} for the data schema
- * @type {Property[]}
+ * @type {Field[]}
  */
-const properties = [
+const fields = [
 	{
 		path:        'general',
 		type:        'section',
@@ -482,4 +482,4 @@ const properties = [
 	}
 ];
 
-export default properties;
+export default fields;

@@ -3,10 +3,10 @@ import domEvent from 'mixins/domEvent';
 import './tags/pragma.tag';
 import './tags/playground.tag';
 
-import CharacterFactory from './services/CharacterFactory';
+import CharacterFactory        from './services/CharacterFactory';
 import CharacterSheetProcessor from "./services/CharacterSheetProcessor";
-import PropertyProcessor from './services/PropertyProcessor';
-import abilityModifier from './model/functions/abilityModifier';
+import FormProcessor           from './services/FormProcessor';
+import abilityModifier         from './model/functions/abilityModifier';
 
 import data from './data';
 import store from './store';
@@ -24,7 +24,7 @@ let app = {
 	services: {
 		factory: new CharacterFactory(),
 		processor: new CharacterSheetProcessor(),
-		propertyProcessor: new PropertyProcessor({
+		formProcessor: new FormProcessor({
 			abilityModifier: abilityModifier
 		})
 	}

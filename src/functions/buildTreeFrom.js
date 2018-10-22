@@ -1,8 +1,8 @@
 /**
  * Build a property tree from a dictionary of properties.
  *
- * @param {PropertyDictionary} dictionary
- * @returns {PropertyTree} TODO: Typedef
+ * @param {FieldDictionary} dictionary
+ * @returns {FieldTree} TODO: Typedef
  */
 export default function (dictionary) {
 	// Let's make a tree out of a dictionary

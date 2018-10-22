@@ -1,10 +1,10 @@
-import properties from './data/properties';
+import fields from './data/fields';
 
 const data = {
 	/**
-	 * Character sheet property dictionary.
+	 * Character sheet form field dictionary.
 	 */
-	properties: properties,
+	fields: fields,
 	
 	/**
 	 * Character classes data set.
@@ -123,5 +123,3 @@ export const classes = data.classes;
 export const sizes = data.sizes;
 export const skills = data.skills;
 export const spells = data.spells;
-export const propagationMap = data.propagationMap;
-export const abilityMaps = data.abilityMaps;

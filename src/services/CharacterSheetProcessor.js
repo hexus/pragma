@@ -3,7 +3,8 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import each from 'lodash/each';
 import merge from 'lodash/merge';
-import { propagationMap } from '../data/maps';
+
+const propagationMap = {};
 
 /**
  * A character sheet processor.

@@ -3,7 +3,7 @@
  *
  * TODO: Use in a DictionaryProcessor class
  *
- * @param {Property[]} properties
+ * @param {Field[]} properties
  */
 export default function (properties) {
 	let dictionary = {};

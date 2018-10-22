@@ -18,7 +18,7 @@ import buildTreeFrom from '../functions/buildTreeFrom';
  *
  * TODO: Rename to FormProcessor
  */
-export default class PropertyProcessor
+export default class FormProcessor
 {
 	/**
 	 * Create a new property processor.
@@ -78,7 +78,7 @@ export default class PropertyProcessor
 	 *
 	 * Fills in default values, determines default names.
 	 *
-	 * @param {Property[]} properties
+	 * @param {Field[]} properties
 	 */
 	process(properties)
 	{
@@ -110,7 +110,7 @@ export default class PropertyProcessor
 	/**
 	 * Derive a property's name from its path.
 	 *
-	 * @param {Property} property
+	 * @param {Field} property
 	 * @return {string} The derived name
 	 */
 	deriveName(property)
@@ -124,7 +124,7 @@ export default class PropertyProcessor
 	/**
 	 * Derive a property's value from some data.
 	 *
-	 * @param {Property} property - The property to derive a value for
+	 * @param {Field} property - The property to derive a value for
 	 * @param {Object} data - The data to derive derivation arguments from
 	 * @return {*} The derived value
 	 */
@@ -175,7 +175,7 @@ export default class PropertyProcessor
 	/**
 	 * Cast a value based on the property it belongs to.
 	 *
-	 * @param {Property} property
+	 * @param {Field} property
 	 * @param {*} value
 	 */
 	castValue(property, value)
@@ -194,9 +194,9 @@ export default class PropertyProcessor
 	/**
 	 * Update a property with the given value.
 	 *
-	 * @param {PropertyDictionary} dictionary - The property dictionary
+	 * @param {FieldDictionary} dictionary - The property dictionary
 	 * @param {Object} data - The data to update
-	 * @param {Property} property - The property the value belongs to
+	 * @param {Field} property - The property the value belongs to
 	 * @param {*} value - The value to update within the data according to the property
 	 */
 	updateValue(dictionary, data, property, value)
@@ -224,8 +224,8 @@ export default class PropertyProcessor
 	}
 	
 	/**
-	 * @param {Property[]}properties
-	 * @returns {PropertyDictionary}
+	 * @param {Field[]} properties
+	 * @returns {FieldDictionary}
 	 */
 	buildDictionaryFrom(properties)
 	{
@@ -233,8 +233,8 @@ export default class PropertyProcessor
 	}
 	
 	/**
-	 * @param {PropertyDictionary} dictionary
-	 * @returns {Property[]}
+	 * @param {FieldDictionary} dictionary
+	 * @returns {Field[]}
 	 */
 	buildTreeFrom(dictionary)
 	{
@@ -242,8 +242,8 @@ export default class PropertyProcessor
 	}
 	
 	/**
-	 * @param {Property[]} tree
-	 * @returns {PropertyDictionary}
+	 * @param {Field[]} tree
+	 * @returns {FieldDictionary}
 	 */
 	flattenToDictionary(tree)
 	{
@@ -254,16 +254,13 @@ export default class PropertyProcessor
 /**
  * A dictionary of properties.
  *
- * @typedef {Object.<string, Property>} PropertyDictionary
+ * @typedef {Object.<string, Field>} FieldDictionary
  */
 
 /**
  * A property description.
  *
- * TODO: Think about multiple selection. A lot.
- * TODO: Rename to field.
- *
- * @typedef {Object} Property
+ * @typedef {Object} Field
  *
  * @property {string}      path             - The path that matches this property.
  * @property {string|int}  [parent]         - The path for this property's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
@@ -282,8 +279,8 @@ export default class PropertyProcessor
  * @property {number}      [min=-100]       - The minimum value of the property if the type is `'number'`. Defaults to -100.
  * @property {number}      [max=100]        - The maximum value of the property if the type is `'number'`. Defaults to 100.
  * @property {number}      [step]           - The step value of the property if the type is `'number'`.
- * @property {Property[]}  [children]       - Child properties.
- * @property {Property|Property[]} [template] - Template property for creating more children for `'list'` or `'table'` property types.
+ * @property {Field[]}  [children]       - Child properties.
+ * @property {Field|Field[]} [template] - Template property for creating more children for `'list'` or `'table'` property types.
  */
 
 /**

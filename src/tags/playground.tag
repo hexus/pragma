@@ -13,13 +13,13 @@
 
 		const app = this.opts.app;
 
-		let properties = app.data.properties;
-		let processor = app.services.propertyProcessor;
+		let fields = app.data.fields;
+		let formProcessor = app.services.formProcessor;
 
 		// TODO: Could just be one method couldn't it...
-		properties = processor.process(properties);
-		let dictionary = processor.buildDictionaryFrom(properties);
-		let tree = processor.buildTreeFrom(dictionary);
+		fields = formProcessor.process(fields);
+		let dictionary = formProcessor.buildDictionaryFrom(fields);
+		let tree = formProcessor.buildTreeFrom(dictionary);
 
 		this.tree = tree;
 
@@ -32,7 +32,7 @@
 
 			let property = dictionary[name];
 
-			processor.updateValue(dictionary, this.sheet, property, value);
+			formProcessor.updateValue(dictionary, this.sheet, property, value);
 
 			console.log(name, value);
 		};
