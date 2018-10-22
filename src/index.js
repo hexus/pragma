@@ -24,9 +24,12 @@ let app = {
 	services: {
 		factory: new CharacterFactory(),
 		processor: new CharacterSheetProcessor(),
-		formProcessor: new FormProcessor({
-			abilityModifier: abilityModifier
-		})
+		formProcessor: new FormProcessor(
+			data.fields,
+			{
+				abilityModifier: abilityModifier
+			}
+		)
 	}
 };
 

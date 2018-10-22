@@ -1,5 +1,5 @@
 /**
- * A set of properties that define the structure of a Pathfinder Character Sheet.
+ * A set of fields that define the structure of a Pathfinder Character Sheet.
  *
  * Used for generating character sheets, processing maps and UI.
  *

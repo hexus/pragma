@@ -23,12 +23,13 @@ export default class FormProcessor
 	/**
 	 * Create a new property processor.
 	 *
-	 * @param {Object.<string, Function>} derivations - Functions to make available for property value derivations.
+	 * @param {Field[]}                     fields    - Form fields.
+ 	 * @param {Object.<string, Derivation>} functions - Functions to make available for field value derivations.
 	 */
-	constructor(derivations)
+	constructor(fields, functions)
 	{
 		/**
-		 * Default values for each property type.
+		 * Default values for each field type.
 		 *
 		 * @type {Object}
 		 */
@@ -53,12 +54,12 @@ export default class FormProcessor
 		 *
 		 * @type {Object.<string, Function>}
 		 */
-		this.derivations = merge({
+		this.functions = merge({
 			'copy': identity,
 			'sum': sum,
 			'min': min,
 			'interpolate': identity // TODO: Actual interpolation/templating
-		}, derivations);
+		}, functions);
 		
 		/**
 		 * Typecasting functions.
@@ -71,6 +72,20 @@ export default class FormProcessor
 			'number': (p, v) => util.clamp(v, p.min, p.max)
 		};
 		
+		/**
+		 * @type {Field[]}
+		 */
+		this.fields = this.process(fields);
+		
+		/**
+		 * @type {FieldDictionary}
+		 */
+		this.dictionary = buildDictionaryFrom(this.fields);
+		
+		/**
+		 * @type {Field[]}
+		 */
+		this.tree = buildTreeFrom(this.dictionary);
 	}
 	
 	/**
@@ -78,20 +93,21 @@ export default class FormProcessor
 	 *
 	 * Fills in default values, determines default names.
 	 *
-	 * @param {Field[]} properties
+	 * @param {Field[]} fields - The field to process
+	 * @returns {Field[]} The given fields with derived names and default values
 	 */
-	process(properties)
+	process(fields)
 	{
-		if (!properties || !properties.length) {
-			return properties;
+		if (!fields || !fields.length) {
+			return fields;
 		}
 		
 		let i, property;
 		
-		for (i = 0; i < properties.length; i++) {
-			property = properties[i];
+		for (i = 0; i < fields.length; i++) {
+			property = fields[i];
 			
-			// Derive a name TODO: Improve, obv
+			// Derive a name
 			if (!property.name) {
 				property.name = this.deriveName(property);
 			}
@@ -104,18 +120,20 @@ export default class FormProcessor
 			}
 		}
 		
-		return properties;
+		return fields;
 	}
 	
 	/**
 	 * Derive a property's name from its path.
 	 *
-	 * @param {Field} property
+	 * TODO: Improve this
+	 *
+	 * @param {Field} field
 	 * @return {string} The derived name
 	 */
-	deriveName(property)
+	deriveName(field)
 	{
-		let path = property.path;
+		let path = field.path;
 		let lastDotIndex = path.lastIndexOf('.');
 		
 		return util.titleCase(path.substring(lastDotIndex + 1));
@@ -124,33 +142,35 @@ export default class FormProcessor
 	/**
 	 * Derive a property's value from some data.
 	 *
-	 * @param {Field} property - The property to derive a value for
-	 * @param {Object} data - The data to derive derivation arguments from
+	 * @param {string} path - The path of the field to derive a value for
+	 * @param {Object} data - The data to field values from
 	 * @return {*} The derived value
 	 */
-	deriveValue(property, data)
+	deriveValue(path, data)
 	{
-		if (!property)
+		let field = this.dictionary[path];
+		
+		if (!field)
 			return null;
 		
-		let value = get(data, property.path);
+		let value = get(data, field.path);
 		
-		value = this.castValue(property, value);
+		value = this.castValue(field, value);
 		
 		// Casting is all we need if there's no derivation function
-		if (!property.derivation)
+		if (!field.derivation)
 			return value;
 		
-		let derivation = property.derivation;
+		let derivation = field.derivation;
 		let derivationFunction = derivation.function || null;
 		let derivationArguments = derivation.arguments || [];
 		
-		let validFunction = this.derivations[derivationFunction] &&
-			typeof this.derivations[derivationFunction] === 'function';
+		let validFunction = this.functions[derivationFunction] &&
+			typeof this.functions[derivationFunction] === 'function';
 		
 		// Awkward case of an invalid function
 		if (!validFunction) {
-			return defaultTo(value, defaultTo(property.default, null));
+			return defaultTo(value, defaultTo(field.default, null));
 		}
 		
 		// TODO: Extract argument processing, derive arguments from '{this}', etc.
@@ -167,42 +187,49 @@ export default class FormProcessor
 				args[a] = argument;
 		}
 		
-		value = this.derivations[derivationFunction](...args);
+		value = this.functions[derivationFunction](...args);
 		
-		return defaultTo(value, defaultTo(property.default, null));
+		return defaultTo(value, defaultTo(field.default, null));
 	}
 	
 	/**
 	 * Cast a value based on the property it belongs to.
 	 *
-	 * @param {Field} property
+	 * @param {Field} field
 	 * @param {*} value
 	 */
-	castValue(property, value)
+	castValue(field, value)
 	{
-		if (!property)
+		if (!field)
 			return value;
 		
-		if (!this.casts[property.type])
+		if (!this.casts[field.type])
 			return value;
+
+		if (Array.isArray(value))
+			return value.map(this.casts[field.type]);
 		
-		// TODO: Maybe, for array values that would come from multi-selects, map castings across each array element
-		
-		return this.casts[property.type](property, value);
+		return this.casts[field.type](field, value);
 	}
 	
 	/**
 	 * Update a property with the given value.
 	 *
-	 * @param {FieldDictionary} dictionary - The property dictionary
 	 * @param {Object} data - The data to update
-	 * @param {Field} property - The property the value belongs to
+	 * @param {Field} path - The property the value belongs to
 	 * @param {*} value - The value to update within the data according to the property
 	 */
-	updateValue(dictionary, data, property, value)
+	updateValue(data, path, value)
 	{
-		// Update this value
-		set(data, property.path, value);
+		let dictionary = this.dictionary;
+		let field = dictionary[path];
+		
+		// Do nothing if we have no such field
+		if (!field)
+			return;
+		
+		// Update the value
+		set(data, field.path, value);
 		
 		// Derive all values after this value change
 		// TODO: Use a derivation argument map to derive only the affected properties? Derive all if arguments aren't specified
@@ -210,17 +237,17 @@ export default class FormProcessor
 			if (!dictionary[p])
 				continue;
 			
-			property = dictionary[p];
+			field = dictionary[p];
 			
 			set(
 				data,
-				property.path,
-				value = this.deriveValue(property, data)
+				field.path,
+				value = this.deriveValue(field.path, data)
 			);
 		}
 		
 		// Get the updated value
-		return get(data, property.path);
+		return get(data, field.path);
 	}
 	
 	/**

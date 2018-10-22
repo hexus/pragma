@@ -9,19 +9,11 @@
 		import './input/group.tag';
 		import './input/list.tag';
 
-		import set from 'lodash/set';
-
 		const app = this.opts.app;
 
-		let fields = app.data.fields;
 		let formProcessor = app.services.formProcessor;
 
-		// TODO: Could just be one method couldn't it...
-		fields = formProcessor.process(fields);
-		let dictionary = formProcessor.buildDictionaryFrom(fields);
-		let tree = formProcessor.buildTreeFrom(dictionary);
-
-		this.tree = tree;
+		this.tree = formProcessor.tree;
 
 		this.sheet = app.state.sheet;
 
@@ -30,9 +22,7 @@
 
 			let { name, value } = event.detail;
 
-			let property = dictionary[name];
-
-			formProcessor.updateValue(dictionary, this.sheet, property, value);
+			formProcessor.updateValue(this.sheet, name, value);
 
 			console.log(name, value);
 		};
