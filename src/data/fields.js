@@ -354,7 +354,17 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'defense.saves.fortitude.total'
+		path: 'defense.saves.fortitude.total',
+		derivation: {
+			function: 'sum',
+			arguments: [
+				'defense.saves.fortitude.base',
+				'defense.saves.fortitude.abilityModifier',
+				'defense.saves.fortitude.magicModifier',
+				'defense.saves.fortitude.miscModifier',
+				'defense.saves.fortitude.tempModifier'
+			]
+		}
 	},
 	{
 		path: 'defense.saves.fortitude.base'
@@ -363,7 +373,7 @@ const fields = [
 		path:       'defense.saves.fortitude.abilityModifier',
 		derivation: {
 			function:  'copy',
-			arguments: ['abilities.modifier.con']
+			arguments: ['abilities.con.modifier']
 		}
 	},
 	{
@@ -380,7 +390,17 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'defense.saves.reflex.total'
+		path: 'defense.saves.reflex.total',
+		derivation: {
+			function: 'sum',
+			arguments: [
+				'defense.saves.reflex.base',
+				'defense.saves.reflex.abilityModifier',
+				'defense.saves.reflex.magicModifier',
+				'defense.saves.reflex.miscModifier',
+				'defense.saves.reflex.tempModifier'
+			]
+		}
 	},
 	{
 		path: 'defense.saves.reflex.base'
@@ -389,7 +409,7 @@ const fields = [
 		path:       'defense.saves.reflex.abilityModifier',
 		derivation: {
 			function:  'copy',
-			arguments: ['abilities.modifier.dex']
+			arguments: ['abilities.dex.modifier']
 		}
 	},
 	{
@@ -406,7 +426,17 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'defense.saves.will.total'
+		path: 'defense.saves.will.total',
+		derivation: {
+			function: 'sum',
+			arguments: [
+				'defense.saves.will.base',
+				'defense.saves.will.abilityModifier',
+				'defense.saves.will.magicModifier',
+				'defense.saves.will.miscModifier',
+				'defense.saves.will.tempModifier'
+			]
+		}
 	},
 	{
 		path: 'defense.saves.will.base'
@@ -415,7 +445,7 @@ const fields = [
 		path:       'defense.saves.will.abilityModifier',
 		derivation: {
 			function:  'copy',
-			arguments: ['abilities.modifier.wis']
+			arguments: ['abilities.wis.modifier']
 		}
 	},
 	{

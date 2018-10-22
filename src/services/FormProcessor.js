@@ -178,13 +178,16 @@ export default class FormProcessor
 		
 		for (a = 0; a < derivationArguments.length; a++) {
 			argument = derivationArguments[a];
-			
-			// TODO: DERIVE or UPDATE values here, getting is not enough, we need to recurse
+
 			// TODO: '{argument.path}' strings instead of any string, to allow constant string values
-			if (typeof argument === 'string')
-				args[a] = get(data, derivationArguments[a]);
-			else
+			if (typeof argument === 'string') {
+				if (argument === field.path)
+					args[a] = value;
+				else
+					args[a] = this.deriveValue(argument, data);
+			} else {
 				args[a] = argument;
+			}
 		}
 		
 		value = this.functions[derivationFunction](...args);
