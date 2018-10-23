@@ -1,6 +1,6 @@
 <tree>
 	<virtual each="{ child in children }">
-		<tree-child data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }">
+		<tree-child data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }" data="{ data }">
 			<virtual if=" {opts.property.children }">
 				<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
 			</virtual>

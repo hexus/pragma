@@ -123,7 +123,13 @@ const fields = [
 		name: 'Abilities'
 	},
 	{
+		// virtual!
+		path: 'abilities.table',
+		type: 'pragma-table'
+	},
+	{
 		path: 'abilities.str',
+		parent: 'abilities.table',
 		type: 'group',
 		name: 'Strength'
 	},
@@ -140,6 +146,7 @@ const fields = [
 	},
 	{
 		path: 'abilities.dex',
+		parent: 'abilities.table',
 		type: 'group',
 		name: 'Dexterity'
 	},
@@ -156,6 +163,7 @@ const fields = [
 	},
 	{
 		path: 'abilities.con',
+		parent: 'abilities.table',
 		type: 'group',
 		name: 'Constitution'
 	},
@@ -172,6 +180,7 @@ const fields = [
 	},
 	{
 		path: 'abilities.int',
+		parent: 'abilities.table',
 		type: 'group',
 		name: 'Intelligence'
 	},
@@ -188,6 +197,7 @@ const fields = [
 	},
 	{
 		path: 'abilities.wis',
+		parent: 'abilities.table',
 		type: 'group',
 		name: 'Wisdom'
 	},
@@ -204,6 +214,7 @@ const fields = [
 	},
 	{
 		path: 'abilities.cha',
+		parent: 'abilities.table',
 		type: 'group',
 		name: 'Charisma'
 	},
