@@ -2,17 +2,25 @@
  * Build a property tree from a dictionary of properties.
  *
  * @param {FieldDictionary} dictionary
- * @returns {FieldTree} TODO: Typedef
+ * @returns {Field}
  */
 export default function (dictionary) {
 	// Let's make a tree out of a dictionary
 	let tree = {
+		path: '',
 		children: []
 	};
 	
 	// Bail early on an empty dictionary
 	if (!dictionary) {
 		return tree;
+	}
+	
+	// Make sure the root is available as a parent
+	if (dictionary['']) {
+		tree = dictionary[''];
+	} else {
+		dictionary[''] = tree;
 	}
 	
 	let path, property, lastDotIndex, parentPath, parent;
@@ -28,9 +36,8 @@ export default function (dictionary) {
 		}
 		
 		// Ascertain a parent
-		
-		// TODO: Extract this block?
-		if (property.parent) {
+		// TODO: Extract this block? Move parent path acquisition to FormProcessor.process()?
+		if (property.parent != null) {
 			parent = dictionary[property.parent];
 		} else {
 			lastDotIndex = property.path.lastIndexOf('.');
@@ -42,6 +49,8 @@ export default function (dictionary) {
 				parentPath = property.path.substring(lastDotIndex, 0);
 				parent     = dictionary[parentPath];
 			}
+			
+			property.parent = parentPath;
 		}
 		
 		// Sorry, you're an orphan, you don't get into the tree

@@ -73,17 +73,23 @@ export default class FormProcessor
 		};
 		
 		/**
+		 * The set of form fields.
+		 *
 		 * @type {Field[]}
 		 */
 		this.fields = this.process(fields);
 		
 		/**
+		 * Fields keyed by path.
+		 *
 		 * @type {FieldDictionary}
 		 */
 		this.dictionary = buildDictionaryFrom(this.fields);
 		
 		/**
-		 * @type {Field[]}
+		 * Fields composed into a tree.
+		 *
+		 * @type {Field}
 		 */
 		this.tree = buildTreeFrom(this.dictionary);
 	}
@@ -294,7 +300,7 @@ export default class FormProcessor
  *
  * @property {string}      path             - The path that matches this property.
  * @property {string|int}  [parent]         - The path for this property's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
- * @property {string}      pathFragment     - The path fragment used to compose the property's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to name
+ * @property {string}      [pathFragment]   - The path fragment used to compose the property's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to name
  * @property {string}      [type]           - The type of the property. Defaults to `'number'`.
  * @property {string}      [input]          - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.
  * @property {string}      [name]           - The property's name. Defaults to a title-case translation of the path's leaf. TODO: Rename to label
@@ -309,7 +315,7 @@ export default class FormProcessor
  * @property {number}      [min=-100]       - The minimum value of the property if the type is `'number'`. Defaults to -100.
  * @property {number}      [max=100]        - The maximum value of the property if the type is `'number'`. Defaults to 100.
  * @property {number}      [step]           - The step value of the property if the type is `'number'`.
- * @property {Field[]}  [children]       - Child properties.
+ * @property {Field[]}     [children]       - Child properties.
  * @property {Field|Field[]} [template] - Template property for creating more children for `'list'` or `'table'` property types.
  */
 
