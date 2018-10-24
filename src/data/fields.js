@@ -12,6 +12,11 @@
  */
 const fields = [
 	{
+		// virtual!
+		path: 'sections',
+		type: 'hidden'
+	},
+	{
 		path:        'general',
 		type:        'section',
 		name:        'General',
@@ -119,7 +124,7 @@ const fields = [
 	},
 	{
 		// virtual!
-		path: 'abilities.section',
+		path: 'sections.abilities',
 		parent: '',
 		type: 'section',
 		name: 'Abilities'
@@ -127,7 +132,7 @@ const fields = [
 	{
 		path: 'abilities',
 		type: 'pragma-table',
-		parent: 'abilities.section'
+		parent: 'sections.abilities'
 	},
 	{
 		path: 'abilities.str',
@@ -352,7 +357,7 @@ const fields = [
 		path: 'defense.spellResistance'
 	},
 	{
-		path: 'defense.saves.section',
+		path: 'sections.saves',
 		parent: 'defense',
 		name: 'Saving throws',
 		type: 'section'
@@ -360,7 +365,7 @@ const fields = [
 	{
 		// virtual!
 		path: 'defense.saves',
-		parent: 'defense.saves.section',
+		parent: 'sections.saves',
 		type: 'pragma-table'
 	},
 	{
