@@ -356,9 +356,16 @@ const fields = [
 		path: 'defense.spellResistance'
 	},
 	{
-		path: 'defense.saves',
+		path: 'defense.saves.section',
+		parent: 'defense',
 		name: 'Saving throws',
 		type: 'section'
+	},
+	{
+		// virtual!
+		path: 'defense.saves',
+		parent: 'defense.saves.section',
+		type: 'pragma-table'
 	},
 	{
 		path: 'defense.saves.fortitude',
