@@ -1,5 +1,5 @@
 <playground>
-	<tree children="{ tree.children }" data="{ sheet }" onedit="{ edit }"></tree>
+	<tree children="{ tree.children }" data="{ sheet }" onedit="{ edit }" onadd="{ add }"></tree>
 
 	<script>
 		import './tree.tag';
@@ -26,6 +26,10 @@
 			formProcessor.updateValue(this.sheet, name, value);
 
 			console.log(name, value);
+		};
+
+		this.add = function (event) {
+			console.log('playground add event', event);
 		};
 
 		console.log(this);
