@@ -6,7 +6,7 @@ export default {
 		// Dispatch an edit event
 		this.triggerDom('edit', {
 			input: input,
-			name: input.name,
+			name:  input.name,
 			value: input.value
 		});
 	}

@@ -4,7 +4,7 @@
 
 		<p each="{ value, name in general }">
 			<label>
-				{ util.titleCase(name) }
+				{ util.sentenceCase(name) }
 				<input type="text" name="{ name }" value="{ value }" onkeyup="{ edit }"/>
 			</label>
 		</p>

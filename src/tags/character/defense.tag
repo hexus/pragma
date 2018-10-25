@@ -69,7 +69,7 @@
 			<table>
 				<tr each="{ save, name in defense.saves }">
 					<th>
-						<span>{ util.titleCase(name) }</span>
+						<span>{ util.sentenceCase(name) }</span>
 					</th>
 					<td>
 						<input type="number" name="{ 'saves.' + name + '.total' }" min="0" max="100" value="{ save.total }" onkeyup="{ edit }" onchange="{ edit }"/>
@@ -98,7 +98,7 @@
 			<table if="{ defense.resistances }">
 				<tr each="{ resistance, name in defense.resistances }">
 					<th>
-						<span>{ util.titleCase(name) }</span>
+						<span>{ util.sentenceCase(name) }</span>
 					</th>
 					<td>
 						<input type="number" name="{ 'resistances.' + name + '.total'}" min="0" max="100" step="1" value="{ resistance.total }" onkeyup="{ edit }" onchange="{ edit }"/>

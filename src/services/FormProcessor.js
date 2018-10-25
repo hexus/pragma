@@ -23,10 +23,11 @@ export default class FormProcessor
 	/**
 	 * Create a new property processor.
 	 *
-	 * @param {Field[]}                     fields    - Form fields.
- 	 * @param {Object.<string, Derivation>} functions - Functions to make available for field value derivations.
+	 * @param {Field[]}                     fields        - Form fields.
+ 	 * @param {Object.<string, Derivation>} functions     - Functions to make available for field value derivations.
+	 * @param {Object.<string, Object>}     inputOptions  - Default input options keyed by input type.
 	 */
-	constructor(fields, functions)
+	constructor(fields, functions, defaults)
 	{
 		/**
 		 * Default values for each field type.
@@ -36,7 +37,8 @@ export default class FormProcessor
 		this.defaultValues = {
 			'*': {
 				store: true,
-				type: 'number'
+				type: 'number',
+				derive: true
 			},
 			'number': {
 				default: 0,
@@ -60,6 +62,16 @@ export default class FormProcessor
 			'min': min,
 			'interpolate': identity // TODO: Actual interpolation/templating
 		}, functions);
+		
+		/**
+		 * Default input options keyed by input type.
+		 */
+		this.inputOptions = merge({
+			'number': {
+				min: -100,
+				max: 100
+			}
+		});
 		
 		/**
 		 * Typecasting functions.
@@ -142,7 +154,7 @@ export default class FormProcessor
 		let path = field.path;
 		let lastDotIndex = path.lastIndexOf('.');
 		
-		return util.titleCase(path.substring(lastDotIndex + 1));
+		return util.sentenceCase(path.substring(lastDotIndex + 1));
 	}
 	
 	/**
@@ -154,18 +166,18 @@ export default class FormProcessor
 	 */
 	deriveValue(path, data)
 	{
+		let value = get(data, path);
 		let field = this.dictionary[path];
 		
+		// All we can do is return the raw value if there's no field
 		if (!field)
-			return null;
-		
-		let value = get(data, field.path);
+			return value;
 		
 		value = this.castValue(field, value);
 		
 		// Casting is all we need if there's no derivation function
 		if (!field.derivation)
-			return value;
+			return defaultTo(value, defaultTo(field.default, null));
 		
 		let derivation = field.derivation;
 		let derivationFunction = derivation.function || null;
@@ -174,7 +186,7 @@ export default class FormProcessor
 		let validFunction = this.functions[derivationFunction] &&
 			typeof this.functions[derivationFunction] === 'function';
 		
-		// Awkward case of an invalid function
+		// Just return the value or default if there's no valid derivation
 		if (!validFunction) {
 			return defaultTo(value, defaultTo(field.default, null));
 		}
@@ -224,24 +236,21 @@ export default class FormProcessor
 	/**
 	 * Update a property with the given value.
 	 *
-	 * @param {Object} data - The data to update
-	 * @param {Field} path - The property the value belongs to
-	 * @param {*} value - The value to update within the data according to the property
+	 * @param {Object} data  - The data to update.
+	 * @param {string} path  - The data path to update the value of.
+	 * @param {*}      value - The value to update within the data according to the property.
+	 * @return {*} The update value
 	 */
 	updateValue(data, path, value)
 	{
 		let dictionary = this.dictionary;
-		let field = dictionary[path];
-		
-		// Do nothing if we have no such field
-		if (!field)
-			return;
+		let field;
 		
 		// Update the value
-		set(data, field.path, value);
+		set(data, path, value);
 		
 		// Derive all values after this value change
-		// TODO: Use a derivation argument map to derive only the affected properties? Derive all if arguments aren't specified
+		// TODO: Build and use a derivation argument map to derive only the affected properties? Derive all fields only if arguments aren't specified.
 		for (let p in dictionary) {
 			if (!dictionary[p])
 				continue;
@@ -298,17 +307,18 @@ export default class FormProcessor
  *
  * @typedef {Object} Field
  *
- * @property {string}      path             - The path that matches this property.
- * @property {string|int}  [parent]         - The path for this property's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
- * @property {string}      [pathFragment]   - The path fragment used to compose the property's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to name
- * @property {string}      [type]           - The type of the property. Defaults to `'number'`.
- * @property {string}      [input]          - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property.
- * @property {string}      [name]           - The property's name. Defaults to a title-case translation of the path's leaf. TODO: Rename to label
- * @property {string}      [elaboration]    - An elaboration on the property's name. Defaults to `null`.
- * @property {string}      [description]    - The property's description. Defaults to `null`.
+ * @property {string}      path             - The path that matches this field.
+ * @property {string|int}  [parent]         - The path for this field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
+ * @property {string}      [pathFragment]   - The path fragment used to compose the property's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to name?
+ * @property {string}      [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`. TODO: Make this strictly about data type rather than using for tags
+ * @property {string}      [input]          - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property. // TODO: Rename? Might not be an actual input... (i.e. section)
+ * @property {string}      [name]           - The property's name. Defaults to a sentence-case translation of the path's leaf. TODO: Rename to label
+ * @property {string}      [elaboration]    - An elaboration on the property's name.
+ * @property {string}      [description]    - The property's description.
  * @property {boolean}     [store=true]     - Whether to store the property. Defaults to `true`.
  * @property {boolean}     [disabled=false] - Whether the property is disabled. Implied if derivation is set.
  * @property {*}           [default]        - The property's default value. Defaults as appropriate to the `type`.
+ * @property {boolean}     [derive=true]    - Whether to derive a value if a derivation is present.
  * @property {Derivation}  [derivation]     - The property's processing definition. If one exists, this property won't have an editable input.
  * @property {string}      [sanitizer]      - The property's sanitization function.
  * @property {string}      [validator]      - The property's validation function. Defaults as appropriate to the `type`.

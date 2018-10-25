@@ -1,4 +1,4 @@
-import startCase from 'lodash/startCase';
+import Case from 'case';
 import toLower from 'lodash/toLower';
 import toUpper from 'lodash/toUpper';
 import clamp from 'lodash/clamp';
@@ -17,8 +17,8 @@ const util = {
 	 * @param {string} string
 	 * @return {string}
 	 */
-	titleCase: function (string) {
-		return startCase(toLower(string));
+	sentenceCase: function (string) {
+		return Case.sentence(string);
 	},
 	
 	/**

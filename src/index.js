@@ -28,6 +28,9 @@ let app = {
 			data.fields,
 			{
 				abilityModifier: abilityModifier
+			},
+			{
+				// Statistic type?
 			}
 		)
 	}
