@@ -528,7 +528,110 @@ const fields = [
 	},
 	{
 		path: 'defense.combatManeuverDefense.tempModifier'
-	}
+	},
+	{
+		path: 'offense',
+		type: 'section'
+	},
+	{
+		path: 'offense.initiative',
+		type: 'group'
+	},
+	{
+		path: 'offense.initiative.total',
+		derivation: {
+			function: 'sum',
+			arguments: [
+				'offense.initiative.abilityModifier',
+				'offense.initiative.miscModifier'
+			]
+		}
+	},
+	{
+		path: 'offense.initiative.abilityModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['abilities.dex.modifier']
+		}
+	},
+	{
+		path: 'offense.initiative.miscModifier'
+	},
+	{
+		path: 'offense.baseAttackBonus'
+	},
+	{
+		path: 'offense.speed',
+		type: 'group'
+	},
+	{
+		path: 'offense.speed.land',
+		type: 'string'
+	},
+	{
+		path: 'offense.speed.withArmor',
+		type: 'string'
+	},
+	{
+		path: 'offense.speed.fly',
+		type: 'string'
+	},
+	{
+		path: 'offense.speed.swim',
+		type: 'string'
+	},
+	{
+		path: 'offense.speed.climb',
+		type: 'string'
+	},
+	{
+		path: 'offense.speed.burrow',
+		type: 'string'
+	},
+	{
+		path: 'offense.combatManeuverBonus',
+		type: 'group'
+	},
+	{
+		path: 'offense.combatManeuverBonus.total',
+		derivation: {
+			function: 'sum',
+			arguments: [
+				'offense.combatManeuverBonus.baseAttackBonus',
+				'offense.combatManeuverBonus.abilityModifier',
+				'offense.combatManeuverBonus.sizeModifier',
+				'offense.combatManeuverBonus.miscModifier',
+				'offense.combatManeuverBonus.tempModifier'
+			]
+		}
+	},
+	{
+		path: 'offense.combatManeuverBonus.baseAttackBonus',
+		derivation: {
+			function: 'copy',
+			arguments: ['offense.baseAttackBonus']
+		}
+	},
+	{
+		path: 'offense.combatManeuverBonus.abilityModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['abilities.str.modifier']
+		}
+	},
+	{
+		path: 'offense.combatManeuverBonus.sizeModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['size.modifier']
+		}
+	},
+	{
+		path: 'offense.combatManeuverBonus.miscModifier'
+	},
+	{
+		path: 'offense.combatManeuverBonus.tempModifier'
+	},
 ];
 
 export default fields;

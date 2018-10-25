@@ -146,7 +146,7 @@ export default {
 				},
 				baseAttackBonus: 4,
 				speed: {
-					land: '5\'',
+					land: '5ft',
 					withArmor: 'N/A',
 					fly: '',
 					swim: '',
