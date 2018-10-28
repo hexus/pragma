@@ -89,7 +89,7 @@ const fields = [
 		description: "The character's classes"
 	},
 	{
-		// TODO: Process fields that use templates, building new fields according to data
+		// TODO: Process fields that use templates, building new fields according to the form data
 		path: 'templates.class',
 		name: 'Class',
 		type: 'group',

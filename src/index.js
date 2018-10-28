@@ -26,11 +26,12 @@ let app = {
 		processor: new CharacterSheetProcessor(),
 		formProcessor: new FormProcessor(
 			data.fields,
+			store.characters[1], // TODO: This obv needs to change, setData maybe
 			{
 				abilityModifier: abilityModifier
 			},
 			{
-				// Statistic type?
+				// E.g. Custom statistic type?
 			}
 		)
 	}

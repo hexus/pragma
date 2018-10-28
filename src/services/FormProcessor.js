@@ -1,5 +1,6 @@
 import merge           from 'lodash/merge';
 import defaults        from 'lodash/defaultsDeep';
+import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
 import defaultTo       from 'lodash/defaultTo';
@@ -15,19 +16,18 @@ import buildTree       from '../functions/buildTree';
  *
  * Expands property lists to trees. Processes property derivations from source
  * data.
- *
- * TODO: Rename to FormProcessor
  */
 export default class FormProcessor
 {
 	/**
 	 * Create a new property processor.
 	 *
-	 * @param {Field[]}                     fields        - Form fields.
- 	 * @param {Object.<string, Derivation>} functions     - Functions to make available for field value derivations.
-	 * @param {Object.<string, Object>}     inputOptions  - Default input options keyed by input type.
+	 * @param {Field[]}                     fields         - Form fields.
+	 * @param {Object}                      [data={}]      - Form data.
+ 	 * @param {Object.<string, Derivation>} [functions]    - Functions to make available for field value derivations.
+	 * @param {Object.<string, Object>}     [inputOptions] - Default input options keyed by input type.
 	 */
-	constructor(fields, functions, inputOptions)
+	constructor(fields, data, functions, inputOptions)
 	{
 		/**
 		 * Default values for each field type.
@@ -49,6 +49,18 @@ export default class FormProcessor
 			'string': {
 				default: ''
 			},
+			'section': {
+				store: false
+			},
+			'group': {
+				store: false
+			},
+			'list': {
+				store: false
+			},
+			'pragma-table': {
+				store: false
+			}
 		};
 		
 		/**
@@ -60,7 +72,7 @@ export default class FormProcessor
 			'copy': identity,
 			'sum': sum,
 			'min': min,
-			'interpolate': identity // TODO: Actual interpolation/templating
+			'expression': identity // TODO: Actual expression processing
 		}, functions);
 		
 		/**
@@ -85,11 +97,18 @@ export default class FormProcessor
 		};
 		
 		/**
+		 * The form data.
+		 *
+		 * @type {Object}
+		 */
+		this.data = data || {};
+		
+		/**
 		 * The set of form fields.
 		 *
 		 * @type {Field[]}
 		 */
-		this.fields = this.process(fields);
+		this.fields = this.process(fields, data);
 		
 		/**
 		 * Fields keyed by path.
@@ -112,9 +131,10 @@ export default class FormProcessor
 	 * Fills in default values, determines default names.
 	 *
 	 * @param {Field[]} fields - The field to process
+	 * @param {Object}  data   - The form data
 	 * @returns {Field[]} The given fields with derived names and default values
 	 */
-	process(fields)
+	process(fields, data)
 	{
 		if (!fields || !fields.length) {
 			return fields;
@@ -137,7 +157,16 @@ export default class FormProcessor
 			if (this.defaultValues[field.type]) {
 				field = defaults(field, this.defaultValues[field.type]);
 			}
+			
+			// Set the value if the data has one
+			if (has(data, field.path)) {
+				field.value = get(data, field.path);
+			} else if (field.defaultValue !== undefined) {
+				field.value = field.defaultValue;
+			}
 		}
+		
+		console.log(fields);
 		
 		return fields;
 	}
@@ -243,12 +272,17 @@ export default class FormProcessor
 	updateValue(data, path, value)
 	{
 		let dictionary = this.dictionary;
-		let field;
+		let field = dictionary[path];
 		
-		// TODO: Bail if a field exists and its derivation is enabled
-		
-		// Update the value
-		set(data, path, value);
+		// Update the value if one is given
+		if (value !== undefined) {
+			// TODO: Also check whether the value is derived, and skip setting anything if so
+			if (field) {
+				field.value = value;
+			}
+			
+			set(data, path, value);
+		}
 		
 		// Derive all values after this value change
 		// TODO: Build and use a derivation argument map to derive only the affected properties? Derive all fields only if arguments aren't specified.
@@ -257,12 +291,8 @@ export default class FormProcessor
 				continue;
 			
 			field = dictionary[p];
-			
-			set(
-				data,
-				field.path,
-				value = this.deriveValue(field.path, data)
-			);
+			field.value = this.deriveValue(field.path, data);
+			set(data, field.path, value);
 		}
 		
 		// Get the updated value
@@ -332,6 +362,7 @@ export default class FormProcessor
  * @property {string}        [description]    - The property's description.
  * @property {boolean}       [store=true]     - Whether to store the property. Defaults to `true`.
  * @property {boolean}       [disabled=false] - Whether the property is disabled. Implied if derivation is set.
+ * @property {*}             [value]          - The property's value.
  * @property {*}             [default]        - The property's default value. Defaults as appropriate to the `type`.
  * @property {boolean}       [derive=true]    - Whether to derive a value if a derivation is present.
  * @property {Derivation}    [derivation]     - The property's processing definition. If one exists, this property won't have an editable input.
