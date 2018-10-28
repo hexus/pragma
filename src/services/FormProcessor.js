@@ -120,21 +120,22 @@ export default class FormProcessor
 			return fields;
 		}
 		
-		let i, property;
+		let i, field;
 		
 		for (i = 0; i < fields.length; i++) {
-			property = fields[i];
+			field = fields[i];
 			
 			// Derive a name
-			if (!property.name) {
-				property.name = this.deriveName(property);
+			if (!field.name) {
+				field.name = this.deriveName(field);
 			}
+
+			// Apply global defaults
+			field = defaults(field, this.defaultValues['*']);
 			
-			// Tasty merge sandwiches, to retain the original reference
-			property = defaults(property, this.defaultValues['*']);
-			
-			if (this.defaultValues[property.type]) {
-				property = defaults(property, this.defaultValues[property.type]);
+			// Apply type-specific defaults
+			if (this.defaultValues[field.type]) {
+				field = defaults(field, this.defaultValues[field.type]);
 			}
 		}
 		
@@ -244,6 +245,8 @@ export default class FormProcessor
 		let dictionary = this.dictionary;
 		let field;
 		
+		// TODO: Bail if a field exists and its derivation is enabled
+		
 		// Update the value
 		set(data, path, value);
 		
@@ -287,11 +290,23 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * @param {Field[]} tree
+	 * @param {Field} tree
 	 * @returns {FieldDictionary}
 	 */
 	flattenToDictionary(tree)
 	{
+		// TODO: Implement
+	}
+	
+	/**
+	 * Build data from a tree of fields.
+	 *
+	 * @param {Field} tree
+	 */
+	buildData(tree)
+	{
+		let data = {};
+		
 		// TODO: Implement
 	}
 }
