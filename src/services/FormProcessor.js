@@ -1,14 +1,14 @@
-import merge from 'lodash/merge';
-import defaults from 'lodash/defaultsDeep';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import defaultTo from 'lodash/defaultTo';
-import { util } from '../mixins/util';
-import identity from 'lodash/identity';
-import sum from '../functions/sum';
-import min from '../functions/min';
-import buildDictionaryFrom from '../functions/buildDictionaryFrom';
-import buildTreeFrom from '../functions/buildTreeFrom';
+import merge           from 'lodash/merge';
+import defaults        from 'lodash/defaultsDeep';
+import get             from 'lodash/get';
+import set             from 'lodash/set';
+import defaultTo       from 'lodash/defaultTo';
+import { util }        from '../mixins/util';
+import identity        from 'lodash/identity';
+import sum             from '../functions/sum';
+import min             from '../functions/min';
+import buildDictionary from '../functions/buildDictionary';
+import buildTree       from '../functions/buildTree';
 
 /**
  * Processes lists of property definitions.
@@ -27,7 +27,7 @@ export default class FormProcessor
  	 * @param {Object.<string, Derivation>} functions     - Functions to make available for field value derivations.
 	 * @param {Object.<string, Object>}     inputOptions  - Default input options keyed by input type.
 	 */
-	constructor(fields, functions, defaults)
+	constructor(fields, functions, inputOptions)
 	{
 		/**
 		 * Default values for each field type.
@@ -71,7 +71,7 @@ export default class FormProcessor
 				min: -100,
 				max: 100
 			}
-		});
+		}, inputOptions);
 		
 		/**
 		 * Typecasting functions.
@@ -96,14 +96,14 @@ export default class FormProcessor
 		 *
 		 * @type {FieldDictionary}
 		 */
-		this.dictionary = buildDictionaryFrom(this.fields);
+		this.dictionary = buildDictionary(this.fields);
 		
 		/**
 		 * Fields composed into a tree.
 		 *
 		 * @type {Field}
 		 */
-		this.tree = buildTreeFrom(this.dictionary);
+		this.tree = buildTree(this.dictionary);
 	}
 	
 	/**
@@ -143,8 +143,6 @@ export default class FormProcessor
 	
 	/**
 	 * Derive a property's name from its path.
-	 *
-	 * TODO: Improve this
 	 *
 	 * @param {Field} field
 	 * @return {string} The derived name
@@ -272,18 +270,18 @@ export default class FormProcessor
 	 * @param {Field[]} properties
 	 * @returns {FieldDictionary}
 	 */
-	buildDictionaryFrom(properties)
+	buildDictionary(properties)
 	{
-		return buildDictionaryFrom(properties);
+		return buildDictionary(properties);
 	}
 	
 	/**
 	 * @param {FieldDictionary} dictionary
-	 * @returns {Field[]}
+	 * @returns {Field}
 	 */
-	buildTreeFrom(dictionary)
+	buildTree(dictionary)
 	{
-		return buildTreeFrom(dictionary);
+		return buildTree(dictionary);
 	}
 	
 	/**
