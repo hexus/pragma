@@ -89,6 +89,24 @@ const fields = [
 		description: "The character's classes"
 	},
 	{
+		// TODO: Process fields that use templates, building new fields according to data
+		path: 'templates.class',
+		name: 'Class',
+		type: 'group',
+		children: [
+			{
+				pathFragment: 'name',
+				type: 'string',
+				name: 'Class name'
+			},
+			{
+				pathFragment: 'levels',
+				type: 'number',
+				name: 'Levels'
+			}
+		]
+	},
+	{
 		path:     'classes.list',
 		type:     'list',
 		name:     'Class list',
@@ -103,6 +121,7 @@ const fields = [
 				},
 				{
 					pathFragment: 'levels',
+					type:         'number',
 					name:         'Levels'
 				}
 			]

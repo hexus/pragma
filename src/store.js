@@ -17,10 +17,14 @@ export default {
 				name: 'Tiefling'
 			},
 			classes: {
-				list:[
+				list: [
 					{
 						name: 'Sorcerer',
 						levels: 10
+					},
+					{
+						name: 'Test second class',
+						levels: 1
 					}
 				]
 			},

@@ -1,8 +1,8 @@
 <pragma-table>
-	<table name="{ opts.property.path }">
+	<table name="{ property.path }">
 		<thead><!-- TODO: Heading data --></thead>
 		<tbody>
-			<tr each="{ row in opts.property.children }">
+			<tr each="{ row in property.children }">
 				<th>
 					{ row.name }
 				</th>
@@ -19,6 +19,7 @@
 	<script>
 		import get from 'lodash/get';
 		this.get = get;
+		this.property = this.opts.property;
 		this.data = this.opts.data || {};
 
 		// TODO: Can the <tree> duplication be avoided? Yielding rows would be great, but seems very tricky given browser strictness.
