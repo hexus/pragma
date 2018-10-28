@@ -18,6 +18,8 @@
 
 		this.sheet = app.state.sheet;
 
+		formProcessor.update(this.sheet);
+
 		this.edit = function (event) {
 			console.log('playground edit event', event);
 

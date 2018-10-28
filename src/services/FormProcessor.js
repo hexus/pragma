@@ -23,11 +23,10 @@ export default class FormProcessor
 	 * Create a new property processor.
 	 *
 	 * @param {Field[]}                     fields         - Form fields.
-	 * @param {Object}                      [data={}]      - Form data.
  	 * @param {Object.<string, Derivation>} [functions]    - Functions to make available for field value derivations.
 	 * @param {Object.<string, Object>}     [inputOptions] - Default input options keyed by input type.
 	 */
-	constructor(fields, data, functions, inputOptions)
+	constructor(fields, functions, inputOptions)
 	{
 		/**
 		 * Default values for each field type.
@@ -97,18 +96,11 @@ export default class FormProcessor
 		};
 		
 		/**
-		 * The form data.
-		 *
-		 * @type {Object}
-		 */
-		this.data = data || {};
-		
-		/**
 		 * The set of form fields.
 		 *
 		 * @type {Field[]}
 		 */
-		this.fields = this.process(fields, data);
+		this.fields = this.process(fields);
 		
 		/**
 		 * Fields keyed by path.
@@ -131,10 +123,9 @@ export default class FormProcessor
 	 * Fills in default values, determines default names.
 	 *
 	 * @param {Field[]} fields - The field to process
-	 * @param {Object}  data   - The form data
 	 * @returns {Field[]} The given fields with derived names and default values
 	 */
-	process(fields, data)
+	process(fields)
 	{
 		if (!fields || !fields.length) {
 			return fields;
@@ -157,16 +148,7 @@ export default class FormProcessor
 			if (this.defaultValues[field.type]) {
 				field = defaults(field, this.defaultValues[field.type]);
 			}
-			
-			// Set the value if the data has one
-			if (has(data, field.path)) {
-				field.value = get(data, field.path);
-			} else if (field.defaultValue !== undefined) {
-				field.value = field.defaultValue;
-			}
 		}
-		
-		console.log(fields);
 		
 		return fields;
 	}
@@ -265,8 +247,8 @@ export default class FormProcessor
 	 * Update a property with the given value.
 	 *
 	 * @param {Object} data  - The data to update.
-	 * @param {string} path  - The data path to update the value of.
-	 * @param {*}      value - The value to update within the data according to the property.
+	 * @param {string} path  - The path to update the value of.
+	 * @param {*}      value - The value to set.
 	 * @return {*} The updated value
 	 */
 	updateValue(data, path, value)
@@ -276,7 +258,7 @@ export default class FormProcessor
 		
 		// Update the value if one is given
 		if (value !== undefined) {
-			// TODO: Also check whether the value is derived, and skip setting anything if so
+			// TODO: Also check whether the field's value is derived, skip setting anything if so
 			if (field) {
 				field.value = value;
 			}
@@ -284,19 +266,34 @@ export default class FormProcessor
 			set(data, path, value);
 		}
 		
-		// Derive all values after this value change
-		// TODO: Build and use a derivation argument map to derive only the affected properties? Derive all fields only if arguments aren't specified.
-		for (let p in dictionary) {
-			if (!dictionary[p])
-				continue;
-			
-			field = dictionary[p];
-			field.value = this.deriveValue(field.path, data);
-			set(data, field.path, value);
-		}
+		// Update all values after this value change
+		// TODO: Build and use a derivation argument map to update only the affected properties? i.e. this.updatePath(path);
+		// TODO: Derive all fields only if arguments aren't specified, our hand is forced in that situation i.e. this.update();
+		this.update(data);
 		
 		// Get the updated value
-		return get(data, field.path);
+		return get(data, path);
+	}
+	
+	/**
+	 * Derive values for every field using the given data.
+	 *
+	 * @param {Object} [data] - The data to update.
+	 */
+	update(data)
+	{
+		let dictionary = this.dictionary;
+		let field;
+		let path;
+		
+		for (path in dictionary) {
+			if (!dictionary[path])
+				continue;
+			
+			field = dictionary[path];
+			field.value = this.deriveValue(path, data);
+			set(data, path, field.value);
+		}
 	}
 	
 	/**
@@ -329,7 +326,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Build data from a tree of fields.
+	 * Build data from the current form state.
 	 *
 	 * @param {Field} tree
 	 */
@@ -353,26 +350,25 @@ export default class FormProcessor
  * @typedef {Object} Field
  *
  * @property {string}        path             - The path that matches this field.
- * @property {string|int}    [parent]         - The path for this field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
- * @property {string}        [pathFragment]   - The path fragment used to compose the property's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to name?
- * @property {string}        [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`. TODO: Make this strictly about data type rather than using for tags
- * @property {string|Input}  [input]          - The preferred input type of the property, if any. `'none'` shows the value without an input, `'hidden'` hides this property. // TODO: Rename? Might not be an actual input... (i.e. section)
- * @property {string}        [name]           - The property's name. Defaults to a sentence-case translation of the path's leaf. TODO: Rename to label
+ * @property {string}        [parent]         - The path for this field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
+ * @property {string}        [pathFragment]   - The path fragment used to compose the field's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to key?
+ * @property {string}        [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`. TODO: Make this strictly about data type rather than using for tags. That's what `input` should be for.
+ * @property {string|Input}  [input]          - The input type to use for this field, if any. `'none'` shows the value without an input, `'hidden'` hides this field. // TODO: Rename? Might not be an actual input... (i.e. section)
+ * @property {string}        [name]           - The property's name. Defaults to a sentence-case translation of the path's leaf. TODO: Rename to label?
  * @property {string}        [elaboration]    - An elaboration on the property's name.
  * @property {string}        [description]    - The property's description.
  * @property {boolean}       [store=true]     - Whether to store the property. Defaults to `true`.
  * @property {boolean}       [disabled=false] - Whether the property is disabled. Implied if derivation is set.
- * @property {*}             [value]          - The property's value.
- * @property {*}             [default]        - The property's default value. Defaults as appropriate to the `type`.
+ * @property {*}             [value]          - The field's value.
+ * @property {*}             [default]        - The field's default value. Defaults as appropriate to the `type`.
  * @property {boolean}       [derive=true]    - Whether to derive a value if a derivation is present.
- * @property {Derivation}    [derivation]     - The property's processing definition. If one exists, this property won't have an editable input.
- * @property {string}        [sanitizer]      - The property's sanitization function.
- * @property {string}        [validator]      - The property's validation function. Defaults as appropriate to the `type`.
- * @property {number}        [min=-100]       - The minimum value of the property if the type is `'number'`. Defaults to -100.
- * @property {number}        [max=100]        - The maximum value of the property if the type is `'number'`. Defaults to 100.
- * @property {number}        [step]           - The step value of the property if the type is `'number'`.
- * @property {Field[]}       [children]       - Child properties.
- * @property {Field|Field[]} [template] - Template property for creating more children for `'list'` or `'table'` property types.
+ * @property {Derivation}    [derivation]     - The field's processing definition. If one exists, this field won't have an editable input.
+ * @property {string}        [validator]      - The field's validation function. Defaults as appropriate to the `type`.
+ * @property {number}        [min=-100]       - The minimum value of the field if the type is `'number'`. Defaults to -100. TODO: Input options
+ * @property {number}        [max=100]        - The maximum value of the field if the type is `'number'`. Defaults to 100. TODO: Input options
+ * @property {number}        [step]           - The step value of the field if the type is `'number'`. TODO: Input options
+ * @property {Field[]}       [children]       - Child fields.
+ * @property {Field|string}  [template]       - Template field for creating new child fields. Can be a Field or a `path`.
  */
 
 /**
