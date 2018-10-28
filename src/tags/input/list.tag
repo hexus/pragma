@@ -1,23 +1,13 @@
 <list>
 	<div>{ opts.property.name }</div>
 
-	<!-- TODO: Render children from opts.data using opts.property.template... somehow -->
-
-	{ JSON.stringify(get(opts.data, opts.property.path, []), null, 2) }
-
-	<!-- We expect the data to be an array -->
 	<div each="{ item, index in get(opts.data, opts.property.path, []) }">
-
-		{ JSON.stringify(templateField(opts.property, index), null, 2) }
 		<tree-child data-is="{ opts.property.template.type }" property="{ templateField(opts.property, index) }" data="{ data }">
-			{ console.log(opts.property) }
 			<virtual if="{ opts.property.children }">
 				<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
 			</virtual>
 		</tree-child>
 	</div>
-
-	<!--<yield/>-->
 
 	<button type="button" onclick="{ add }">Add</button>
 
