@@ -1,6 +1,6 @@
 import riot from 'riot';
 import domEvent from 'mixins/domEvent';
-import './tags/pragma.tag';
+import './tags/old.tag';
 import './tags/playground.tag';
 
 import CharacterFactory        from './services/CharacterFactory';

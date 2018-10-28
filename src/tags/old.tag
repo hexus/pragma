@@ -1,4 +1,4 @@
-<pragma>
+<old>
 	<h1>Pragma</h1>
 
 	<input type="button" value="Force Update" onmouseup="{ () => {} }"/>
@@ -114,4 +114,4 @@
 			this.sheet = null;
 		});
 	</script>
-</pragma>
+</old>
