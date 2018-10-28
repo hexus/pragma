@@ -237,7 +237,7 @@ export default class FormProcessor
 	 * @param {Object} data  - The data to update.
 	 * @param {string} path  - The data path to update the value of.
 	 * @param {*}      value - The value to update within the data according to the property.
-	 * @return {*} The update value
+	 * @return {*} The updated value
 	 */
 	updateValue(data, path, value)
 	{
@@ -267,12 +267,14 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * @param {Field[]} properties
+	 * Build a dictionary from the given fields.
+	 *
+	 * @param {Field[]} fields
 	 * @returns {FieldDictionary}
 	 */
-	buildDictionary(properties)
+	buildDictionary(fields)
 	{
-		return buildDictionary(properties);
+		return buildDictionary(fields);
 	}
 	
 	/**
