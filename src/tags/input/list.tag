@@ -27,7 +27,7 @@
 		/**
 		 * Create a field from a template for its parent.
 		 *
-		 * TODO: This will likely need to go somewhere else, FormProcessor probably
+		 * TODO: Get rid of this entirely, use fields generate by FormProcessor
 		 *
 		 * @param {Field} parent   - Parent field with a template
 		 * @param {number} [index] - Child index

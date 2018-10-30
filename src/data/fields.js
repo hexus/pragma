@@ -128,20 +128,6 @@ const fields = [
 		},
 	},
 	{
-		path: 'classes.list.0',
-		type: 'group',
-		name: 'Class'
-	},
-	{
-		path: 'classes.list.0.name',
-		type: 'string',
-		name: 'Class name'
-	},
-	{
-		path: 'classes.list.0.levels',
-		name: 'Levels'
-	},
-	{
 		// virtual!
 		path: 'sections.abilities',
 		parent: '',
