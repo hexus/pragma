@@ -303,6 +303,7 @@ export default class FormProcessor
 			value = get(data, field.path);
 			
 			// Build new fields for the template
+			// TODO: THIS could safely return existing fields that have been updated
 			newFields.push(
 				...this.buildTemplateFields(field, field.template, value)
 			);
