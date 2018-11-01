@@ -32,6 +32,8 @@
 
 		this.add = function (event) {
 			console.log('playground add event', event);
+
+			// TODO: addValue()?
 		};
 
 		console.log(this);

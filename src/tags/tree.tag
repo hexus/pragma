@@ -1,9 +1,11 @@
 <tree>
 	<virtual each="{ child in children }">
 		<tree-child if="{ isVisible(child) }" data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }" data="{ data }">
+			<yield from="beforeChild"/>
 			<virtual if="{ opts.property.children }">
 				<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
 			</virtual>
+			<yield from="afterChild"/>
 		</tree-child>
 	</virtual>
 

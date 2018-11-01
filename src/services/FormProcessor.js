@@ -4,6 +4,9 @@ import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
 import each            from 'lodash/each';
+import pick            from 'lodash/pick';
+import pickBy          from 'lodash/pickBy';
+import startsWith      from 'lodash/startsWith';
 import reject          from 'lodash/reject';
 import defaultTo       from 'lodash/defaultTo';
 import { util }        from '../mixins/util';
@@ -138,7 +141,7 @@ export default class FormProcessor
 			field = fields[i];
 			
 			// Derive a name
-			if (!field.name) {
+			if (field.name === undefined) {
 				field.name = this.deriveName(field);
 			}
 
@@ -266,6 +269,11 @@ export default class FormProcessor
 	/**
 	 * Unravel all templates into fields for the given data.
 	 *
+	 * TODO: Optimise by only rebuilding fields as necessary
+	 *        - Update values of existing template fields
+	 *        - Build new fields as necessary
+	 *        - Remove redundant fields as necessary
+	 *
 	 * @param {Object} [data] - The data used to unravel field templates
 	 */
 	updateTemplates(data)
@@ -273,20 +281,26 @@ export default class FormProcessor
 		let dictionary = this.dictionary;
 		let newFields = [], value;
 
-		// TODO: Clear existing fields for every template
+		// Find all fields with templates for their children
+		let fieldsWithTemplates = pickBy(dictionary, field => !!field.template);
+		
+		// Clear existing template fields TODO: This is naive, see docblock above
+		each(fieldsWithTemplates, (fieldWithTemplate) => {
+			// Remove them from the dictionary
+			dictionary = pickBy(
+				dictionary,
+				field => !startsWith(field.path, fieldWithTemplate.path + '.')
+			);
+			
+			// Empty the field's children to make way for the next generation
+			fieldWithTemplate.children = [];
+		});
 		
 		// Build new fields for each field with a template
-		each(dictionary, (field) => {
-			// We only care about fields with templates
-			if (!field.template) {
-				return;
-			}
+		each(fieldsWithTemplates, (field) => {
+			// TODO: Dictionary lookup for template field by path string
 			
-			// TODO: Dictionary lookup for template field path as a string
-			
-			value = get(data, field.path, []);
-			
-			console.log(field.path, value);
+			value = get(data, field.path);
 			
 			// Build new fields for the template
 			newFields.push(
@@ -296,16 +310,16 @@ export default class FormProcessor
 		
 		console.log(newFields);
 		
-		// Update the dictionary
+		// Update the dictionary with the new fields
 		each(newFields, (field) => {
 			dictionary[field.path] = field;
 		});
+		
+		this.dictionary = dictionary;
 	}
 	
 	/**
 	 * Build fields from a template.
-	 *
-	 * Acts recursively on any child fields in the template.
 	 *
 	 * @param {Field} parent   - The parent field
 	 * @param {Field} template - The template field
@@ -318,21 +332,24 @@ export default class FormProcessor
 			return [];
 		}
 		
-		let field, fields = [];
+		let fields = [];
 		
+		// Build new fields for each item and add them to the list of new fields
 		each(value, (item, key) => {
-			// Build the new field
-			field = this.buildTemplateField(parent, template, template.pathFragment || key, item);
-			
-			// Add it to the list of new fields
-			fields.push(field);
+			fields.push(
+				...this.buildTemplateField(
+					parent, template, template.pathFragment || key, item
+				)
+			);
 		});
 		
 		return fields;
 	}
 	
 	/**
-	 * Build a single field from a template.
+	 * Build a field and all of its child fields from a template.
+	 *
+	 * Acts recursively on any child fields in the template.
 	 *
 	 * TODO: Merge this method into buildTemplateFields(), it seems like they belong together
 	 *
@@ -340,7 +357,7 @@ export default class FormProcessor
 	 * @param {Field}      template - The template field
 	 * @param {string|int} key      - The key of the new field
 	 * @param {*}          value    - The value of the new field
-	 * @return {Field} The built field
+	 * @return {Field[]} The built fields
 	 */
 	buildTemplateField(parent, template, key, value)
 	{
@@ -352,6 +369,8 @@ export default class FormProcessor
 				value: value
 			}
 		);
+		
+		let fields = [field];
 		
 		// Extract template children and template
 		let children = field.children;
@@ -382,12 +401,12 @@ export default class FormProcessor
 			let childKey = child.pathFragment || c;
 			let childValue = field.value ? field.value[childKey] : null;
 			
-			// TODO: Merge this method into buildTemplateFields(), it seems like they belong together
+			// TODO: Merge this method into buildTemplateFields(), it seems like they might belong together
 			let childField = this.buildTemplateField(field, child, childKey, childValue);
-			this.dictionary[childField.path] = childField;
+			fields.push(childField);
 		}
 		
-		return field;
+		return fields;
 	}
 	
 	/**

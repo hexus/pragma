@@ -109,7 +109,7 @@ const fields = [
 	{
 		path:     'classes.list',
 		type:     'list',
-		name:     'Class list',
+		name:     null,
 		template: {
 			name:     'Class',
 			type:     'group',
