@@ -2,6 +2,7 @@
 	<table name="{ property.path }">
 		<thead><!-- TODO: Heading data --></thead>
 		<tbody>
+			<!-- TODO: Split up rows into their own tag -->
 			<tr each="{ row in property.children }">
 				<th>
 					{ row.name }
