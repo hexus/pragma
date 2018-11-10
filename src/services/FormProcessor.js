@@ -135,10 +135,23 @@ export default class FormProcessor
 			return fields;
 		}
 		
-		let i, field;
+		let i, field, lastDotIndex, parentPath;
 		
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
+			
+			// Ascertain a parent
+			if (field.parent == null) {
+				lastDotIndex = field.path.lastIndexOf('.');
+				
+				if (lastDotIndex < 1) {
+					parentPath = '';
+				} else {
+					parentPath = field.path.substring(lastDotIndex, 0);
+				}
+				
+				field.parent = parentPath;
+			}
 			
 			// Derive a name
 			if (field.name === undefined) {
@@ -320,23 +333,23 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Build fields from a template.
+	 * Build fields from a template and its corresponding data.
 	 *
 	 * @param {Field} parent   - The parent field
 	 * @param {Field} template - The template field
-	 * @param {*}     value    - The value for the new field
+	 * @param {*}     [data]   - The data used to build the new fields
 	 * @return {Field[]} The new fields
 	 */
-	buildTemplateFields(parent, template, value)
+	buildTemplateFields(parent, template, data)
 	{
-		if (!parent || !parent.path || !template || !value) {
+		if (!parent || !parent.path || !template || !data) {
 			return [];
 		}
 		
 		let fields = [];
 		
 		// Build new fields for each item and add them to the list of new fields
-		each(value, (item, key) => {
+		each(data, (item, key) => {
 			fields.push(
 				...this.buildTemplateField(
 					parent, template, template.pathFragment || key, item
@@ -348,11 +361,10 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Build a field and all of its child fields from a template.
+	 * Build a child field, and all of its child fields, from a parent field's
+	 * template.
 	 *
 	 * Acts recursively on any child fields in the template.
-	 *
-	 * TODO: Merge this method into buildTemplateFields(), it seems like they belong together
 	 *
 	 * @param {Field}      parent   - The parent field
 	 * @param {Field}      template - The template field
@@ -362,6 +374,8 @@ export default class FormProcessor
 	 */
 	buildTemplateField(parent, template, key, value)
 	{
+		// TODO: Optional parent?
+		
 		let field = merge(
 			{},
 			template,
@@ -397,12 +411,12 @@ export default class FormProcessor
 		}
 		
 		// Recursively build the template children as fields
+		// TODO: Use each()
 		for (let c = 0; c < children.length; c++) {
 			let child = children[c];
 			let childKey = child.pathFragment || c;
 			let childValue = field.value ? field.value[childKey] : null;
-			
-			// TODO: Merge this method into buildTemplateFields(), it seems like they might belong together
+
 			let childField = this.buildTemplateField(field, child, childKey, childValue);
 			fields.push(childField);
 		}
@@ -510,13 +524,82 @@ export default class FormProcessor
 	/**
 	 * Build data from the current form state.
 	 *
-	 * @param {Field} tree
+	 * @param {Field}  field  - The root field to traverse from.
+	 * @param {Object} [data] - The target data object.
+	 * @return {Object} The built data.
 	 */
-	buildData(tree)
+	buildData(field, data)
 	{
-		let data = {};
+		data = data || {};
 		
-		// TODO: Implement
+		if (!field)
+			return data;
+		
+		let childData;
+		
+		// If the field has children, build the data of its children
+		if (field.children) {
+			for (let c = 0; c < field.children.length; c++) {
+				childData = this.buildData(field.children[c], data);
+			}
+			
+			return data;
+		}
+		
+		// Set data if the field has a path
+		if (field.path) {
+			set(data, field.path, defaultTo(field.value, field.default));
+		}
+	}
+	
+	/**
+	 * Build data for a field's children template.
+	 *
+	 * TODO: Would be nice not to have to build and reach into the parent paths... hmm
+	 *
+	 * @param {Field}  field  - The field to build child data for.
+	 * @param {Object} [data] - The target data object.
+	 * @return {Object} The built data.
+	 */
+	buildTemplateData(field, data)
+	{
+		if (!field.template) {
+			return null;
+		}
+		
+		// Build the template field
+		let templateFields = this.buildTemplateField(field, field.template, 0, null);
+		
+		// The root will always be the first
+		let templateField = templateFields[0];
+		
+		console.log(templateField);
+		
+		// Build the data for the template field
+		return get(this.buildData(templateField), field.path + '.0');
+	}
+	
+	/**
+	 * Add new child data for the given field using its template.
+	 *
+	 * @protected
+	 * @param {string}        path  - The path of the field to add new child data to.
+	 * @param {Object}        data  - The data to change.
+	 * @param {string|number} [key] - Optional key to use for the new child data.
+	 */
+	addChildData(path, data)
+	{
+		let field = this.dictionary[path];
+		
+		if (!field)
+			return;
+		
+		// Build the data
+		let newData = this.buildTemplateData(field);
+		
+		// Set it
+		console.log(newData);
+		// pragma.services.formProcessor.addChildData('classes.list');
 	}
 }
 

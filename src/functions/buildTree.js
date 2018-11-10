@@ -35,23 +35,12 @@ export default function (dictionary) {
 			continue;
 		}
 		
-		// Ascertain a parent
-		// TODO: Extract this block? Move parent path acquisition to FormProcessor.process()?
-		if (property.parent != null) {
-			parent = dictionary[property.parent];
-		} else {
-			lastDotIndex = property.path.lastIndexOf('.');
-			
-			if (lastDotIndex < 1) {
-				parentPath = null;
-				parent     = tree;
-			} else {
-				parentPath = property.path.substring(lastDotIndex, 0);
-				parent     = dictionary[parentPath];
-			}
-			
-			property.parent = parentPath;
+		if (property.parent == null) {
+			// You don't have an explicitly defined parent, by Felicia
+			continue;
 		}
+		
+		parent = dictionary[property.parent];
 		
 		// Sorry, you're an orphan, you don't get into the tree
 		if (!parent) {
