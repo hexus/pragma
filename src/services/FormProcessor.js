@@ -135,23 +135,24 @@ export default class FormProcessor
 			return fields;
 		}
 		
-		let i, field, lastDotIndex, parentPath;
+		let i, field, lastDotIndex, pathFragment, parentPath;
 		
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
 			
-			// Ascertain a parent
-			if (field.parent == null) {
-				lastDotIndex = field.path.lastIndexOf('.');
-				
-				if (lastDotIndex < 1) {
-					parentPath = '';
-				} else {
-					parentPath = field.path.substring(lastDotIndex, 0);
-				}
-				
-				field.parent = parentPath;
+			// Ascertain a parent path and path fragment
+			lastDotIndex = field.path.lastIndexOf('.');
+			
+			if (lastDotIndex < 1) {
+				pathFragment = field.path;
+				parentPath = '';
+			} else {
+				pathFragment = field.path.substring(lastDotIndex + 1);
+				parentPath = field.path.substring(0, lastDotIndex);
 			}
+			
+			field.pathFragment = defaultTo(field.pathFragment, pathFragment);
+			field.parent = defaultTo(field.parent, parentPath);
 			
 			// Derive a name
 			if (field.name === undefined) {
@@ -316,13 +317,12 @@ export default class FormProcessor
 			value = get(data, field.path);
 			
 			// Build new fields for the template
-			// TODO: THIS could safely return existing fields that have been updated
 			newFields.push(
 				...this.buildTemplateFields(field, field.template, value)
 			);
 		});
 		
-		console.log(newFields);
+		console.log('new fields', newFields);
 		
 		// Update the dictionary with the new fields
 		each(newFields, (field) => {
@@ -330,6 +330,9 @@ export default class FormProcessor
 		});
 		
 		this.dictionary = dictionary;
+		
+		// lol
+		// this.tree = this.buildTree(this.dictionary);
 	}
 	
 	/**
@@ -348,8 +351,9 @@ export default class FormProcessor
 		
 		let fields = [];
 		
-		// Build new fields for each item and add them to the list of new fields
+		// Build new fields for each data item
 		each(data, (item, key) => {
+			console.log(item, key);
 			fields.push(
 				...this.buildTemplateField(
 					parent, template, template.pathFragment || key, item
@@ -466,10 +470,10 @@ export default class FormProcessor
 		let dictionary = this.dictionary;
 		let path;
 		
-		// Update templates
+		// Update template fields
 		this.updateTemplates(data);
 		
-		// Update values
+		// Update the values of every field
 		for (path in dictionary) {
 			if (!dictionary[path])
 				continue;
@@ -567,6 +571,9 @@ export default class FormProcessor
 			return null;
 		}
 		
+		// Clone the field
+		field = merge({}, field);
+		
 		// Build the template field
 		let templateFields = this.buildTemplateField(field, field.template, 0, null);
 		
@@ -582,24 +589,38 @@ export default class FormProcessor
 	/**
 	 * Add new child data for the given field using its template.
 	 *
-	 * @protected
-	 * @param {string}        path  - The path of the field to add new child data to.
 	 * @param {Object}        data  - The data to change.
+	 * @param {string}        path  - The path of the field to add new child data to.
 	 * @param {string|number} [key] - Optional key to use for the new child data.
 	 */
-	addChildData(path, data)
+	addItem(data, path, key)
 	{
 		let field = this.dictionary[path];
 		
 		if (!field)
 			return;
 		
-		// Build the data
+		// Build the new child data
 		let newData = this.buildTemplateData(field);
 		
-		// Set it
+		// Get the target for the data
+		let target = get(data, path, []);
+		
+		// Add the new child data to the collection
+		if (Array.isArray(target)) {
+			target.push(newData);
+		} else if (key != null && typeof target === 'object') {
+			target[key] = newData;
+		} else {
+			console.warn(
+				`Could not set child data for '${path}', either it wasn't an array or wasn't an object with a key provided`
+			);
+		}
+		
+		// Set it back
+		set(data, path, target);
 		console.log(newData);
-		// pragma.services.formProcessor.addChildData('classes.list');
+		console.log(data);
 	}
 }
 

@@ -1,4 +1,6 @@
 <tree>
+	<!--<pre>{ JSON.stringify(children, null, 2) }</pre>-->
+
 	<virtual each="{ child in children }">
 		<tree-child if="{ isVisible(child) }" data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }" data="{ data }">
 			<yield from="beforeChild"/>

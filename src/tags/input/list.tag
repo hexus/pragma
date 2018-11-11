@@ -22,8 +22,8 @@
 			});
 		};
 
-		this.remove = function (event) {
-			//
+		this.remove = function () {
+			// TODO: Find path of removed item (new list item tag would help this)
 
 			this.triggerDom('remove', {
 

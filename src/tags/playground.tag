@@ -1,4 +1,8 @@
 <playground>
+	<!--<pre>{ JSON.stringify(sheet, null, 2) }</pre>-->
+
+	<!--<pre>{ JSON.stringify(tree.children, null, 2) }</pre>-->
+
 	<tree children="{ tree.children }" data="{ sheet }" onedit="{ edit }" onadd="{ add }"></tree>
 
 	<script>
@@ -33,7 +37,13 @@
 		this.add = function (event) {
 			console.log('playground add event', event);
 
-			// TODO: addValue()?
+			let { name } = event.detail;
+
+			// Add a new data item
+			formProcessor.addItem(this.sheet, name);
+
+			// Update the form
+			formProcessor.update(this.sheet);
 		};
 
 		console.log(this);
