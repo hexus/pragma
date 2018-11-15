@@ -1,8 +1,8 @@
 <tree>
 	<virtual each="{ child in opts.children }">
-		<tree-child if="{ isVisible(child) }" data-is="{ child.type }" property="{ child }" value="{ getValue(child) }" data="{ data }">
+		<tree-child if="{ isVisible(child) }" data-is="{ child.type }" property="{ child }" value="{ getValue(child) }" data="{ opts.data }">
 			<virtual if="{ opts.property.children }">
-				<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
+				<tree children="{ opts.property.children }" data="{ parent.opts.data }"></tree>
 			</virtual>
 		</tree-child>
 	</virtual>
@@ -33,11 +33,6 @@
 			return defaultTo(field.value, field.default);
 			// get(this.opts.data, field.path, field.default);
 		};
-
-		this.on('update', function () {
-			this.children = this.opts.children || [];
-			this.data = this.opts.data || {};
-		});
 
 		// TODO: Would be amazing to retain and mount custom element tags without data-is
 	</script>

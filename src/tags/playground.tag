@@ -14,7 +14,7 @@
 		import './input/list.tag';
 		import './input/pragma-table.tag';
 
-		const app = this.opts.app;
+		let app = this.opts.app;
 
 		let formProcessor = app.services.formProcessor;
 
