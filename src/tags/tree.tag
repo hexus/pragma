@@ -1,23 +1,17 @@
 <tree>
-	<!--<pre>{ JSON.stringify(children, null, 2) }</pre>-->
-
-	<virtual each="{ child in children }">
-		<tree-child if="{ isVisible(child) }" data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }" data="{ data }">
-			<yield from="beforeChild"/>
+	<virtual each="{ child in opts.children }">
+		<tree-child if="{ isVisible(child) }" data-is="{ child.type }" property="{ child }" value="{ getValue(child) }" data="{ data }">
 			<virtual if="{ opts.property.children }">
 				<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
 			</virtual>
-			<yield from="afterChild"/>
 		</tree-child>
 	</virtual>
 
 	<script>
 		import get from 'lodash/get';
+		import defaultTo from 'lodash/defaultTo';
 
 		this.get = get;
-		this.children = this.opts.children || [];
-		this.depth = parseInt(this.opts.depth) || 0;
-		this.data = this.opts.data || {};
 
 		/**
 		 * Determine whether a field should be drawn.
@@ -27,7 +21,23 @@
 		 */
 		this.isVisible = function (field) {
 			return field && field.type !== 'hidden';
-		}
+		};
+
+		/**
+		 * Get a field's value.
+		 *
+		 * @param {Field} field
+		 * @returns {boolean}
+		 */
+		this.getValue = function (field) {
+			return defaultTo(field.value, field.default);
+			// get(this.opts.data, field.path, field.default);
+		};
+
+		this.on('update', function () {
+			this.children = this.opts.children || [];
+			this.data = this.opts.data || {};
+		});
 
 		// TODO: Would be amazing to retain and mount custom element tags without data-is
 	</script>

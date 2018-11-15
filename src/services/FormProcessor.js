@@ -597,6 +597,7 @@ export default class FormProcessor
 	{
 		let field = this.dictionary[path];
 		
+		// We need to know about the field to do anything here
 		if (!field)
 			return;
 		

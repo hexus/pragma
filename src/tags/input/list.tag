@@ -2,11 +2,7 @@
 	<div>{ opts.property.name }</div>
 
 	<!-- TODO: Split up list items into their own tag -->
-	<tree children="{ opts.property.children }" data="{ data }">
-		<yield to="afterChild">
-			<button type="button" onclick="{ remove }">Remove</button>
-		</yield>
-	</tree>
+	<tree children="{ opts.property.children }" data="{ data }"></tree>
 
 	<button type="button" onclick="{ add }">Add</button>
 
@@ -22,12 +18,16 @@
 			});
 		};
 
-		this.remove = function () {
+		this.rem = function () {
 			// TODO: Find path of removed item (new list item tag would help this)
 
-			this.triggerDom('remove', {
-
-			});
+			// this.triggerDom('remove', {
+			//
+			// });
 		};
+
+		this.on('update', function () {
+			this.data = this.opts.data || {};
+		});
 	</script>
 </list>
