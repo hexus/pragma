@@ -5,10 +5,9 @@
 		   min="{ opts.property.min }"
 		   max="{ opts.property.max }"
 		   step="{ opts.property.step }"
-		   value="{ opts.riotValue }"
+		   value="{ opts.property.value }"
 		   disabled="{ !!opts.property.derivation }"
-		   onchange="{ edit }"
-		   onkeyup="{ edit }"
+		   oninput="{ edit }"
 	/>
 
 	<script>

@@ -3,7 +3,7 @@
 
 	<!--<pre>{ JSON.stringify(tree.children, null, 2) }</pre>-->
 
-	<tree children="{ tree.children }" data="{ sheet }" onedit="{ edit }" onadd="{ add }"></tree>
+	<tree children="{ tree.children }" onedit="{ edit }" onadd="{ add }"></tree>
 
 	<script>
 		import './tree.tag';

@@ -8,7 +8,7 @@
  */
 export default {
 	/**
-	 * Trigger a DOM event on the root element of the tag..
+	 * Trigger a DOM event on the root element of the tag.
 	 *
 	 * @param {string}       eventName      - The name of the event to fire
 	 * @param {Event|Object} [event]        - The event object to dispatch, or data to attach to the created event.
