@@ -3,6 +3,7 @@ import defaults        from 'lodash/defaultsDeep';
 import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
+import unset           from 'lodash/unset';
 import each            from 'lodash/each';
 import pick            from 'lodash/pick';
 import pickBy          from 'lodash/pickBy';
@@ -580,8 +581,6 @@ export default class FormProcessor
 		// The root will always be the first
 		let templateField = templateFields[0];
 		
-		console.log(templateField);
-		
 		// Build the data for the template field
 		return get(this.buildData(templateField), field.path + '.0');
 	}
@@ -614,7 +613,7 @@ export default class FormProcessor
 			target[key] = newData;
 		} else {
 			console.warn(
-				`Could not set child data for '${path}', either it wasn't an array or wasn't an object with a key provided`
+				`Could not create new child data for '${path}', either it wasn't an array or wasn't an object with a key provided`
 			);
 		}
 		
@@ -622,6 +621,17 @@ export default class FormProcessor
 		set(data, path, target);
 		console.log(newData);
 		console.log(data);
+	}
+	
+	/**
+	 * Remove data from the given path.
+	 *
+	 * @param {Object} data - The data to change.
+	 * @param {string} path - The path to remove.
+	 */
+	remove(data, path)
+	{
+		unset(data, path);
 	}
 }
 

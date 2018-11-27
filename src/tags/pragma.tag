@@ -1,9 +1,12 @@
-<playground>
+<pragma>
 	<!--<pre>{ JSON.stringify(sheet, null, 2) }</pre>-->
 
 	<!--<pre>{ JSON.stringify(tree.children, null, 2) }</pre>-->
 
-	<tree children="{ tree.children }" onedit="{ edit }" onadd="{ add }"></tree>
+	<tree children="{ tree.children }" onedit="{ edit }" onadd="{ add }" onremove="{ remove }"></tree>
+
+	<!-- Debug the data -->
+	<pre>{ JSON.stringify(sheet, null, 2) }</pre>
 
 	<script>
 		import './tree.tag';
@@ -12,6 +15,7 @@
 		import './input/section.tag';
 		import './input/group.tag';
 		import './input/list.tag';
+		import './input/list-item.tag';
 		import './input/pragma-table.tag';
 
 		let app = this.opts.app;
@@ -25,17 +29,18 @@
 		formProcessor.update(this.sheet);
 
 		this.edit = function (event) {
-			console.log('playground edit event', event);
+			console.log('pragma edit event', event);
 
 			let { name, value } = event.detail;
 
+			// Update a value
 			formProcessor.updateValue(this.sheet, name, value);
 
 			console.log(name, value);
 		};
 
 		this.add = function (event) {
-			console.log('playground add event', event);
+			console.log('pragma add event', event);
 
 			let { name } = event.detail;
 
@@ -46,6 +51,18 @@
 			formProcessor.update(this.sheet);
 		};
 
+		this.remove = function (event) {
+			console.log('pragma remove event', event);
+
+			let { name } = event.detail;
+
+			// Remove a value
+			formProcessor.remove(this.sheet, name);
+
+			// Update the form
+			formProcessor.update(this.sheet);
+		};
+
 		console.log(this);
 	</script>
-</playground>
+</pragma>

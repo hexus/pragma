@@ -1,7 +1,7 @@
 import riot from 'riot';
 import domEvent from 'mixins/domEvent';
 import './tags/old.tag';
-import './tags/playground.tag';
+import './tags/pragma.tag';
 
 import CharacterFactory        from './services/CharacterFactory';
 import CharacterSheetProcessor from "./services/CharacterSheetProcessor";
