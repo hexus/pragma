@@ -1,9 +1,13 @@
 <list-item>
-	<p>
-		<tree children="{ [opts.property] }"></tree>
+	<div>
+		<div style="display:inline-block;">
+			<tree children="{ [opts.property] }"></tree>
+		</div>
 
-		<button type="button" onclick="{ remove }">Remove</button>
-	</p>
+		<div style="display:inline-block;">
+			<button type="button" onclick="{ remove }">Remove</button>
+		</div>
+	</div>
 
 	<script>
 		this.remove = function () {

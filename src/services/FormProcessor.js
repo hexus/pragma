@@ -619,8 +619,6 @@ export default class FormProcessor
 		
 		// Set it back
 		set(data, path, target);
-		console.log(newData);
-		console.log(data);
 	}
 	
 	/**
@@ -631,6 +629,11 @@ export default class FormProcessor
 	 */
 	remove(data, path)
 	{
+		if (!has(data, path)) {
+			return;
+		}
+		
+		set(data, path, null);
 		unset(data, path);
 	}
 }
