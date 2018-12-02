@@ -6,7 +6,9 @@
 	<tree children="{ tree.children }" onedit="{ edit }" onadd="{ add }" onremove="{ remove }"></tree>
 
 	<!-- Debug the data -->
-	<pre>{ JSON.stringify(sheet, null, 2) }</pre>
+	<div style="position: fixed; top: 0; right: 0; height: 100%; width: 300px; background: rgba(255, 255, 255, 0.5); overflow: auto;">
+		<pre>{ JSON.stringify(sheet, null, 2) }</pre>
+	</div>
 
 	<script>
 		import './tree.tag';
@@ -59,7 +61,7 @@
 			formProcessor.remove(this.sheet, name);
 
 			// Update the form
-			formProcessor.update(this.sheet);
+			//formProcessor.update(this.sheet);
 		};
 
 		console.log(this);

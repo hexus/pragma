@@ -579,7 +579,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Add new child data for the given field using its template.
+	 * Add new child data for the field at the given path using its template.
 	 *
 	 * @param {Object}        data  - The data to change.
 	 * @param {string}        path  - The path of the field to add new child data to.
@@ -606,7 +606,8 @@ export default class FormProcessor
 			target[key] = newData;
 		} else {
 			console.warn(
-				`Could not create new child data for '${path}', either it wasn't an array or wasn't an object with a key provided`
+				`Could not create new child data for '${path}';` +
+				` either it wasn't an array or wasn't an object with a key provided`
 			);
 		}
 		
@@ -622,13 +623,17 @@ export default class FormProcessor
 	 */
 	remove(data, path)
 	{
-		if (!has(data, path)) {
-			return;
-		}
+		// if (!has(data, path)) {
+		// 	return;
+		// }
 		
 		let [parentPath, pathFragment] = splitPath(path);
 		
 		let parent = get(data, parentPath);
+		
+		if (!parent) {
+			return;
+		}
 		
 		if (Array.isArray(parent)) {
 			parent.splice(pathFragment, 1);
