@@ -16,6 +16,7 @@ import sum             from '../functions/sum';
 import min             from '../functions/min';
 import buildDictionary from '../functions/buildDictionary';
 import buildTree       from '../functions/buildTree';
+import splitPath       from '../functions/splitPath';
 
 /**
  * Processes lists of property definitions.
@@ -142,15 +143,7 @@ export default class FormProcessor
 			field = fields[i];
 			
 			// Ascertain a parent path and path fragment
-			lastDotIndex = field.path.lastIndexOf('.');
-			
-			if (lastDotIndex < 1) {
-				pathFragment = field.path;
-				parentPath = '';
-			} else {
-				pathFragment = field.path.substring(lastDotIndex + 1);
-				parentPath = field.path.substring(0, lastDotIndex);
-			}
+			[parentPath, pathFragment] = splitPath(field.path);
 			
 			field.pathFragment = defaultTo(field.pathFragment, pathFragment);
 			field.parent = defaultTo(field.parent, parentPath);
@@ -474,7 +467,7 @@ export default class FormProcessor
 		// Update template fields
 		this.updateTemplates(data);
 		
-		// Update the values of every field
+		// Update every field
 		for (path in dictionary) {
 			if (!dictionary[path])
 				continue;
@@ -633,8 +626,19 @@ export default class FormProcessor
 			return;
 		}
 		
-		set(data, path, null);
-		unset(data, path);
+		let [parentPath, pathFragment] = splitPath(path);
+		
+		let parent = get(data, parentPath);
+		
+		if (Array.isArray(parent)) {
+			parent.splice(pathFragment, 1);
+		} else {
+			delete parent[pathFragment];
+		}
+		
+		console.log('remove', parentPath, pathFragment, parent);
+		
+		set(data, parentPath, parent);
 	}
 }
 

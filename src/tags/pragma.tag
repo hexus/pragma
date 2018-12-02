@@ -15,7 +15,6 @@
 		import './input/section.tag';
 		import './input/group.tag';
 		import './input/list.tag';
-		import './input/list-item.tag';
 		import './input/pragma-table.tag';
 
 		let app = this.opts.app;

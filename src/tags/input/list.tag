@@ -1,7 +1,7 @@
 <list>
 	<div>{ opts.property.name }</div>
 
-	<virtual each="{ child in opts.property.children }">
+	<virtual each="{ child in opts.property.children }" key="path">
 		<list-item property="{ child }"></list-item>
 	</virtual>
 

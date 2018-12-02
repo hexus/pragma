@@ -11,7 +11,6 @@
 
 	<script>
 		this.remove = function () {
-			console.log('hihi');
 			this.triggerDom('remove', {
 				name: this.opts.property.path
 			});
