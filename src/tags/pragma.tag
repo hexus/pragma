@@ -61,7 +61,7 @@
 			formProcessor.remove(this.sheet, name);
 
 			// Update the form
-			//formProcessor.update(this.sheet);
+			formProcessor.update(this.sheet);
 		};
 
 		console.log(this);

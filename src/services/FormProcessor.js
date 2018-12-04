@@ -420,6 +420,9 @@ export default class FormProcessor
 			fields.push(childField);
 		}
 		
+		// Process the fields
+		fields = this.process(fields);
+		
 		return fields;
 	}
 	
