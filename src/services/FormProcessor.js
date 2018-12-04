@@ -282,14 +282,16 @@ export default class FormProcessor
 	 *        - Build new fields as necessary
 	 *        - Remove redundant fields as necessary
 	 *
+	 * TODO: Stop this from replacing the dictionary reference, it causes problems
+	 *
 	 * @param {Object} [data] - The data used to unravel field templates
 	 */
-	updateTemplates(data)
+	updateTemplateFields(data)
 	{
 		let dictionary = this.dictionary;
 		let newFields = [], value;
 
-		// Find all fields with templates for their children
+		// Find all fields that have templates for their children
 		let fieldsWithTemplates = pickBy(dictionary, field => !!field.template);
 		
 		// Clear existing template fields TODO: This is naive, see docblock above
@@ -347,7 +349,6 @@ export default class FormProcessor
 		
 		// Build new fields for each data item
 		each(data, (item, key) => {
-			console.log(item, key);
 			fields.push(
 				...this.buildTemplateField(
 					parent, template, template.pathFragment || key, item
@@ -461,18 +462,15 @@ export default class FormProcessor
 	 */
 	update(data)
 	{
-		let dictionary = this.dictionary;
-		let path;
-		
 		// Update template fields
-		this.updateTemplates(data);
+		this.updateTemplateFields(data);
 		
-		// Update every field
-		for (path in dictionary) {
-			if (!dictionary[path])
+		// Update the value of every
+		for (let path in this.dictionary) {
+			if (!this.dictionary[path])
 				continue;
 			
-			this.updateField(dictionary[path], data);
+			this.updateFieldValue(this.dictionary[path], data);
 		}
 	}
 	
@@ -484,7 +482,7 @@ export default class FormProcessor
 	 * @param {Field}  field - The field to update.
 	 * @param {Object} data  - The data to update with.
 	 */
-	updateField(field, data)
+	updateFieldValue(field, data)
 	{
 		field.value = this.deriveValue(field.path, data);
 		set(data, field.path, field.value);
@@ -553,7 +551,8 @@ export default class FormProcessor
 	/**
 	 * Build data for a field's children template.
 	 *
-	 * TODO: Would be nice not to have to build and reach into the parent paths... hmm
+	 * TODO: Would be nice to avoid using the full field paths to retrieve the
+	 *       results. But that would mean changing the paths afterwards.
 	 *
 	 * @param {Field}  field  - The field to build child data for.
 	 * @param {Object} [data] - The target data object.
