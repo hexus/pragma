@@ -45,7 +45,7 @@
 
 			let { name } = event.detail;
 
-			// Add a new data item
+			// Add a new item
 			formProcessor.addItem(this.sheet, name);
 
 			// Update the form

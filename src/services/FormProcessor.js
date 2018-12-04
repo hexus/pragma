@@ -308,13 +308,19 @@ export default class FormProcessor
 		
 		// Build new fields for each field with a template
 		each(fieldsWithTemplates, (field) => {
+			let template = field.template;
+			
 			// TODO: Dictionary lookup for template field by path string
+			//       Needs more work for this to behave correctly
+			if (typeof field.template === 'string') {
+				template = dictionary[field.template];
+			}
 			
 			value = get(data, field.path);
 			
 			// Build new fields for the template
 			newFields.push(
-				...this.buildTemplateFields(field, field.template, value)
+				...this.buildTemplateFields(field, template, value)
 			);
 		});
 		
@@ -351,7 +357,7 @@ export default class FormProcessor
 		each(data, (item, key) => {
 			fields.push(
 				...this.buildTemplateField(
-					parent, template, template.pathFragment || key, item
+					parent, template, key, item
 				)
 			);
 		});
@@ -373,6 +379,7 @@ export default class FormProcessor
 	 */
 	buildTemplateField(parent, template, key, value)
 	{
+		console.log('keyval', key, value);
 		// TODO: Optional parent?
 		
 		let field = merge(
