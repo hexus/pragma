@@ -420,10 +420,10 @@ export default class FormProcessor
 		// TODO: Use each()
 		for (let c = 0; c < children.length; c++) {
 			let child = children[c];
-			let childKey = child.pathFragment || c;
+			let childKey = child.pathFragment;
 			let childValue = field.value ? field.value[childKey] : null;
-
 			let childField = this.buildTemplateField(field, child, childKey, childValue);
+			
 			fields.push(childField);
 		}
 		

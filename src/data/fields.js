@@ -91,40 +91,23 @@ const fields = [
 	{
 		path: 'templates.class',
 		name: null, // Class
-		type: 'group',
-		children: [
-			{
-				pathFragment: 'name',
-				type:         'string',
-				name:         'Class name'
-			},
-			{
-				pathFragment: 'levels',
-				type:         'number',
-				name:         'Levels'
-			}
-		]
+		type: 'group'
+	},
+	{
+		path: 'templates.class.name',
+		type: 'string',
+		name: 'Class name'
+	},
+	{
+		path: 'templates.class.levels',
+		type: 'number',
+		name: 'Levels'
 	},
 	{
 		path:     'classes.list',
 		type:     'list',
 		name:     null,
-		template: {
-			name:     null, // Class
-			type:     'group',
-			children: [
-				{
-					pathFragment: 'name',
-					type:         'string',
-					name:         'Class name'
-				},
-				{
-					pathFragment: 'levels',
-					type:         'number',
-					name:         'Levels'
-				}
-			]
-		},
+		template: 'templates.class',
 	},
 	{
 		// virtual!
