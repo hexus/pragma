@@ -386,7 +386,7 @@ export default class FormProcessor
 			{},
 			template,
 			{
-				path: [parent.path, template.pathFragment || key].join('.'),
+				path: [parent.path, key].join('.'),
 				value: value
 			}
 		);
