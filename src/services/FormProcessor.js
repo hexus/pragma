@@ -1,14 +1,10 @@
 import merge           from 'lodash/merge';
 import defaults        from 'lodash/defaultsDeep';
-import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
-import unset           from 'lodash/unset';
 import each            from 'lodash/each';
-import pick            from 'lodash/pick';
 import pickBy          from 'lodash/pickBy';
 import startsWith      from 'lodash/startsWith';
-import reject          from 'lodash/reject';
 import defaultTo       from 'lodash/defaultTo';
 import { util }        from '../mixins/util';
 import identity        from 'lodash/identity';
@@ -42,7 +38,6 @@ export default class FormProcessor
 		 */
 		this.defaultValues = {
 			'*': {
-				store: true,
 				type: 'number'
 			},
 			'number': {
@@ -55,16 +50,16 @@ export default class FormProcessor
 				default: ''
 			},
 			'section': {
-				store: false
+				omit: true
 			},
 			'group': {
-				store: false
+				omit: true
 			},
 			'list': {
-				store: false
+				omit: true
 			},
 			'pragma-table': {
-				store: false
+				omit: true
 			}
 		};
 		
@@ -310,8 +305,7 @@ export default class FormProcessor
 		each(fieldsWithTemplates, (field) => {
 			let template = field.template;
 			
-			// TODO: Dictionary lookup for template field by path string
-			//       Needs more work for this to behave correctly
+			// Lookup the path to the template in the dictionary
 			if (typeof field.template === 'string') {
 				template = dictionary[field.template];
 			}
@@ -475,12 +469,19 @@ export default class FormProcessor
 		// Update template fields
 		this.updateTemplateFields(data);
 		
-		// Update the value of every
+		// TODO: Traverse tree for 'omit' inheritance?
+		
+		// Update the value of every field
 		for (let path in this.dictionary) {
 			if (!this.dictionary[path])
 				continue;
 			
-			this.updateFieldValue(this.dictionary[path], data);
+			let field = this.dictionary[path];
+			
+			if (field.omit)
+				continue;
+			
+			this.updateFieldValue(field, data);
 		}
 	}
 	
@@ -675,7 +676,7 @@ export default class FormProcessor
  * @property {string}        [name]           - The property's name. Defaults to a sentence-case translation of the path's leaf. TODO: Rename to label?
  * @property {string}        [elaboration]    - An elaboration on the field's name. TODO: Input options
  * @property {string}        [description]    - The field's description.
- * @property {boolean}       [store=true]     - Whether to store the property. Defaults to `true`.
+ * @property {boolean}       [omit=false]     - Whether to prevent storing the property's value in data. Defaults to `false`.
  * @property {boolean}       [disabled=false] - Whether the property is disabled. Implied if derivation is set. TODO: Input options?
  * @property {*}             [value]          - The field's value.
  * @property {*}             [default]        - The field's default value. Defaults as appropriate to the `type`.

@@ -89,6 +89,12 @@ const fields = [
 		description: "The character's classes"
 	},
 	{
+		// Templates parent placeholder
+		path: 'templates',
+		type: 'hidden',
+		omit: true // Omit this and its children from data
+	},
+	{
 		path: 'templates.class',
 		name: null, // Class
 		type: 'group'
