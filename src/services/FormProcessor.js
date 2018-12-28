@@ -109,14 +109,14 @@ export default class FormProcessor
 		 *
 		 * @type {FieldDictionary}
 		 */
-		this.dictionary = buildDictionary(this.fields);
+		this.dictionary = this.buildDictionary(this.fields);
 		
 		/**
 		 * Fields composed into a tree.
 		 *
 		 * @type {Field}
 		 */
-		this.tree = buildTree(this.dictionary);
+		this.tree = this.buildTree(this.dictionary);
 	}
 	
 	/**
@@ -641,6 +641,7 @@ export default class FormProcessor
 	 * TODO: Would be nice to avoid using the full field paths to retrieve the
 	 *       results. But that would mean changing the paths afterwards.
 	 *
+	 * @protected
 	 * @param {Field}  field  - The field to build child data for.
 	 * @param {Object} [data] - The target data object.
 	 * @return {Object} The built data.
@@ -667,6 +668,7 @@ export default class FormProcessor
 	/**
 	 * Add new child data for the field at the given path using its template.
 	 *
+	 * @public
 	 * @param {Object}        data  - The data to change.
 	 * @param {string}        path  - The path of the field to add new child data to.
 	 * @param {string|number} [key] - Optional key to use for the new child data.
@@ -704,15 +706,12 @@ export default class FormProcessor
 	/**
 	 * Remove data from the given path.
 	 *
+	 * @public
 	 * @param {Object} data - The data to change.
 	 * @param {string} path - The path to remove.
 	 */
 	remove(data, path)
 	{
-		// if (!has(data, path)) {
-		// 	return;
-		// }
-		
 		let [parentPath, pathFragment] = splitPath(path);
 		
 		let parent = get(data, parentPath);
@@ -752,7 +751,7 @@ export default class FormProcessor
  *
  * TODO: Formalise as a class?
  *
- * @typedef {FieldDescription} Field
+ * @typedef {Object} Field
  *
  * @property {string}        path             - The path that matches this field.
  * @property {string}        [parent]         - The path for this field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
