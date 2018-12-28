@@ -12,9 +12,16 @@
  */
 const fields = [
 	{
-		// virtual!
+		// Sections placeholder parent
 		path: 'sections',
-		type: 'hidden'
+		type: 'hidden',
+		omit: true
+	},
+	{
+		// Templates placeholder parent
+		path: 'templates',
+		type: 'hidden',
+		omit: true // Omit this and its children from data
 	},
 	{
 		path:        'general',
@@ -83,16 +90,17 @@ const fields = [
 		description: "The name of the race"
 	},
 	{
+		// virtual!
+		path:   'sections.classes',
+		parent: '',
+		type:   'section',
+		name:   'Classes'
+	},
+	{
 		path:        'classes',
 		type:        'section',
 		name:        'Classes',
 		description: "The character's classes"
-	},
-	{
-		// Templates parent placeholder
-		path: 'templates',
-		type: 'hidden',
-		omit: true // Omit this and its children from data
 	},
 	{
 		path: 'templates.class',
@@ -110,22 +118,23 @@ const fields = [
 		name: 'Levels'
 	},
 	{
-		path:     'classes.list',
+		path:     'classes',
+		parent:   'sections.classes',
 		type:     'list',
 		name:     null,
 		template: 'templates.class',
 	},
 	{
 		// virtual!
-		path: 'sections.abilities',
+		path:   'sections.abilities',
 		parent: '',
-		type: 'section',
-		name: 'Abilities'
+		type:   'section',
+		name:   'Abilities'
 	},
 	{
-		path: 'abilities',
-		type: 'pragma-table',
-		parent: 'sections.abilities'
+		path:   'abilities',
+		parent: 'sections.abilities',
+		type:   'pragma-table'
 	},
 	{
 		path: 'abilities.str',
@@ -350,25 +359,25 @@ const fields = [
 		path: 'defense.spellResistance'
 	},
 	{
-		path: 'sections.saves',
+		path:   'sections.saves',
 		parent: 'defense',
-		name: 'Saving throws',
-		type: 'section'
+		name:   'Saving throws',
+		type:   'section'
 	},
 	{
 		// virtual!
-		path: 'defense.saves',
+		path:   'defense.saves',
 		parent: 'sections.saves',
-		type: 'pragma-table'
+		type:   'pragma-table'
 	},
 	{
 		path: 'defense.saves.fortitude',
 		type: 'group'
 	},
 	{
-		path: 'defense.saves.fortitude.total',
+		path:       'defense.saves.fortitude.total',
 		derivation: {
-			function: 'sum',
+			function:  'sum',
 			arguments: [
 				'defense.saves.fortitude.base',
 				'defense.saves.fortitude.abilityModifier',
@@ -402,9 +411,9 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'defense.saves.reflex.total',
+		path:       'defense.saves.reflex.total',
 		derivation: {
-			function: 'sum',
+			function:  'sum',
 			arguments: [
 				'defense.saves.reflex.base',
 				'defense.saves.reflex.abilityModifier',
@@ -438,9 +447,9 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'defense.saves.will.total',
+		path:       'defense.saves.will.total',
 		derivation: {
-			function: 'sum',
+			function:  'sum',
 			arguments: [
 				'defense.saves.will.base',
 				'defense.saves.will.abilityModifier',
@@ -474,9 +483,9 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'defense.combatManeuverDefense.total',
+		path:       'defense.combatManeuverDefense.total',
 		derivation: {
-			function: 'sum',
+			function:  'sum',
 			arguments: [
 				10,
 				'defense.combatManeuverDefense.baseAttackBonus',
@@ -489,30 +498,30 @@ const fields = [
 		}
 	},
 	{
-		path: 'defense.combatManeuverDefense.baseAttackBonus',
+		path:       'defense.combatManeuverDefense.baseAttackBonus',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['offense.baseAttackBonus']
 		}
 	},
 	{
-		path: 'defense.combatManeuverDefense.strModifier',
+		path:       'defense.combatManeuverDefense.strModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['abilities.str.modifier']
 		}
 	},
 	{
-		path: 'defense.combatManeuverDefense.dexModifier',
+		path:       'defense.combatManeuverDefense.dexModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['abilities.dex.modifier']
 		}
 	},
 	{
-		path: 'defense.combatManeuverDefense.sizeModifier',
+		path:       'defense.combatManeuverDefense.sizeModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['size.modifier']
 		}
 	},
@@ -531,9 +540,9 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'offense.initiative.total',
+		path:       'offense.initiative.total',
 		derivation: {
-			function: 'sum',
+			function:  'sum',
 			arguments: [
 				'offense.initiative.abilityModifier',
 				'offense.initiative.miscModifier'
@@ -541,9 +550,9 @@ const fields = [
 		}
 	},
 	{
-		path: 'offense.initiative.abilityModifier',
+		path:       'offense.initiative.abilityModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['abilities.dex.modifier']
 		}
 	},
@@ -586,9 +595,9 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'offense.combatManeuverBonus.total',
+		path:       'offense.combatManeuverBonus.total',
 		derivation: {
-			function: 'sum',
+			function:  'sum',
 			arguments: [
 				'offense.combatManeuverBonus.baseAttackBonus',
 				'offense.combatManeuverBonus.abilityModifier',
@@ -599,23 +608,23 @@ const fields = [
 		}
 	},
 	{
-		path: 'offense.combatManeuverBonus.baseAttackBonus',
+		path:       'offense.combatManeuverBonus.baseAttackBonus',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['offense.baseAttackBonus']
 		}
 	},
 	{
-		path: 'offense.combatManeuverBonus.abilityModifier',
+		path:       'offense.combatManeuverBonus.abilityModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['abilities.str.modifier']
 		}
 	},
 	{
-		path: 'offense.combatManeuverBonus.sizeModifier',
+		path:       'offense.combatManeuverBonus.sizeModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['size.modifier']
 		}
 	},

@@ -16,18 +16,16 @@ export default {
 			race: {
 				name: 'Tiefling'
 			},
-			classes: {
-				list: [
-					{
-						name: 'Sorcerer',
-						levels: 10
-					},
-					{
-						name: 'Test second class',
-						levels: 1
-					}
-				]
-			},
+			classes: [
+				{
+					name: 'Sorcerer',
+					levels: 10
+				},
+				{
+					name: 'Test second class',
+					levels: 1
+				}
+			],
 			abilities: {
 				str: {
 					score: 8,

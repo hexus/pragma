@@ -25,6 +25,7 @@ export default class FormProcessor
 	/**
 	 * Create a new property processor.
 	 *
+	 * @constructor
 	 * @param {Field[]}                     fields         - Form fields.
  	 * @param {Object.<string, Derivation>} [functions]    - Functions to make available for field value derivations.
 	 * @param {Object.<string, Object>}     [inputOptions] - Default input options keyed by input type.
@@ -50,16 +51,16 @@ export default class FormProcessor
 				default: ''
 			},
 			'section': {
-				omit: true
+			
 			},
 			'group': {
-				omit: true
+			
 			},
 			'list': {
-				omit: true
+			
 			},
 			'pragma-table': {
-				omit: true
+			
 			}
 		};
 		
@@ -123,6 +124,7 @@ export default class FormProcessor
 	 *
 	 * Fills in default values, derives default names.
 	 *
+	 * @protected
 	 * @param {Field[]} fields - The field to process
 	 * @returns {Field[]} The given fields with derived names and default values
 	 */
@@ -132,7 +134,7 @@ export default class FormProcessor
 			return fields;
 		}
 		
-		let i, field, lastDotIndex, pathFragment, parentPath;
+		let i, field, pathFragment, parentPath;
 		
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
@@ -163,6 +165,7 @@ export default class FormProcessor
 	/**
 	 * Derive a property's name from its path.
 	 *
+	 * @protected
 	 * @param {Field} field
 	 * @return {string} The derived name
 	 */
@@ -177,42 +180,61 @@ export default class FormProcessor
 	/**
 	 * Derive a property's value from some data.
 	 *
-	 * @param {string} path - The path of the field to derive a value for
-	 * @param {Object} data - The data to derive values from
-	 * @return {*} The derived value
+	 * @protected
+	 * @param {string} path - The path of the field to derive a value for.
+	 * @param {Object} data - The data to derive values from.
+	 * @return {*} The derived value.
 	 */
 	deriveValue(path, data)
 	{
 		let value = get(data, path);
 		let field = this.dictionary[path];
 		
-		// All we can do is return the raw value if there's no field
-		if (!field)
+		// Return the raw value if there's no such field
+		if (!field) {
 			return value;
-		
-		value = this.castValue(field, value);
-		
-		// Casting is all we need if there's no derivation function
-		if (!field.derivation) {
-			return defaultTo(value, defaultTo(field.default, null));
 		}
 		
+		// Cast the value
+		value = this.castValue(field, value);
+		
+		// Compute the field's expression
+		value = this.computeExpression(field, data, value);
+		
+		return defaultTo(value, defaultTo(field.default, null));
+	}
+	
+	/**
+	 * Compute a field's value from its expression.
+	 *
+	 * Causes the computation of any dependent fields.
+	 *
+	 * @param {Field}  field   - The field to compute the value of.
+	 * @param {Object} data    - The data to derive values from.
+	 * @param {*}      [value] - The runtime default value for the field.
+	 * @return {*} The computed value of the field's expression.
+	 */
+	computeExpression(field, data, value)
+	{
 		let derivation = field.derivation;
-		let derivationFunction = derivation.function || null;
 		
-		let validFunction = this.functions[derivationFunction] &&
-			typeof this.functions[derivationFunction] === 'function';
+		let validFunction =
+				derivation &&
+				derivation.function &&
+				this.functions[derivation.function] &&
+				typeof this.functions[derivation.function] === 'function';
 		
-		// Just return the value or default if there's no valid derivation
+		// Return the value or default if there's no valid derivation
 		if (!validFunction) {
 			return defaultTo(value, defaultTo(field.default, null));
 		}
 		
+		let derivationFunction = derivation.function;
+		
+		// Otherwise, derive any arguments and invoke the function with them
 		let derivationArguments = this.deriveArguments(field, data);
 		
-		value = this.functions[derivationFunction](...derivationArguments);
-		
-		return defaultTo(value, defaultTo(field.default, null));
+		return this.functions[derivationFunction](...derivationArguments);
 	}
 	
 	/**
@@ -220,6 +242,7 @@ export default class FormProcessor
 	 *
 	 * TODO: Derive arguments from '{this}', etc.
 	 *
+	 * @protected
 	 * @param {Field} field - The field to derive derivation arguments for.
 	 * @param {Object} data - The data to derive arguments from
 	 * @return {*} The derived argument value
@@ -252,6 +275,7 @@ export default class FormProcessor
 	/**
 	 * Cast a value based on the property it belongs to.
 	 *
+	 * @public
 	 * @param {Field} field
 	 * @param {*} value
 	 */
@@ -279,6 +303,7 @@ export default class FormProcessor
 	 *
 	 * TODO: Stop this from replacing the dictionary reference, it causes problems
 	 *
+	 * @protected
 	 * @param {Object} [data] - The data used to unravel field templates
 	 */
 	updateTemplateFields(data)
@@ -334,6 +359,7 @@ export default class FormProcessor
 	/**
 	 * Build fields from a template and its corresponding data.
 	 *
+	 * @protected
 	 * @param {Field} parent   - The parent field
 	 * @param {Field} template - The template field
 	 * @param {*}     [data]   - The data used to build the new fields
@@ -365,6 +391,7 @@ export default class FormProcessor
 	 *
 	 * Acts recursively on any child fields in the template.
 	 *
+	 * @protected
 	 * @param {Field}      parent   - The parent field
 	 * @param {Field}      template - The template field
 	 * @param {string|int} key      - The key of the new field
@@ -373,7 +400,7 @@ export default class FormProcessor
 	 */
 	buildTemplateField(parent, template, key, value)
 	{
-		console.log('keyval', key, value);
+		console.log('buildTemplateField', key, value);
 		// TODO: Optional parent?
 		
 		let field = merge(
@@ -430,8 +457,9 @@ export default class FormProcessor
 	/**
 	 * Update a property with the given value.
 	 *
+	 * @public
 	 * @param {Object} data  - The data to update.
-	 * @param {string} path  - The path to update the value of.
+	 * @param {string} path  - The path of the field to update.
 	 * @param {*}      value - The value to set.
 	 * @return {*} The updated value
 	 */
@@ -462,6 +490,7 @@ export default class FormProcessor
 	/**
 	 * Update every field using the given data.
 	 *
+	 * @public
 	 * @param {Object} [data] - The data to update with.
 	 */
 	update(data)
@@ -469,18 +498,40 @@ export default class FormProcessor
 		// Update template fields
 		this.updateTemplateFields(data);
 		
-		// TODO: Traverse tree for 'omit' inheritance?
-		
 		// Update the value of every field
-		for (let path in this.dictionary) {
-			if (!this.dictionary[path])
+		this.updateFields([this.tree], data);
+	}
+	
+	/**
+	 * Update the given fields with the given data.
+	 *
+	 * Recursively descends into child fields.
+	 *
+	 * @protected
+	 * @param {Field[]} fields - The fields to update.
+	 * @param {Object} data    - The data to update with.
+	 */
+	updateFields(fields, data)
+	{
+		if (!fields || !fields.length)
+			return;
+		
+		let i, field;
+		
+		for (i = 0; i < fields.length; i++) {
+			field = fields[i];
+			
+			// Skip omitted fields
+			if (field.omit) {
 				continue;
+			}
 			
-			let field = this.dictionary[path];
+			console.log(field);
 			
-			if (field.omit)
-				continue;
+			// Update the field's children
+			this.updateFields(field.children, data);
 			
+			// Update the field's value
 			this.updateFieldValue(field, data);
 		}
 	}
@@ -488,13 +539,16 @@ export default class FormProcessor
 	/**
 	 * Update a field using the given data.
 	 *
-	 * Derives the field's value and unfolds its template.
+	 * Derives the field's value, setting it on the field and updating it in the
+	 * data.
 	 *
+	 * @protected
 	 * @param {Field}  field - The field to update.
 	 * @param {Object} data  - The data to update with.
 	 */
 	updateFieldValue(field, data)
 	{
+		console.log('updateFieldValue', field.path);
 		field.value = this.deriveValue(field.path, data);
 		set(data, field.path, field.value);
 	}
@@ -511,6 +565,9 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Build a tree from the given dictionary.
+	 *
+	 * @protected
 	 * @param {FieldDictionary} dictionary
 	 * @returns {Field}
 	 */
@@ -520,6 +577,8 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Flatten a tree to a dictionary.
+	 *
 	 * @param {Field} tree
 	 * @returns {FieldDictionary}
 	 */
@@ -557,6 +616,8 @@ export default class FormProcessor
 		if (field.path) {
 			set(data, field.path, defaultTo(field.value, field.default));
 		}
+		
+		return data;
 	}
 	
 	/**
