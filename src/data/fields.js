@@ -1,7 +1,7 @@
 /**
  * A set of fields that define the structure of a Pathfinder Character Sheet.
  *
- * Used for generating character sheets, processing maps and UI.
+ * Used for generating character sheets and UI.
  *
  * TODO: Worth splitting these out to separate files and composing them here.
  * TODO: Consider defining UI layout somewhere else... maybe.
@@ -16,6 +16,27 @@ const fields = [
 		path: 'sections',
 		type: 'hidden',
 		omit: true
+	},
+	{
+		path:   'sections.abilities',
+		parent: '',
+		type:   'section',
+		name:   'Abilities',
+		virtual: true
+	},
+	{
+		path:   'sections.classes',
+		parent: '',
+		type:   'section',
+		name:   'Classes',
+		virtual: true
+	},
+	{
+		path:   'sections.saves',
+		parent: 'defense',
+		name:   'Saving throws',
+		type:   'section',
+		virtual: true
 	},
 	{
 		// Templates placeholder parent
@@ -90,13 +111,6 @@ const fields = [
 		description: "The name of the race"
 	},
 	{
-		// virtual!
-		path:   'sections.classes',
-		parent: '',
-		type:   'section',
-		name:   'Classes'
-	},
-	{
 		path:        'classes',
 		type:        'section',
 		name:        'Classes',
@@ -123,13 +137,6 @@ const fields = [
 		type:     'list',
 		name:     null,
 		template: 'templates.class',
-	},
-	{
-		// virtual!
-		path:   'sections.abilities',
-		parent: '',
-		type:   'section',
-		name:   'Abilities'
 	},
 	{
 		path:   'abilities',
@@ -359,13 +366,6 @@ const fields = [
 		path: 'defense.spellResistance'
 	},
 	{
-		path:   'sections.saves',
-		parent: 'defense',
-		name:   'Saving throws',
-		type:   'section'
-	},
-	{
-		// virtual!
 		path:   'defense.saves',
 		parent: 'sections.saves',
 		type:   'pragma-table'

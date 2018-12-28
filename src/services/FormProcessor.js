@@ -513,26 +513,27 @@ export default class FormProcessor
 	 */
 	updateFields(fields, data)
 	{
-		if (!fields || !fields.length)
+		if (!fields || !fields.length) {
 			return;
+		}
 		
 		let i, field;
 		
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
 			
-			// Skip omitted fields
+			// Update the field's value
+			this.updateFieldValue(field, data);
+			
 			if (field.omit) {
 				continue;
 			}
 			
-			console.log(field);
+			// Update the data value
+			this.updateDataValue(field, data);
 			
 			// Update the field's children
 			this.updateFields(field.children, data);
-			
-			// Update the field's value
-			this.updateFieldValue(field, data);
 		}
 	}
 	
@@ -548,8 +549,22 @@ export default class FormProcessor
 	 */
 	updateFieldValue(field, data)
 	{
-		console.log('updateFieldValue', field.path);
 		field.value = this.deriveValue(field.path, data);
+	}
+	
+	/**
+	 * Update data from the given field.
+	 *
+	 * @protected
+	 * @param {Field}  field - The field to update with.
+	 * @param {Object} data  - The data to update.
+	 */
+	updateDataValue(field, data)
+	{
+		if (!field.path || field.omit || field.virtual) {
+			return;
+		}
+		
 		set(data, field.path, field.value);
 	}
 	
@@ -719,15 +734,25 @@ export default class FormProcessor
 }
 
 /**
- * A dictionary of properties.
+ * A dictionary of fields.
  *
  * @typedef {Object.<string, Field>} FieldDictionary
  */
 
 /**
- * A property description.
+ * A field description.
  *
- * @typedef {Object} Field
+ * TODO: Update this to reflect the simplest approach to describing fields.
+ *
+ * @typedef {Object} FieldDescription
+ */
+
+/**
+ * A field.
+ *
+ * TODO: Formalise as a class?
+ *
+ * @typedef {FieldDescription} Field
  *
  * @property {string}        path             - The path that matches this field.
  * @property {string}        [parent]         - The path for this field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
@@ -737,7 +762,8 @@ export default class FormProcessor
  * @property {string}        [name]           - The property's name. Defaults to a sentence-case translation of the path's leaf. TODO: Rename to label?
  * @property {string}        [elaboration]    - An elaboration on the field's name. TODO: Input options
  * @property {string}        [description]    - The field's description.
- * @property {boolean}       [omit=false]     - Whether to prevent storing the property's value in data. Defaults to `false`.
+ * @property {boolean}       [omit=false]     - Whether to prevent storing the property's value in data AND prevent updating any children. Defaults to `false`.
+ * @property {boolean}       [virtual=false]  - Whether to prevent storing the property's value in data. Defaults to `false`.
  * @property {boolean}       [disabled=false] - Whether the property is disabled. Implied if derivation is set. TODO: Input options?
  * @property {*}             [value]          - The field's value.
  * @property {*}             [default]        - The field's default value. Defaults as appropriate to the `type`.
