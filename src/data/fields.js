@@ -18,27 +18,6 @@ const fields = [
 		omit: true
 	},
 	{
-		path:   'sections.abilities',
-		parent: '',
-		type:   'section',
-		name:   'Abilities',
-		virtual: true
-	},
-	{
-		path:   'sections.classes',
-		parent: '',
-		type:   'section',
-		name:   'Classes',
-		virtual: true
-	},
-	{
-		path:   'sections.saves',
-		parent: 'defense',
-		name:   'Saving throws',
-		type:   'section',
-		virtual: true
-	},
-	{
 		// Templates placeholder parent
 		path: 'templates',
 		type: 'hidden',
@@ -111,6 +90,13 @@ const fields = [
 		description: "The name of the race"
 	},
 	{
+		path:   'sections.classes',
+		parent: '',
+		type:   'section',
+		name:   'Classes',
+		virtual: true
+	},
+	{
 		path:        'classes',
 		type:        'section',
 		name:        'Classes',
@@ -137,6 +123,13 @@ const fields = [
 		type:     'list',
 		name:     null,
 		template: 'templates.class',
+	},
+	{
+		path:   'sections.abilities',
+		parent: '',
+		type:   'section',
+		name:   'Abilities',
+		virtual: true
 	},
 	{
 		path:   'abilities',
@@ -364,6 +357,13 @@ const fields = [
 	},
 	{
 		path: 'defense.spellResistance'
+	},
+	{
+		path:   'sections.saves',
+		parent: 'defense',
+		name:   'Saving throws',
+		type:   'section',
+		virtual: true
 	},
 	{
 		path:   'defense.saves',
@@ -633,6 +633,69 @@ const fields = [
 	},
 	{
 		path: 'offense.combatManeuverBonus.tempModifier'
+	},
+	{
+		path: 'skills',
+		type: 'section'
+	},
+	{
+		path: 'skills.list',
+		type: 'pragma-table'
+	},
+	{
+		path: 'skills.list.acrobatics',
+		type: 'group'
+	},
+	{
+		path: 'skills.list.acrobatics.total',
+		derivation: {
+			function: 'sum',
+			arguments: [
+				'skills.list.acrobatics.abilityModifier',
+				'skills.list.acrobatics.ranks',
+				'skills.list.acrobatics.classBonus',
+				'skills.list.acrobatics.racialBonus',
+				'skills.list.acrobatics.traitBonus',
+				'skills.list.acrobatics.miscModifier',
+				'skills.list.acrobatics.tempModifier'
+			]
+		}
+	},
+	{
+		path: 'skills.list.acrobatics.abilityModifier',
+		derivation: {
+			function: 'copy',
+			arguments: ['abilities.dex.modifier']
+		}
+	},
+	{
+		path: 'skills.list.acrobatics.classSkill',
+		type: 'boolean'
+	},
+	{
+		path: 'skills.list.acrobatics.classBonus',
+		derivation: {
+			function: 'multiply',
+			arguments: [
+				'skills.list.acrobatics.classSkill',
+				3
+			]
+		}
+	},
+	{
+		path: 'skills.list.acrobatics.ranks'
+	},
+	{
+		path: 'skills.list.acrobatics.racialBonus'
+	},
+	{
+		path: 'skills.list.acrobatics.traitBonus'
+	},
+	{
+		path: 'skills.list.acrobatics.miscModifier'
+	},
+	{
+		path: 'skills.list.acrobatics.tempModifier'
 	},
 ];
 

@@ -7,7 +7,15 @@ export default {
 		this.triggerDom('edit', {
 			input: input,
 			name:  input.name,
-			value: input.value
+			value: getInputValue(input)
 		});
 	}
 };
+
+function getInputValue(input) {
+	if (input.type === 'checkbox') {
+		return input.checked;
+	}
+	
+	return input.value;
+}

@@ -10,6 +10,7 @@ import { util }        from '../mixins/util';
 import identity        from 'lodash/identity';
 import sum             from '../functions/sum';
 import min             from '../functions/min';
+import multiply        from '../functions/multiply';
 import buildDictionary from '../functions/buildDictionary';
 import buildTree       from '../functions/buildTree';
 import splitPath       from '../functions/splitPath';
@@ -73,6 +74,7 @@ export default class FormProcessor
 			'copy': identity,
 			'sum': sum,
 			'min': min,
+			'multiply': multiply,
 			'expression': identity // TODO: Actual expression processing
 		}, functions);
 		
@@ -94,7 +96,9 @@ export default class FormProcessor
 		 * @type {Object.<string, Function>}
 		 */
 		this.casts = {
-			'number': (p, v) => util.clamp(v, p.min, p.max)
+			'string':  (f, v) => '' + v,
+			'number':  (f, v) => util.clamp(v, f.min, f.max),
+			'boolean': (f, v) => !!v
 		};
 		
 		/**
