@@ -10,7 +10,7 @@
 		<tbody>
 			<!-- TODO: Split up rows into their own tag? -->
 			<tr each="{ row in opts.property.children }">
-				<th if="{ get(opts.property, 'options.showRowLabel') }">
+				<th if="{ get(opts.property, 'options.showLabel') }">
 					{ row.name }
 				</th>
 				<td each="{ child in row.children }">

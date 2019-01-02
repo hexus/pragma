@@ -105,7 +105,10 @@ const fields = [
 	{
 		path: 'templates.class',
 		name: null, // Class
-		type: 'group'
+		type: 'group',
+		options: {
+			hideLabel: true
+		}
 	},
 	{
 		path: 'templates.class.name',
@@ -121,7 +124,6 @@ const fields = [
 		path:     'classes',
 		parent:   'sections.classes',
 		type:     'list',
-		name:     null,
 		template: 'templates.class',
 	},
 	{
@@ -136,7 +138,7 @@ const fields = [
 		parent:  'sections.abilities',
 		type:    'pragma-table',
 		options: {
-			showRowLabel: true,
+			showLabel: true,
 			headings:     [
 				'Ability',
 				'Score',
@@ -378,7 +380,7 @@ const fields = [
 		parent:  'sections.saves',
 		type:    'pragma-table',
 		options: {
-			showRowLabel: true,
+			showLabel: true,
 			headings:     [
 				'Save',
 				'Total',
@@ -666,15 +668,15 @@ const fields = [
 		path:     'skills.list',
 		type:     'pragma-table',
 		options:  {
-			showRowLabel: true,
+			showLabel: true,
 			headings:     [
 				'Skill',
 				'Total',
 				'Ability',
 				'Modifier',
-				'Ranks',
 				'Class', // Class skill
 				'',      // Class bonus
+				'Ranks',
 				'Racial',
 				'Trait',
 				'Misc',
@@ -721,6 +723,7 @@ const fields = [
 		derivation: {
 			function:  'sum',
 			arguments: [
+				// TODO: {parent}.* support
 				'templates.skill.abilityModifier',
 				'templates.skill.ranks',
 				'templates.skill.classBonus',
@@ -733,7 +736,11 @@ const fields = [
 	},
 	{
 		path:     'templates.skill.ability',
+		// TODO: Select input
 		type:     'string',
+		options:  {
+			options: '`abilities`'
+		},
 		disabled: true
 	},
 	{

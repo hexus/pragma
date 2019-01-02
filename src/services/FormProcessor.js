@@ -155,11 +155,11 @@ export default class FormProcessor
 			}
 
 			// Apply global defaults
-			field = defaults(field, this.defaultValues['*']);
+			field = defaults(field, this.defaultValues['*'], field);
 			
 			// Apply type-specific defaults
 			if (this.defaultValues[field.type]) {
-				field = defaults(field, this.defaultValues[field.type]);
+				field = defaults(field, this.defaultValues[field.type], field);
 			}
 		}
 		
@@ -339,7 +339,7 @@ export default class FormProcessor
 				template = dictionary[field.template];
 			}
 			
-			value = get(data, field.path);
+			value = get(data, field.path, field.default);
 			
 			// Build new fields for the template
 			newFields.push(
@@ -395,6 +395,8 @@ export default class FormProcessor
 	 *
 	 * Acts recursively on any child fields in the template.
 	 *
+	 * TODO: Accept-as-parameter and merge in current field, if any
+	 *
 	 * @protected
 	 * @param {Field}      parent   - The parent field
 	 * @param {Field}      template - The template field
@@ -424,6 +426,9 @@ export default class FormProcessor
 		let fieldTemplate = field.template;
 		delete field.template;
 		
+		// Drop the name so it can be derived from the new path
+		delete field.name;
+		
 		// Add the new field to the parent children
 		parent.children = parent.children || [];
 		parent.children.push(field);
@@ -444,9 +449,10 @@ export default class FormProcessor
 		// Recursively build the template children as fields
 		// TODO: Use each()
 		for (let c = 0; c < children.length; c++) {
-			let child = children[c];
-			let childKey = child.pathFragment;
+			let child      = children[c];
+			let childKey   = child.pathFragment;
 			let childValue = field.value ? field.value[childKey] : null;
+
 			let childField = this.buildTemplateField(field, child, childKey, childValue);
 			
 			fields.push(childField);
@@ -682,8 +688,9 @@ export default class FormProcessor
 		let field = this.dictionary[path];
 		
 		// We need to know about the field to do anything here
-		if (!field)
+		if (!field) {
 			return;
+		}
 		
 		// Build the new child data
 		let newData = this.buildTemplateData(field);
@@ -762,6 +769,7 @@ export default class FormProcessor
  * @property {string}        [pathFragment]   - The path fragment used to compose the field's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to key, pathKey, pathSegment?
  * @property {string}        [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`. TODO: Make this strictly about data type rather than using for tags. That's what `input` should be for.
  * @property {string|Input}  [input]          - The input type to use for this field, if any. `'none'` shows the value without an input, `'hidden'` hides this field. // TODO: Rename? Might not be an actual input... (i.e. section)
+ * @property {Object}        [options]        - The input options. A free-form object for different input types to interpret and utilise.
  * @property {string}        [name]           - The property's name. Defaults to a sentence-case translation of the path's leaf. TODO: Rename to label?
  * @property {string}        [elaboration]    - An elaboration on the field's name. TODO: Input options
  * @property {string}        [description]    - The field's description.

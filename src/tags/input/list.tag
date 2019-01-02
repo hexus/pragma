@@ -1,5 +1,5 @@
 <list>
-	<div>{ opts.property.name }</div>
+	<div if="{ !!get(opts.property, 'options.showLabel') }">{ opts.property.name }</div>
 
 	<virtual each="{ child in opts.property.children }" key="path">
 		<list-item property="{ child }"></list-item>
@@ -8,6 +8,9 @@
 	<button type="button" onclick="{ add }">Add</button>
 
 	<script>
+		import get from 'lodash/get';
+		this.get = get;
+
 		import './list-item.tag';
 
 		this.add = function () {
