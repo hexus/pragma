@@ -90,10 +90,10 @@ const fields = [
 		description: "The name of the race"
 	},
 	{
-		path:   'sections.classes',
-		parent: '',
-		type:   'section',
-		name:   'Classes',
+		path:    'sections.classes',
+		parent:  '',
+		type:    'section',
+		name:    'Classes',
 		virtual: true
 	},
 	{
@@ -125,16 +125,24 @@ const fields = [
 		template: 'templates.class',
 	},
 	{
-		path:   'sections.abilities',
-		parent: '',
-		type:   'section',
-		name:   'Abilities',
+		path:    'sections.abilities',
+		parent:  '',
+		type:    'section',
+		name:    'Abilities',
 		virtual: true
 	},
 	{
-		path:   'abilities',
-		parent: 'sections.abilities',
-		type:   'pragma-table'
+		path:    'abilities',
+		parent:  'sections.abilities',
+		type:    'pragma-table',
+		options: {
+			showRowLabel: true,
+			headings:     [
+				'Ability',
+				'Score',
+				'Modifier'
+			]
+		}
 	},
 	{
 		path: 'abilities.str',
@@ -359,16 +367,28 @@ const fields = [
 		path: 'defense.spellResistance'
 	},
 	{
-		path:   'sections.saves',
-		parent: 'defense',
-		name:   'Saving throws',
-		type:   'section',
+		path:    'sections.saves',
+		parent:  'defense',
+		name:    'Saving throws',
+		type:    'section',
 		virtual: true
 	},
 	{
-		path:   'defense.saves',
-		parent: 'sections.saves',
-		type:   'pragma-table'
+		path:    'defense.saves',
+		parent:  'sections.saves',
+		type:    'pragma-table',
+		options: {
+			showRowLabel: true,
+			headings:     [
+				'Save',
+				'Total',
+				'Base',
+				'Ability',
+				'Magic',
+				'Misc',
+				'Temp'
+			]
+		}
 	},
 	{
 		path: 'defense.saves.fortitude',
@@ -545,7 +565,8 @@ const fields = [
 			function:  'sum',
 			arguments: [
 				'offense.initiative.abilityModifier',
-				'offense.initiative.miscModifier'
+				'offense.initiative.miscModifier',
+				'offense.initiative.tempModifier'
 			]
 		}
 	},
@@ -558,6 +579,9 @@ const fields = [
 	},
 	{
 		path: 'offense.initiative.miscModifier'
+	},
+	{
+		path: 'offense.initiative.tempModifier'
 	},
 	{
 		path: 'offense.baseAttackBonus'
@@ -639,64 +663,115 @@ const fields = [
 		type: 'section'
 	},
 	{
-		path: 'skills.list',
-		type: 'pragma-table'
+		path:     'skills.list',
+		type:     'pragma-table',
+		options:  {
+			showRowLabel: true,
+			headings:     [
+				'Skill',
+				'Total',
+				'Ability',
+				'Modifier',
+				'Ranks',
+				'Class', // Class skill
+				'',      // Class bonus
+				'Racial',
+				'Trait',
+				'Misc',
+				'Temp'
+			]
+		},
+		template: 'templates.skill',
+		default:  {
+			acrobatics:     { ability: 'dex' },
+			appraise:       { ability: 'int' },
+			bluff:          { ability: 'cha' },
+			climb:          { ability: 'str' },
+			craft:          { ability: 'int', variant: true }, // TODO: Variant skills
+			diplomacy:      { ability: 'cha' },
+			disableDevice:  { ability: 'dex', trained: true },
+			disguise:       { ability: 'cha' },
+			escapeArtist:   { ability: 'dex' },
+			fly:            { ability: 'dex' },
+			handleAnimal:   { ability: 'cha', trained: true },
+			heal:           { ability: 'wis' },
+			intimidate:     { ability: 'cha' },
+			knowledge:      { ability: 'int', trained: true },  // TODO: Fixed variant skills
+			linguistics:    { ability: 'int', trained: true },
+			perception:     { ability: 'wis' },
+			perform:        { ability: 'cha', variant: true },
+			profession:     { ability: 'wis', trained: true, variant: true },
+			ride:           { ability: 'dex' },
+			senseMotive:    { ability: 'wis' },
+			sleightOfHand:  { ability: 'dex' },
+			spellcraft:     { ability: 'int', trained: true },
+			stealth:        { ability: 'dex' },
+			survival:       { ability: 'wis' },
+			swim:           { ability: 'str' },
+			useMagicDevice: { ability: 'cha', trained: true}
+		}
 	},
 	{
-		path: 'skills.list.acrobatics',
+		path: 'templates.skill',
 		type: 'group'
 	},
 	{
-		path: 'skills.list.acrobatics.total',
+		// TODO: Trained-only
+		path:       'templates.skill.total',
 		derivation: {
-			function: 'sum',
+			function:  'sum',
 			arguments: [
-				'skills.list.acrobatics.abilityModifier',
-				'skills.list.acrobatics.ranks',
-				'skills.list.acrobatics.classBonus',
-				'skills.list.acrobatics.racialBonus',
-				'skills.list.acrobatics.traitBonus',
-				'skills.list.acrobatics.miscModifier',
-				'skills.list.acrobatics.tempModifier'
+				'templates.skill.abilityModifier',
+				'templates.skill.ranks',
+				'templates.skill.classBonus',
+				'templates.skill.racialBonus',
+				'templates.skill.traitBonus',
+				'templates.skill.miscModifier',
+				'templates.skill.tempModifier'
 			]
 		}
 	},
 	{
-		path: 'skills.list.acrobatics.abilityModifier',
+		path:     'templates.skill.ability',
+		type:     'string',
+		disabled: true
+	},
+	{
+		path:       'templates.skill.abilityModifier',
 		derivation: {
-			function: 'copy',
+			function:  'copy',
 			arguments: ['abilities.dex.modifier']
 		}
 	},
 	{
-		path: 'skills.list.acrobatics.classSkill',
+		path: 'templates.skill.classSkill',
 		type: 'boolean'
 	},
 	{
-		path: 'skills.list.acrobatics.classBonus',
+		path:       'templates.skill.classBonus',
 		derivation: {
-			function: 'multiply',
-			arguments: [
-				'skills.list.acrobatics.classSkill',
+			function:  'multiply',
+			arguments: [ // TODO: When ranks > 0
+				'templates.skill.classSkill',
 				3
 			]
 		}
 	},
 	{
-		path: 'skills.list.acrobatics.ranks'
+		path: 'templates.skill.ranks'
 	},
 	{
-		path: 'skills.list.acrobatics.racialBonus'
+		path: 'templates.skill.racialBonus'
 	},
 	{
-		path: 'skills.list.acrobatics.traitBonus'
+		path: 'templates.skill.traitBonus'
 	},
 	{
-		path: 'skills.list.acrobatics.miscModifier'
+		path: 'templates.skill.miscModifier'
 	},
 	{
-		path: 'skills.list.acrobatics.tempModifier'
-	},
+		path: 'templates.skill.tempModifier'
+	}
 ];
 
 export default fields;

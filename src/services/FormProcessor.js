@@ -96,7 +96,7 @@ export default class FormProcessor
 		 * @type {Object.<string, Function>}
 		 */
 		this.casts = {
-			'string':  (f, v) => '' + v,
+			'string':  (f, v) => v == null ? '' : '' + v,
 			'number':  (f, v) => util.clamp(v, f.min, f.max),
 			'boolean': (f, v) => !!v
 		};

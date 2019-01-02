@@ -1,14 +1,20 @@
 <pragma-table>
-	<table name="{ property.path }">
-		<thead><!-- TODO: Heading data --></thead>
+	<table name="{ opts.property.path }">
+		<thead if="{ get(opts.property, 'options.headings') }">
+			<tr>
+				<th each="{ heading in get(opts.property, 'options.headings', []) }">
+					{ heading }
+				</th>
+			</tr>
+		</thead>
 		<tbody>
-			<!-- TODO: Split up rows into their own tag -->
-			<tr each="{ row in property.children }">
-				<th>
+			<!-- TODO: Split up rows into their own tag? -->
+			<tr each="{ row in opts.property.children }">
+				<th if="{ get(opts.property, 'options.showRowLabel') }">
 					{ row.name }
 				</th>
 				<td each="{ child in row.children }">
-					<tree-child data-is="{ child.type }" property="{ child }" value="{ get(data, child.path, child.default) }" data="{ data }">
+					<tree-child data-is="{ child.type }" property="{ child }">
 						<virtual if="{ opts.property.children }">
 							<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
 						</virtual>
@@ -20,9 +26,8 @@
 	<script>
 		import get from 'lodash/get';
 		this.get = get;
-		this.property = this.opts.property;
-		this.data = this.opts.data || {};
 
-		// TODO: Can the <tree> duplication be avoided? Yielding rows would be great, but seems very tricky given browser strictness.
+		// TODO: Can the <tree> duplication be avoided?
+		//       Yielding rows would be great, but seems very tricky given HTML's strictness with tables.
 	</script>
 </pragma-table>

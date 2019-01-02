@@ -30,10 +30,10 @@ export default function (dictionary) {
 	for (path in dictionary) {
 		property = dictionary[path];
 		
-		if (!property || !property.path || path !== property.path) {
+		if (!property || property.path == null || path !== property.path) {
 			// You're weird and don't belong in our tree, bye Felicia
 			// TODO: "path" could be valid here, set it to property.path if so
-			console.warn(`Skipped property without path`);
+			console.warn(`Skipped property without path`, property);
 			continue;
 		}
 		
