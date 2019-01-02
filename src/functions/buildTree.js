@@ -16,14 +16,14 @@ export default function (dictionary) {
 		return tree;
 	}
 	
-	// Make sure the root is available as a parent
+	// Make sure the root is available as a parent in the dictionary
 	if (dictionary['']) {
 		tree = dictionary[''];
 	} else {
 		dictionary[''] = tree;
 	}
 	
-	let path, property, lastDotIndex, parentPath, parent;
+	let path, property, parent;
 	
 	// Link up properties to their parents, placing any properties without
 	// parents into the children of our tree
@@ -32,18 +32,22 @@ export default function (dictionary) {
 		
 		if (!property || !property.path || path !== property.path) {
 			// You're weird and don't belong in our tree, bye Felicia
+			// TODO: "path" could be valid here, set it to property.path if so
+			console.warn(`Skipped property without path`);
 			continue;
 		}
 		
 		if (property.parent == null) {
-			// You don't have an explicitly defined parent, by Felicia
+			// You don't have an explicitly defined parent, bye Felicia
+			// TODO: Add to root?
+			console.warn(`Skipped property '${path}'; it has no parent`);
 			continue;
 		}
 		
 		parent = dictionary[property.parent];
 		
-		// Sorry, you're an orphan, you don't get into the tree
 		if (!parent) {
+			// Sorry, you're an orphan, you don't get into the tree
 			// TODO: Be nice and create a parent for them?
 			console.warn(`Orphaned property '${path}'`);
 			continue;
