@@ -14,7 +14,7 @@
 		import './list-item.tag';
 
 		this.add = function () {
-			if (!this.opts.editable) {
+			if (!get(this.opts.property, 'options.editable')) {
 				return;
 			}
 
