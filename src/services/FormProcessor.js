@@ -1,5 +1,7 @@
+import exprEval        from 'expr-eval';
 import merge           from 'lodash/merge';
 import defaults        from 'lodash/defaultsDeep';
+import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
 import each            from 'lodash/each';
@@ -75,7 +77,8 @@ export default class FormProcessor
 			'sum': sum,
 			'min': min,
 			'multiply': multiply,
-			'expression': identity // TODO: Actual expression processing
+			'expression': identity, // TODO: Actual expression processing,
+			'concat': (...args) => ''.concat(args, '')
 		}, functions);
 		
 		/**
@@ -121,6 +124,22 @@ export default class FormProcessor
 		 * @type {Field}
 		 */
 		this.tree = this.buildTree(this.dictionary);
+		
+		/**
+		 * Expression parser.
+		 *
+		 * @type {Parser}
+		 */
+		this.parser = new exprEval.Parser({
+			operators: {
+				in: true
+			}
+		});
+		
+		// Provide custom functions to the expression parser
+		this.parser.functions = merge(this.parser.functions, this.functions);
+		
+		// TODO: Override the "+" unary operator to perform concatenation?
 	}
 	
 	/**
@@ -215,10 +234,69 @@ export default class FormProcessor
 	 *
 	 * @param {Field}  field   - The field to compute the value of.
 	 * @param {Object} data    - The data to derive values from.
-	 * @param {*}      [value] - The runtime default value for the field.
+	 * @param {*}      [value] - The input value for the field.
 	 * @return {*} The computed value of the field's expression.
 	 */
 	computeExpression(field, data, value)
+	{
+		value = defaultTo(value, defaultTo(field.default, null));
+		
+		if (field.expression == null || typeof field.expression !== 'string') {
+			// TODO: return value;
+			//       when this.computeDerivation() is removed
+			return this.computeDerivation(field, data, value);
+		}
+		
+		// TODO: Perhaps memoize this per-path for performance
+		let expression = this.parser.parse(field.expression);
+		
+		// Derive values for the expression's variables
+		let variables = expression.variables({ withMembers: true });
+
+		let values = {
+			$self:   value,
+			$parent: get(data, field.parent)
+		};
+		
+		for (let v = 0; v < variables.length; v++) {
+			let variable = variables[v];
+			
+			// TODO: Skip predefined variables more smartly
+			
+			if (has(values, variable))
+				continue;
+
+			set(values, variable, this.deriveValue(variable, data));
+		}
+		
+		// Evaluate the expression
+		let result = expression.evaluate(values);
+		
+		console.log(
+			'computeExpression',
+			field.path,
+			expression.toString(),
+			variables,
+			values,
+			result
+		);
+		
+		console.log(expression);
+		
+		return result;
+	}
+	
+	/**
+	 * Compute a field's value from its derivation expression.
+	 *
+	 * TODO: Remove this when redundant.
+	 *
+	 * @param {Field}  field   - The field to compute the value of.
+	 * @param {Object} data    - The data to derive values from.
+	 * @param {*}      [value] - The runtime default value for the field.
+	 * @return {*} The computed value of the field's derivation expression.
+	 */
+	computeDerivation(field, data, value)
 	{
 		let derivation = field.derivation;
 		
@@ -253,8 +331,9 @@ export default class FormProcessor
 	 */
 	deriveArguments(field, data)
 	{
-		if (!field.derivation || !field.derivation.arguments)
+		if (!field.derivation || !field.derivation.arguments) {
 			return [];
+		}
 		
 		//
 		let a, argument, args = [];
@@ -269,9 +348,11 @@ export default class FormProcessor
 				} else {
 					// Substitute argument variables
 					if (argument.indexOf('$parent') === 0) {
-						let [parent, ] = splitPath(field.path);
+						//let [parent, ] = splitPath(field.path);
 						
-						argument = argument.replace('$parent', parent);
+						//console.log('deriveArguments() before', argument);
+						argument = argument.replace('$parent', field.parent);
+						//console.log('deriveArguments() after', argument);
 					}
 					
 					args[a] = this.deriveValue(argument, data);
@@ -355,7 +436,7 @@ export default class FormProcessor
 			);
 		});
 		
-		console.log('new fields', newFields);
+		//console.log('new fields', newFields);
 		
 		// Update the dictionary with the new fields
 		each(newFields, (field) => {
@@ -403,7 +484,7 @@ export default class FormProcessor
 	 *
 	 * Acts recursively on any child fields in the template.
 	 *
-	 * TODO: Accept-as-parameter and merge in current field, if any
+	 * TODO: Accept-as-parameter and merge in existing field in dictionary, if any
 	 *
 	 * @protected
 	 * @param {Field}      parent   - The parent field
@@ -414,7 +495,7 @@ export default class FormProcessor
 	 */
 	buildTemplateField(parent, template, key, value)
 	{
-		console.log('buildTemplateField', key, value);
+		//console.log('buildTemplateField', key, value);
 		// TODO: Optional parent?
 		
 		let field = merge(
@@ -422,6 +503,7 @@ export default class FormProcessor
 			template,
 			{
 				path: [parent.path, key].join('.'),
+				parent: parent.path,
 				value: value
 			}
 		);
@@ -754,6 +836,8 @@ export default class FormProcessor
 /**
  * A dictionary of fields.
  *
+ * Fields are keyed by their path.
+ *
  * @typedef {Object.<string, Field>} FieldDictionary
  */
 
@@ -786,6 +870,7 @@ export default class FormProcessor
  * @property {boolean}       [disabled=false] - Whether the property is disabled. Implied if derivation is set. TODO: Input options?
  * @property {*}             [value]          - The field's value.
  * @property {*}             [default]        - The field's default value. Defaults as appropriate to the `type`.
+ * @property {string}        [expression]     - An expression used to compute the field's value.
  * @property {Derivation}    [derivation]     - The field's processing definition. If one exists, this field won't have an editable input.
  * @property {string}        [validator]      - The field's validation function. Defaults as appropriate to the `type`.
  * @property {number}        [min=-100]       - The minimum value of the field if the type is `'number'`. Defaults to -100. TODO: Input options
@@ -796,12 +881,12 @@ export default class FormProcessor
  */
 
 /**
- * An input description.
+ * A field's input description.
  *
  * @typedef {Object} Input
  *
- * @property {string}                                type    - The input type. Determines the tag to use to render the field.
- * @property {Object.<string|number, string|number>} options - Options for this input type.
+ * @property {string}                                type    - The field's input type. Determines the tag to use to render the field.
+ * @property {Object.<string|number, string|number>} options - The field's options for this input type.
  */
 
 /**

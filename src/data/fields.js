@@ -142,10 +142,14 @@ const fields = [
 		type:    'pragma-table',
 		options: {
 			showLabel: true,
-			headings:     [
+			headings:  [
 				'Ability',
 				'Score',
-				'Modifier'
+				'Modifier',
+				'Base',
+				'Racial',
+				'Misc',
+				'Temp'
 			]
 		}
 	},
@@ -155,8 +159,12 @@ const fields = [
 		name: 'Strength'
 	},
 	{
-		path: 'abilities.str.score'
-		// TODO: Derivations when base score is a thing
+		path: 'abilities.str.score',
+		expression:
+			'abilities.str.base +' +
+			'abilities.str.racialBonus +' +
+			'abilities.str.miscBonus +' +
+			'abilities.str.tempBonus'
 	},
 	{
 		path:       'abilities.str.modifier',
@@ -164,6 +172,18 @@ const fields = [
 			function:  'abilityModifier',
 			arguments: ['abilities.str.score']
 		}
+	},
+	{
+		path: 'abilities.str.base'
+	},
+	{
+		path: 'abilities.str.racialBonus'
+	},
+	{
+		path: 'abilities.str.miscBonus'
+	},
+	{
+		path: 'abilities.str.tempBonus'
 	},
 	{
 		path: 'abilities.dex',

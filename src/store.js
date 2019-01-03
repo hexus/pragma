@@ -28,8 +28,9 @@ export default {
 			],
 			abilities: {
 				str: {
-					score: 8,
-					modifier: -1
+					base: 8,
+					miscBonus: 0,
+					tempBonus: 0
 				},
 				dex: {
 					score: 12,
@@ -50,8 +51,9 @@ export default {
 				cha: {
 					score: 17,
 					modifier: +3,
-					temp: 21,
-					tempModifier: +5
+					base: 17,
+					miscBonus: +4,
+					tempBonus: +0 // +2 for spellcasting...
 				}
 			},
 			defense: {

@@ -12,6 +12,7 @@
     "url": "git+https://github.com/hexus/pragma.git"
   },
   "keywords": [
+    "form builder",
     "pathfinder",
     "character",
     "sheet"
