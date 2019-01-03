@@ -124,6 +124,9 @@ const fields = [
 		path:     'classes',
 		parent:   'sections.classes',
 		type:     'list',
+		options:  {
+			editable: true
+		},
 		template: 'templates.class',
 	},
 	{
@@ -723,14 +726,13 @@ const fields = [
 		derivation: {
 			function:  'sum',
 			arguments: [
-				// TODO: {parent}.* support
-				'templates.skill.abilityModifier',
-				'templates.skill.ranks',
-				'templates.skill.classBonus',
-				'templates.skill.racialBonus',
-				'templates.skill.traitBonus',
-				'templates.skill.miscModifier',
-				'templates.skill.tempModifier'
+				'$parent.abilityModifier',
+				'$parent.ranks',
+				'$parent.classBonus',
+				'$parent.racialBonus',
+				'$parent.traitBonus',
+				'$parent.miscModifier',
+				'$parent.tempModifier'
 			]
 		}
 	},
@@ -759,7 +761,7 @@ const fields = [
 		derivation: {
 			function:  'multiply',
 			arguments: [ // TODO: When ranks > 0
-				'templates.skill.classSkill',
+				'$parent.classSkill',
 				3
 			]
 		}

@@ -262,12 +262,20 @@ export default class FormProcessor
 		for (a = 0; a < field.derivation.arguments.length; a++) {
 			argument = field.derivation.arguments[a];
 			
-			// TODO: '{path}' strings instead of any string, to allow constant string values
+			// TODO: Expression syntax instead of any string, to allow constant string values
 			if (typeof argument === 'string') {
-				if (argument === field.path)
+				if (argument === field.path) {
 					args[a] = get(data, field.path);
-				else
+				} else {
+					// Substitute argument variables
+					if (argument.indexOf('$parent') === 0) {
+						let [parent, ] = splitPath(field.path);
+						
+						argument = argument.replace('$parent', parent);
+					}
+					
 					args[a] = this.deriveValue(argument, data);
+				}
 			} else {
 				args[a] = argument;
 			}
