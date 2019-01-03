@@ -743,18 +743,9 @@ const fields = [
 	{
 		// TODO: Trained-only
 		path:       'templates.skill.total',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				'$parent.abilityModifier',
-				'$parent.ranks',
-				'$parent.classBonus',
-				'$parent.racialBonus',
-				'$parent.traitBonus',
-				'$parent.miscModifier',
-				'$parent.tempModifier'
-			]
-		}
+		expression: '$parent.abilityModifier + $parent.classBonus + $parent.ranks + $parent.racialBonus + $parent.traitBonus + $parent.miscModifier + $parent.tempModifier'
+		// TODO: Fix this, below? It concatenates for some reason.
+		// expression: 'sum($parent.abilityModifier, $parent.classBonus, $parent.ranks, $parent.racialBonus, $parent.traitBonus, $parent.miscModifier, $parent.tempModifier)'
 	},
 	{
 		path:     'templates.skill.ability',
@@ -767,10 +758,7 @@ const fields = [
 	},
 	{
 		path:       'templates.skill.abilityModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.dex.modifier']
-		}
+		expression: 'abilities.dex.modifier'
 	},
 	{
 		path: 'templates.skill.classSkill',
@@ -778,16 +766,11 @@ const fields = [
 	},
 	{
 		path:       'templates.skill.classBonus',
-		derivation: {
-			function:  'multiply',
-			arguments: [ // TODO: When ranks > 0
-				'$parent.classSkill',
-				3
-			]
-		}
+		expression: '$parent.ranks > 0 ? $parent.classSkill * 3 : 0'
 	},
 	{
-		path: 'templates.skill.ranks'
+		path: 'templates.skill.ranks',
+		min: 0
 	},
 	{
 		path: 'templates.skill.racialBonus'

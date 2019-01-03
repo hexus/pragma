@@ -219,7 +219,8 @@ export default class FormProcessor
 		}
 		
 		// Cast the value
-		value = this.castValue(field, value);
+		if (value != null)
+			value = this.castValue(field, value);
 		
 		// Compute the field's expression
 		value = this.computeExpression(field, data, value);
@@ -234,12 +235,12 @@ export default class FormProcessor
 	 *
 	 * @param {Field}  field   - The field to compute the value of.
 	 * @param {Object} data    - The data to derive values from.
-	 * @param {*}      [value] - The input value for the field.
+	 * @param {*}      [value] - The default value for the field.
 	 * @return {*} The computed value of the field's expression.
 	 */
 	computeExpression(field, data, value)
 	{
-		value = defaultTo(value, defaultTo(field.default, null));
+		value = defaultTo(value, defaultTo(get(data, field.path), defaultTo(field.default, null)));
 		
 		if (field.expression == null || typeof field.expression !== 'string') {
 			// TODO: return value;
@@ -254,7 +255,7 @@ export default class FormProcessor
 		let variables = expression.variables({ withMembers: true });
 
 		let values = {
-			$self:   value,
+			$self:   get(data, field.path, value),
 			$parent: get(data, field.parent)
 		};
 		
@@ -262,6 +263,11 @@ export default class FormProcessor
 			let variable = variables[v];
 			
 			// TODO: Skip predefined variables more smartly
+			if (variable.indexOf('$self') >= 0)
+				continue;
+			
+			if (variable.indexOf('$parent') >= 0)
+				continue;
 			
 			if (has(values, variable))
 				continue;
@@ -281,7 +287,7 @@ export default class FormProcessor
 			result
 		);
 		
-		console.log(expression);
+		//console.log('computeExpression expression', expression);
 		
 		return result;
 	}
