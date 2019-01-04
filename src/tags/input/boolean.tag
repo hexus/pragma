@@ -3,7 +3,7 @@
 		   name="{ opts.property.path }"
 		   title="{ opts.property.name }"
 		   checked="{ !!opts.property.value }"
-		   disabled="{ !!opts.property.derivation }"
+		   disabled="{ !!opts.property.disabled }"
 		   oninput="{ edit }"
 	/>
 

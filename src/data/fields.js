@@ -161,14 +161,14 @@ const fields = [
 	{
 		path: 'abilities.str.score',
 		expression:
-			'abilities.str.base +' +
-			'abilities.str.racialBonus +' +
-			'abilities.str.miscBonus +' +
-			'abilities.str.tempBonus'
+			'$parent.base +' +
+			'$parent.racialBonus +' +
+			'$parent.miscBonus +' +
+			'$parent.tempBonus'
 	},
 	{
 		path:       'abilities.str.modifier',
-		expression: 'abilityModifier(abilities.str.score)'
+		expression: 'abilityModifier($parent.score)'
 	},
 	{
 		path: 'abilities.str.base'
@@ -190,14 +190,14 @@ const fields = [
 	{
 		path: 'abilities.dex.score',
 		expression:
-			'abilities.dex.base +' +
-			'abilities.dex.racialBonus +' +
-			'abilities.dex.miscBonus +' +
-			'abilities.dex.tempBonus'
+			'$parent.base +' +
+			'$parent.racialBonus +' +
+			'$parent.miscBonus +' +
+			'$parent.tempBonus'
 	},
 	{
 		path:       'abilities.dex.modifier',
-		expression: 'abilityModifier(abilities.dex.score)'
+		expression: 'abilityModifier($parent.score)'
 	},
 	{
 		path: 'abilities.dex.base'
@@ -222,10 +222,7 @@ const fields = [
 	},
 	{
 		path:       'abilities.con.modifier',
-		derivation: {
-			function:  'abilityModifier',
-			arguments: ['abilities.con.score']
-		}
+		expression: 'abilityModifier($parent.score)'
 	},
 	{
 		path: 'abilities.int',
@@ -238,10 +235,7 @@ const fields = [
 	},
 	{
 		path:       'abilities.int.modifier',
-		derivation: {
-			function:  'abilityModifier',
-			arguments: ['abilities.int.score']
-		}
+		expression: 'abilityModifier($parent.score)'
 	},
 	{
 		path: 'abilities.wis',
@@ -254,10 +248,7 @@ const fields = [
 	},
 	{
 		path:       'abilities.wis.modifier',
-		derivation: {
-			function:  'abilityModifier',
-			arguments: ['abilities.wis.score']
-		}
+		expression: 'abilityModifier($parent.score)'
 	},
 	{
 		path: 'abilities.cha',
@@ -270,10 +261,7 @@ const fields = [
 	},
 	{
 		path:       'abilities.cha.modifier',
-		derivation: {
-			function:  'abilityModifier',
-			arguments: ['abilities.cha.score']
-		}
+		expression: 'abilityModifier($parent.score)'
 	},
 	{
 		path:        'defense',
@@ -288,17 +276,11 @@ const fields = [
 	},
 	{
 		path:       'defense.hitPoints.current',
-		derivation: {
-			function:  'min',
-			arguments: ['defense.hitPoints.current', 'defense.hitPoints.total']
-		}
+		expression: 'min($self, $parent.total)'
 	},
 	{
 		path:       'defense.hitPoints.total',
-		derivation: {
-			function:  'sum',
-			arguments: ['defense.hitPoints.base', 'defense.hitPoints.tempModifier']
-		}
+		expression: '$parent.base + $parent.tempModifier'
 	},
 	{
 		path: 'defense.hitPoints.base',
@@ -317,51 +299,18 @@ const fields = [
 	{
 		path:       'defense.armorClass.total',
 		name:       'Armor Class',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				10,
-				'defense.armorClass.armorBonus',
-				'defense.armorClass.shieldBonus',
-				'defense.armorClass.abilityModifier',
-				'defense.armorClass.sizeModifier',
-				'defense.armorClass.naturalArmor',
-				'defense.armorClass.deflectionModifier',
-				'defense.armorClass.miscModifier',
-				'defense.armorClass.tempModifier'
-			]
-		}
+		expression: '10 + $parent.armorBonus + $parent.shieldBonus + $parent.abilityModifier + ' +
+						'$parent.sizeModifier + $parent.naturalArmor + $parent.deflectionModifier + ' +
+						'$parent.miscModifier + $parent.tempModifier'
 	},
 	{
 		path:       'defense.armorClass.touch',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				10,
-				'defense.armorClass.abilityModifier',
-				'defense.armorClass.sizeModifier',
-				'defense.armorClass.deflectionModifier',
-				'defense.armorClass.miscModifier',
-				'defense.armorClass.tempModifier'
-			]
-		}
+		expression: '$parent.total - $parent.armorBonus - $parent.shieldBonus - $parent.naturalArmor'
 	},
 	{
 		path:       'defense.armorClass.flatFooted',
 		name:       'Flat-footed Armor Class',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				10,
-				'defense.armorClass.armorBonus',
-				'defense.armorClass.shieldBonus',
-				'defense.armorClass.sizeModifier',
-				'defense.armorClass.naturalArmor',
-				'defense.armorClass.deflectionModifier',
-				'defense.armorClass.miscModifier',
-				'defense.armorClass.tempModifier'
-			]
-		}
+		expression: '$parent.total - $parent.abilityModifier'
 	},
 	{
 		path: 'defense.armorClass.armorBonus',
@@ -371,17 +320,11 @@ const fields = [
 	},
 	{
 		path:       'defense.armorClass.abilityModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.dex.modifier']
-		}
+		expression: 'abilities.dex.modifier'
 	},
 	{
 		path:       'defense.armorClass.sizeModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['size.modifier']
-		}
+		expression: 'size.modifier'
 	},
 	{
 		path: 'defense.armorClass.naturalArmor'
@@ -776,7 +719,8 @@ const fields = [
 	},
 	{
 		path: 'templates.skill.trained',
-		type: 'boolean'
+		type: 'boolean',
+		disabled: true
 	},
 	{
 		path: 'templates.skill.classSkill',

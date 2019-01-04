@@ -191,6 +191,11 @@ export default class FormProcessor
 			if (this.defaultValues[field.type]) {
 				field = defaults(field, this.defaultValues[field.type], field);
 			}
+			
+			// Disable the field if it has an expression
+			if (!field.hasOwnProperty('disabled')) {
+				field.disabled = !!field.expression || !!field.derivation;
+			}
 		}
 		
 		return fields;
@@ -234,8 +239,8 @@ export default class FormProcessor
 		}
 		
 		// Cast the value
-		if (value !== undefined)
-			value = this.castValue(field, value);
+		//if (value !== undefined)
+		value = this.castValue(field, value);
 		
 		// Compute the field's expression
 		value = this.computeExpression(field, data, value);

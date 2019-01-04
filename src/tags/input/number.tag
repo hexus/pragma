@@ -6,7 +6,7 @@
 		   max="{ opts.property.max }"
 		   step="{ opts.property.step }"
 		   value="{ opts.property.value }"
-		   disabled="{ !!opts.property.derivation }"
+		   disabled="{ opts.property.disabled }"
 		   oninput="{ edit }"
 	/>
 
