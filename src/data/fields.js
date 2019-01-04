@@ -803,7 +803,8 @@ const fields = [
 		path: 'templates.skill.tempModifier'
 	},
 	{
-		// TODO: Get this to work (inside skills.list without being overwritten)
+		// TODO: Get "extend" to work
+		//       Then get it to work inside skills.list without being overwritten
 		path: 'skills.test',
 		name: 'Test skill',
 		type: 'group',

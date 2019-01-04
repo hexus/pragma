@@ -1,5 +1,4 @@
 import Case from 'case';
-import toLower from 'lodash/toLower';
 import toUpper from 'lodash/toUpper';
 import clamp from 'lodash/clamp';
 

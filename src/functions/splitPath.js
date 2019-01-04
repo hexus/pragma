@@ -1,7 +1,7 @@
 /**
- * Split a path into its parent-path and base-path segments.
+ * Split a field path into its parent-path and base-path segments.
  *
- * @param {string} path - The path to split.
+ * @param {string} path - The field path to split.
  * @return {string[]} [parentPath, pathFragment]
  */
 export default function (path) {

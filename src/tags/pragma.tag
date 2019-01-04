@@ -36,7 +36,7 @@
 			let { name, value } = event.detail;
 
 			// Update a value
-			formProcessor.updateValue(this.sheet, name, value);
+			formProcessor.setValue(this.sheet, name, value);
 
 			console.log(name, value);
 		};

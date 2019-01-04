@@ -8,6 +8,8 @@ import each            from 'lodash/each';
 import pickBy          from 'lodash/pickBy';
 import startsWith      from 'lodash/startsWith';
 import defaultTo       from 'lodash/defaultTo';
+import difference      from 'lodash/difference';
+import intersection    from 'lodash/intersection';
 import { util }        from '../mixins/util';
 import identity        from 'lodash/identity';
 import sum             from '../functions/sum';
@@ -16,6 +18,7 @@ import multiply        from '../functions/multiply';
 import buildDictionary from '../functions/buildDictionary';
 import buildTree       from '../functions/buildTree';
 import splitPath       from '../functions/splitPath';
+import joinPath        from '../functions/joinPath';
 
 /**
  * Processes lists of property definitions.
@@ -398,6 +401,20 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Get the keys of fields that need creating, updating or removing.
+	 *
+	 * TODO: Extract from updateTemplateFields()
+	 *
+	 * @param {Field[]} fields
+	 * @param {Object} data
+	 * @return array [newKeys[], existingKeys[], oldKeys[]]
+	 */
+	diffFieldsAndData(fields, data)
+	{
+	
+	}
+	
+	/**
 	 * Unravel all templates into fields for the given data.
 	 *
 	 * TODO: Optimise by only rebuilding fields as necessary
@@ -409,6 +426,7 @@ export default class FormProcessor
 	 *
 	 * @protected
 	 * @param {Object} [data] - The data used to unravel field templates
+	 * @return {FieldDictionary}
 	 */
 	updateTemplateFields(data)
 	{
@@ -417,6 +435,34 @@ export default class FormProcessor
 
 		// Find all fields that have templates for their children
 		let fieldsWithTemplates = pickBy(dictionary, field => !!field.template);
+		
+		console.log('updateTemplateFields() fieldsWithTemplates', Object.keys(fieldsWithTemplates).length);
+		
+		for (let i in fieldsWithTemplates) {
+			let fieldWithTemplate = fieldsWithTemplates[i];
+			
+			// Find child keys that need their fields added, updated or removed
+			// TODO: Extract diffing data and fields into its own function?
+			let childData = get(data, fieldWithTemplate.path, fieldWithTemplate.default);
+			let childDataKeys = Object.keys(childData);
+			let childFieldKeys = [];
+			
+			for (let j in dictionary) {
+				if (dictionary[j].parent === fieldWithTemplate.path) {
+					let [, pathFragment] = splitPath(dictionary[j].path);
+					
+					childFieldKeys.push(pathFragment);
+				}
+			}
+			
+			let newKeys      = difference(childDataKeys, childFieldKeys);
+			let existingKeys = intersection(childDataKeys, childFieldKeys);
+			let oldKeys      = difference(childFieldKeys, childDataKeys);
+			
+			console.log('updateTemplateFields()', fieldWithTemplate.path, 'newKeys', newKeys);
+			console.log('updateTemplateFields()', fieldWithTemplate.path, 'existingKeys', existingKeys);
+			console.log('updateTemplateFields()', fieldWithTemplate.path, 'oldKeys', oldKeys);
+		}
 		
 		// Clear existing template fields TODO: This is naive, see docblock above
 		each(fieldsWithTemplates, (fieldWithTemplate) => {
@@ -447,7 +493,7 @@ export default class FormProcessor
 			);
 		});
 		
-		//console.log('new fields', newFields);
+		//console.log('updateTemplateFields() new fields', newFields);
 		
 		// Update the dictionary with the new fields
 		each(newFields, (field) => {
@@ -455,6 +501,8 @@ export default class FormProcessor
 		});
 		
 		this.dictionary = dictionary;
+		
+		return dictionary;
 		
 		// lol
 		// this.tree = this.buildTree(this.dictionary);
@@ -513,9 +561,9 @@ export default class FormProcessor
 			{},
 			template,
 			{
-				path: [parent.path, key].join('.'),
+				path:   joinPath(parent.path, key),
 				parent: parent.path,
-				value: value
+				value:  value
 			}
 		);
 		
@@ -574,7 +622,7 @@ export default class FormProcessor
 	 * @param {*}      value - The value to set.
 	 * @return {*} The updated value
 	 */
-	updateValue(data, path, value)
+	setValue(data, path, value)
 	{
 		let dictionary = this.dictionary;
 		let field = dictionary[path];
