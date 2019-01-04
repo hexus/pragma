@@ -276,7 +276,8 @@ const fields = [
 	},
 	{
 		path:       'defense.hitPoints.current',
-		expression: 'min($self, $parent.total)'
+		expression: 'min($self, $parent.total)',
+		disabled: false
 	},
 	{
 		path:       'defense.hitPoints.total',
