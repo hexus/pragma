@@ -203,6 +203,10 @@ export default class FormProcessor
 	/**
 	 * Derive a property's value from some data.
 	 *
+	 * TODO: Value caching:
+	 *       - Check cache prior to computing
+	 *       - Set cache after computing
+	 *
 	 * @protected
 	 * @param {string} path - The path of the field to derive a value for.
 	 * @param {Object} data - The data to derive values from.
@@ -219,7 +223,7 @@ export default class FormProcessor
 		}
 		
 		// Cast the value
-		if (value != null)
+		if (value !== undefined)
 			value = this.castValue(field, value);
 		
 		// Compute the field's expression
@@ -240,7 +244,7 @@ export default class FormProcessor
 	 */
 	computeExpression(field, data, value)
 	{
-		value = defaultTo(value, defaultTo(get(data, field.path), defaultTo(field.default, null)));
+		value = defaultTo(value, defaultTo(field.default, null));
 		
 		if (field.expression == null || typeof field.expression !== 'string') {
 			// TODO: return value;
@@ -248,45 +252,38 @@ export default class FormProcessor
 			return this.computeDerivation(field, data, value);
 		}
 		
+		// Parse the expression and substitute special variables
 		// TODO: Perhaps memoize this per-path for performance
 		let expression = this.parser.parse(field.expression);
 		
-		// Derive values for the expression's variables
-		let variables = expression.variables({ withMembers: true });
-
+		let substitutions = {
+			$parent: field.parent
+		};
+		
+		for (let s in substitutions) {
+			expression = expression.substitute(s, substitutions[s]);
+		}
+		
+		// Derive values for the variables in the expression
+		let variables = expression.variables({ withMembers: true});
+		
 		let values = {
-			$self:   get(data, field.path, value),
-			$parent: get(data, field.parent)
+			$self: value
 		};
 		
 		for (let v = 0; v < variables.length; v++) {
 			let variable = variables[v];
-			
-			// TODO: Skip predefined variables more smartly
-			if (variable.indexOf('$self') >= 0)
-				continue;
-			
-			if (variable.indexOf('$parent') >= 0)
-				continue;
-			
+
 			if (has(values, variable))
 				continue;
-
+			
 			set(values, variable, this.deriveValue(variable, data));
 		}
 		
 		// Evaluate the expression
 		let result = expression.evaluate(values);
 		
-		console.log(
-			'computeExpression',
-			field.path,
-			expression.toString(),
-			variables,
-			values,
-			result
-		);
-		
+		//console.log('computeExpression', field.path, expression.toString(), variables, values, result);
 		//console.log('computeExpression expression', expression);
 		
 		return result;

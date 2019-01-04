@@ -741,7 +741,10 @@ const fields = [
 		type: 'group'
 	},
 	{
-		// TODO: Trained-only
+		path: 'templates.skill.trained',
+		disabled: true
+	},
+	{
 		path:       'templates.skill.total',
 		expression: '$parent.abilityModifier + $parent.classBonus + $parent.ranks + $parent.racialBonus + $parent.traitBonus + $parent.miscModifier + $parent.tempModifier'
 		// TODO: Fix this, below? It concatenates for some reason.
@@ -749,7 +752,7 @@ const fields = [
 	},
 	{
 		path:     'templates.skill.ability',
-		// TODO: Select input
+		// TODO: "Select" input
 		type:     'string',
 		options:  {
 			options: '`abilities`'
@@ -761,12 +764,16 @@ const fields = [
 		expression: 'abilities.dex.modifier'
 	},
 	{
+		path: 'templates.skill.trained',
+		type: 'boolean'
+	},
+	{
 		path: 'templates.skill.classSkill',
 		type: 'boolean'
 	},
 	{
 		path:       'templates.skill.classBonus',
-		expression: '$parent.ranks > 0 ? $parent.classSkill * 3 : 0'
+		expression: '$parent.classSkill and not $parent.trained or $parent.ranks > 0 ? 3 : 0'
 	},
 	{
 		path: 'templates.skill.ranks',
