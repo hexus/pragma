@@ -21,7 +21,7 @@ const fields = [
 		// Templates placeholder parent
 		path: 'templates',
 		type: 'hidden',
-		omit: true // Omit this and its children from data
+		omit: true
 	},
 	{
 		path:        'general',
@@ -104,7 +104,7 @@ const fields = [
 	},
 	{
 		path: 'templates.class',
-		name: null, // Class
+		name: 'Class',
 		type: 'group',
 		options: {
 			hideLabel: true
@@ -125,7 +125,7 @@ const fields = [
 		parent:   'sections.classes',
 		type:     'list',
 		options:  {
-			editable: true
+			editable: true // TODO: Rename to mutable.. or something more appropriate
 		},
 		template: 'templates.class',
 	},
@@ -168,10 +168,7 @@ const fields = [
 	},
 	{
 		path:       'abilities.str.modifier',
-		derivation: {
-			function:  'abilityModifier',
-			arguments: ['abilities.str.score']
-		}
+		expression: 'abilityModifier(abilities.str.score)'
 	},
 	{
 		path: 'abilities.str.base'
@@ -191,15 +188,28 @@ const fields = [
 		name: 'Dexterity'
 	},
 	{
-		path: 'abilities.dex.score'
-		// TODO: Derivations when base score is a thing
+		path: 'abilities.dex.score',
+		expression:
+			'abilities.dex.base +' +
+			'abilities.dex.racialBonus +' +
+			'abilities.dex.miscBonus +' +
+			'abilities.dex.tempBonus'
 	},
 	{
 		path:       'abilities.dex.modifier',
-		derivation: {
-			function:  'abilityModifier',
-			arguments: ['abilities.dex.score']
-		}
+		expression: 'abilityModifier(abilities.dex.score)'
+	},
+	{
+		path: 'abilities.dex.base'
+	},
+	{
+		path: 'abilities.dex.racialBonus'
+	},
+	{
+		path: 'abilities.dex.miscBonus'
+	},
+	{
+		path: 'abilities.dex.tempBonus'
 	},
 	{
 		path: 'abilities.con',
@@ -694,6 +704,7 @@ const fields = [
 			showLabel: true,
 			headings:     [
 				'Skill',
+				'Trained',
 				'Total',
 				'Ability',
 				'Modifier',
@@ -773,7 +784,7 @@ const fields = [
 	},
 	{
 		path:       'templates.skill.classBonus',
-		expression: '$parent.classSkill and not $parent.trained or $parent.ranks > 0 ? 3 : 0'
+		expression: '$parent.classSkill and (not $parent.trained or $parent.ranks > 0) ? 3 : 0'
 	},
 	{
 		path: 'templates.skill.ranks',
@@ -790,6 +801,13 @@ const fields = [
 	},
 	{
 		path: 'templates.skill.tempModifier'
+	},
+	{
+		// TODO: Get this to work (inside skills.list without being overwritten)
+		path: 'skills.test',
+		name: 'Test skill',
+		type: 'group',
+		template: 'templates.skill'
 	}
 ];
 

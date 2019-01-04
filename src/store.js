@@ -33,8 +33,9 @@ export default {
 					tempBonus: 0
 				},
 				dex: {
-					score: 12,
-					modifier: +1
+					base: 12,
+					miscBonus: 0,
+					tempBonus: 0
 				},
 				con: {
 					score: 12,

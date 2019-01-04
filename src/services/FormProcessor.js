@@ -44,14 +44,17 @@ export default class FormProcessor
 			'*': {
 				type: 'number'
 			},
+			'string': {
+				default: ''
+			},
 			'number': {
 				default: 0,
 				min: -100,
 				max: 100,
 				step: 1
 			},
-			'string': {
-				default: ''
+			'boolean': {
+				default: false
 			},
 			'section': {
 			
@@ -83,13 +86,18 @@ export default class FormProcessor
 		
 		/**
 		 * Default input options keyed by input type.
+		 *
+		 * @type {Object.<string, Object>}
 		 */
-		this.inputOptions = merge({
-			'number': {
-				min: -100,
-				max: 100
-			}
-		}, inputOptions);
+		this.inputOptions = merge(
+			{
+				'number': {
+					min: -100,
+					max: 100
+				}
+			},
+			inputOptions
+		);
 		
 		/**
 		 * Typecasting functions.
