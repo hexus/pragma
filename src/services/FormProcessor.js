@@ -887,8 +887,9 @@ export default class FormProcessor
  * @property {number}        [min=-100]       - The minimum value of the field if the type is `'number'`. Defaults to -100. TODO: Input options
  * @property {number}        [max=100]        - The maximum value of the field if the type is `'number'`. Defaults to 100. TODO: Input options
  * @property {number}        [step]           - The step value of the field if the type is `'number'`. TODO: Input options
+ * @property {string}        [extend]         - Template field for this field to extend.
  * @property {Field[]}       [children]       - Child fields.
- * @property {Field|string}  [template]       - Template field for creating new child fields. Can be a Field or a `path`.
+ * @property {Field|string}  [template]       - Template field for creating new child fields. Can be a `Field` or a `path`.
  */
 
 /**

@@ -807,7 +807,7 @@ const fields = [
 		path: 'skills.test',
 		name: 'Test skill',
 		type: 'group',
-		template: 'templates.skill'
+		extend: 'templates.skill'
 	}
 ];
 
