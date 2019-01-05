@@ -218,7 +218,6 @@ const fields = [
 	},
 	{
 		path: 'abilities.con.score'
-		// TODO: Derivations when base score is a thing
 	},
 	{
 		path:       'abilities.con.modifier',
@@ -231,7 +230,6 @@ const fields = [
 	},
 	{
 		path: 'abilities.int.score'
-		// TODO: Derivations when base score is a thing
 	},
 	{
 		path:       'abilities.int.modifier',
@@ -244,7 +242,6 @@ const fields = [
 	},
 	{
 		path: 'abilities.wis.score'
-		// TODO: Derivations when base score is a thing
 	},
 	{
 		path:       'abilities.wis.modifier',
@@ -257,7 +254,6 @@ const fields = [
 	},
 	{
 		path: 'abilities.cha.score'
-		// TODO: Derivations when base score is a thing
 	},
 	{
 		path:       'abilities.cha.modifier',
@@ -375,26 +371,16 @@ const fields = [
 	},
 	{
 		path:       'defense.saves.fortitude.total',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				'defense.saves.fortitude.base',
-				'defense.saves.fortitude.abilityModifier',
-				'defense.saves.fortitude.magicModifier',
-				'defense.saves.fortitude.miscModifier',
-				'defense.saves.fortitude.tempModifier'
-			]
-		}
+		expression: '$parent.base + $parent.abilityModifier + ' +
+						'$parent.magicModifier + $parent.miscModifier + ' +
+						'$parent.tempModifier'
 	},
 	{
 		path: 'defense.saves.fortitude.base'
 	},
 	{
 		path:       'defense.saves.fortitude.abilityModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.con.modifier']
-		}
+		expression: 'abilities.con.modifier'
 	},
 	{
 		path: 'defense.saves.fortitude.magicModifier'
@@ -411,26 +397,16 @@ const fields = [
 	},
 	{
 		path:       'defense.saves.reflex.total',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				'defense.saves.reflex.base',
-				'defense.saves.reflex.abilityModifier',
-				'defense.saves.reflex.magicModifier',
-				'defense.saves.reflex.miscModifier',
-				'defense.saves.reflex.tempModifier'
-			]
-		}
+		expression: '$parent.base + $parent.abilityModifier + ' +
+						'$parent.magicModifier + $parent.miscModifier + ' +
+						'$parent.tempModifier'
 	},
 	{
 		path: 'defense.saves.reflex.base'
 	},
 	{
 		path:       'defense.saves.reflex.abilityModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.dex.modifier']
-		}
+		expression: 'abilities.dex.modifier'
 	},
 	{
 		path: 'defense.saves.reflex.magicModifier'
@@ -447,26 +423,16 @@ const fields = [
 	},
 	{
 		path:       'defense.saves.will.total',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				'defense.saves.will.base',
-				'defense.saves.will.abilityModifier',
-				'defense.saves.will.magicModifier',
-				'defense.saves.will.miscModifier',
-				'defense.saves.will.tempModifier'
-			]
-		}
+		expression: '$parent.base + $parent.abilityModifier + ' +
+						'$parent.magicModifier + $parent.miscModifier + ' +
+						'$parent.tempModifier'
 	},
 	{
 		path: 'defense.saves.will.base'
 	},
 	{
 		path:       'defense.saves.will.abilityModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.wis.modifier']
-		}
+		expression: 'abilities.wis.modifier'
 	},
 	{
 		path: 'defense.saves.will.magicModifier'
@@ -483,46 +449,25 @@ const fields = [
 	},
 	{
 		path:       'defense.combatManeuverDefense.total',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				10,
-				'defense.combatManeuverDefense.baseAttackBonus',
-				'defense.combatManeuverDefense.strModifier',
-				'defense.combatManeuverDefense.dexModifier',
-				'defense.combatManeuverDefense.sizeModifier',
-				'defense.combatManeuverDefense.miscModifier',
-				'defense.combatManeuverDefense.tempModifier'
-			]
-		}
+		expression: '10 + $parent.baseAttackBonus + $parent.strModifier + ' +
+						'$parent.dexModifier + $parent.sizeModifier + ' +
+						'$parent.miscModifier + $parent.tempModifier'
 	},
 	{
 		path:       'defense.combatManeuverDefense.baseAttackBonus',
-		derivation: {
-			function:  'copy',
-			arguments: ['offense.baseAttackBonus']
-		}
+		expression: 'offense.baseAttackBonus'
 	},
 	{
 		path:       'defense.combatManeuverDefense.strModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.str.modifier']
-		}
+		expression: 'abilities.str.modifier'
 	},
 	{
 		path:       'defense.combatManeuverDefense.dexModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.dex.modifier']
-		}
+		expression: 'abilities.dex.modifier'
 	},
 	{
 		path:       'defense.combatManeuverDefense.sizeModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['size.modifier']
-		}
+		expression: 'size.modifier'
 	},
 	{
 		path: 'defense.combatManeuverDefense.miscModifier'
@@ -532,7 +477,8 @@ const fields = [
 	},
 	{
 		path: 'offense',
-		type: 'section'
+		type: 'section',
+		description: 'Offense statistics'
 	},
 	{
 		path: 'offense.initiative',
@@ -540,21 +486,12 @@ const fields = [
 	},
 	{
 		path:       'offense.initiative.total',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				'offense.initiative.abilityModifier',
-				'offense.initiative.miscModifier',
-				'offense.initiative.tempModifier'
-			]
-		}
+		expression: '$parent.abilityModifier + $parent.miscModifier + ' +
+						'$parent.tempModifier'
 	},
 	{
 		path:       'offense.initiative.abilityModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.dex.modifier']
-		}
+		expression: 'abilities.dex.modifier'
 	},
 	{
 		path: 'offense.initiative.miscModifier'
@@ -599,37 +536,21 @@ const fields = [
 	},
 	{
 		path:       'offense.combatManeuverBonus.total',
-		derivation: {
-			function:  'sum',
-			arguments: [
-				'offense.combatManeuverBonus.baseAttackBonus',
-				'offense.combatManeuverBonus.abilityModifier',
-				'offense.combatManeuverBonus.sizeModifier',
-				'offense.combatManeuverBonus.miscModifier',
-				'offense.combatManeuverBonus.tempModifier'
-			]
-		}
+		expression: '10 + $parent.baseAttackBonus + $parent.abilityModifier + ' +
+						'$parent.sizeModifier + $parent.miscModifier + ' +
+						'$parent.tempModifier'
 	},
 	{
 		path:       'offense.combatManeuverBonus.baseAttackBonus',
-		derivation: {
-			function:  'copy',
-			arguments: ['offense.baseAttackBonus']
-		}
+		expression: 'offense.baseAttackBonus'
 	},
 	{
 		path:       'offense.combatManeuverBonus.abilityModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['abilities.str.modifier']
-		}
+		expression: 'abilities.str.modifier'
 	},
 	{
 		path:       'offense.combatManeuverBonus.sizeModifier',
-		derivation: {
-			function:  'copy',
-			arguments: ['size.modifier']
-		}
+		expression: 'size.modifier'
 	},
 	{
 		path: 'offense.combatManeuverBonus.miscModifier'
@@ -701,9 +622,10 @@ const fields = [
 	},
 	{
 		path:       'templates.skill.total',
-		expression: '$parent.abilityModifier + $parent.classBonus + $parent.ranks + $parent.racialBonus + $parent.traitBonus + $parent.miscModifier + $parent.tempModifier'
-		// TODO: Fix this, below? It concatenates for some reason.
-		// expression: 'sum($parent.abilityModifier, $parent.classBonus, $parent.ranks, $parent.racialBonus, $parent.traitBonus, $parent.miscModifier, $parent.tempModifier)'
+		expression: '$parent.abilityModifier + $parent.classBonus + ' +
+						'$parent.ranks + $parent.racialBonus + ' +
+						'$parent.traitBonus + $parent.miscModifier + ' +
+						'$parent.tempModifier',
 	},
 	{
 		path:     'templates.skill.ability',
