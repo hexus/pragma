@@ -54,6 +54,10 @@ export default class FormProcessor
 				default: 0,
 				min: -100,
 				max: 100,
+				options: {
+					min: -100,
+					max: 100
+				},
 				step: 1
 			},
 			'boolean': {
@@ -74,16 +78,13 @@ export default class FormProcessor
 		};
 		
 		/**
-		 * Derivation functions.
+		 * Expression functions.
 		 *
 		 * @type {Object.<string, Function>}
 		 */
 		this.functions = merge({
-			'copy': identity,
 			'sum': sum,
-			'min': min,
 			'multiply': multiply,
-			'expression': identity, // TODO: Actual expression processing,
 			'concat': (...args) => ''.concat(args, '')
 		}, functions);
 		
@@ -335,24 +336,63 @@ export default class FormProcessor
 	/**
 	 * Get the keys of fields that need creating, updating or removing.
 	 *
-	 * TODO: Extract from updateTemplateFields()
-	 *
+	 * @protected
 	 * @param {Field[]} fields
 	 * @param {Object} data
-	 * @return array [newKeys[], existingKeys[], oldKeys[]]
+	 * @return array [newPaths[], existingPaths[], oldPaths[]]
 	 */
 	diffFieldsAndData(fields, data)
 	{
-	
+		let i, field;
+		let newPaths = [];
+		let existingPaths = [];
+		let oldPaths = [];
+		
+		let prependFieldPath = function (pathFragment) {
+			return joinPath(field.path, pathFragment);
+		};
+		
+		for (i = 0; i < fields.length; i++) {
+			field = fields[i];
+			
+			let childData      = get(data, field.path, field.default);
+			let childDataKeys  = Object.keys(childData);
+			let childFieldKeys = [];
+			
+			for (let j in this.dictionary) {
+				if (this.dictionary[j].parent === field.path) {
+					let [, pathFragment] = splitPath(this.dictionary[j].path);
+					
+					childFieldKeys.push(pathFragment);
+				}
+			}
+			
+			// Keys in data that aren't in fields
+			let newKeys = difference(childDataKeys, childFieldKeys);
+			
+			// Keys in data and fields
+			let existingKeys = intersection(childDataKeys, childFieldKeys);
+			
+			// Keys in fields that aren't in data
+			let oldKeys = difference(childFieldKeys, childDataKeys);
+			
+			// Prepend the field path to the keys and add them to the lists
+			newPaths      = newPaths.concat(newKeys.map(prependFieldPath));
+			existingPaths = existingPaths.concat(existingKeys.map(prependFieldPath));
+			oldPaths      = oldPaths.concat(oldKeys.map(prependFieldPath));
+			
+			console.log('diffFieldsAndData()', field.path, 'newKeys', newKeys);
+			console.log('diffFieldsAndData()', field.path, 'existingKeys', existingKeys);
+			console.log('diffFieldsAndData()', field.path, 'oldKeys', oldKeys);
+		}
+		
+		return [newPaths, existingPaths, oldPaths];
 	}
 	
 	/**
 	 * Unravel all templates into fields for the given data.
 	 *
 	 * TODO: Optimise by only rebuilding fields as necessary
-	 *        - Update values of existing template fields
-	 *        - Build new fields as necessary
-	 *        - Remove redundant fields as necessary
 	 *
 	 * TODO: Stop this from replacing the dictionary reference, it causes problems
 	 *
@@ -362,39 +402,28 @@ export default class FormProcessor
 	 */
 	updateTemplateFields(data)
 	{
-		let dictionary = this.dictionary;
-		let newFields = [], value;
+		let dictionary = this.dictionary,
+			fieldsWithTemplates,
+			newFields = [],
+			value;
 
 		// Find all fields that have templates for their children
-		let fieldsWithTemplates = pickBy(dictionary, field => !!field.template);
+		fieldsWithTemplates = Object.values(pickBy(dictionary, field => !!field.template));
 		
 		console.log('updateTemplateFields() fieldsWithTemplates', Object.keys(fieldsWithTemplates).length);
 		
-		for (let i in fieldsWithTemplates) {
-			let fieldWithTemplate = fieldsWithTemplates[i];
-			
-			// Find child keys that need their fields added, updated or removed
-			// TODO: Extract diffing data and fields into its own function?
-			let childData = get(data, fieldWithTemplate.path, fieldWithTemplate.default);
-			let childDataKeys = Object.keys(childData);
-			let childFieldKeys = [];
-			
-			for (let j in dictionary) {
-				if (dictionary[j].parent === fieldWithTemplate.path) {
-					let [, pathFragment] = splitPath(dictionary[j].path);
-					
-					childFieldKeys.push(pathFragment);
-				}
-			}
-			
-			let newKeys      = difference(childDataKeys, childFieldKeys);
-			let existingKeys = intersection(childDataKeys, childFieldKeys);
-			let oldKeys      = difference(childFieldKeys, childDataKeys);
-			
-			console.log('updateTemplateFields()', fieldWithTemplate.path, 'newKeys', newKeys);
-			console.log('updateTemplateFields()', fieldWithTemplate.path, 'existingKeys', existingKeys);
-			console.log('updateTemplateFields()', fieldWithTemplate.path, 'oldKeys', oldKeys);
-		}
+		// Find child fields that need to be added, updated or removed
+		let [newPaths, existingPaths, oldPaths] = this.diffFieldsAndData(fieldsWithTemplates, data);
+		
+		console.log('updateTemplateFields() newPaths', newPaths);
+		console.log('updateTemplateFields() existingPaths', existingPaths);
+		console.log('updateTemplateFields() oldPaths', oldPaths);
+		
+		// TODO: Remove old fields
+		
+		// TODO: Update existing fields
+		
+		// TODO: Build new fields
 		
 		// Clear existing template fields TODO: This is naive, see docblock above
 		each(fieldsWithTemplates, (fieldWithTemplate) => {
@@ -847,48 +876,26 @@ export default class FormProcessor
  *
  * @typedef {Object} Field
  *
- * @property {string}        path             - The path that matches this field.
- * @property {string}        [parent]         - The path for this field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
- * @property {string}        [pathFragment]   - The path fragment used to compose the field's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to key, pathKey, pathSegment?
- * @property {string}        [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`. TODO: Make this strictly about data type rather than using for tags. That's what `input` should be for.
- * @property {string|Input}  [input]          - The input type to use for this field, if any. `'none'` shows the value without an input, `'hidden'` hides this field. // TODO: Rename? Might not be an actual input... (i.e. section)
- * @property {Object}        [options]        - The input options. A free-form object for different input types to interpret and utilise.
- * @property {string}        [name]           - The property's name. Defaults to a sentence-case translation of the path's leaf. TODO: Rename to label?
- * @property {string}        [elaboration]    - An elaboration on the field's name. TODO: Input options
- * @property {string}        [description]    - The field's description.
- * @property {boolean}       [omit=false]     - Whether to prevent storing the property's value in data AND prevent updating any children. Defaults to `false`.
- * @property {boolean}       [virtual=false]  - Whether to prevent storing the property's value in data. Defaults to `false`.
- * @property {boolean}       [disabled=false] - Whether the property is disabled. Implied if derivation is set. TODO: Input options?
- * @property {*}             [value]          - The field's value.
- * @property {*}             [default]        - The field's default value. Defaults as appropriate to the `type`.
- * @property {string}        [expression]     - An expression used to compute the field's value.
- * @property {Derivation}    [derivation]     - The field's processing definition. If one exists, this field won't have an editable input.
- * @property {string}        [validator]      - The field's validation function. Defaults as appropriate to the `type`.
- * @property {number}        [min=-100]       - The minimum value of the field if the type is `'number'`. Defaults to -100. TODO: Input options
- * @property {number}        [max=100]        - The maximum value of the field if the type is `'number'`. Defaults to 100. TODO: Input options
- * @property {number}        [step]           - The step value of the field if the type is `'number'`. TODO: Input options
- * @property {string}        [extend]         - Template field for this field to extend.
- * @property {Field[]}       [children]       - Child fields.
- * @property {Field|string}  [template]       - Template field for creating new child fields. Can be a `Field` or a `path`.
- */
-
-/**
- * A field's input description.
- *
- * @typedef {Object} Input
- *
- * @property {string}                                type    - The field's input type. Determines the tag to use to render the field.
- * @property {Object.<string|number, string|number>} options - The field's options for this input type.
- */
-
-/**
- * A derivation definition of a property.
- *
- * Describes how to derive the property's final value.
- *
- * @typedef {Object} Derivation
- *
- * @property {string}                function         - The name of the function to apply.
- * @property {Array<number|string>}  [arguments]      - Constant values and property paths to become arguments to the function.
- * @property {boolean}               [disabled=false] - Whether this derivation is disabled
+ * @property {string}         path             - The path of the field.
+ * @property {string}         [parent]         - The path of the field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
+ * @property {string}         [pathFragment]   - The path fragment used to compose the field's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to leaf, key, pathKey or pathSegment?
+ * @property {string}         [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`. TODO: Make this strictly about data type rather than using for tags. That's what `input` should be for.
+ * @property {string}         [input]          - The input type to use for this field, if any. `'none'` shows the value without an input, `'hidden'` hides this field. // TODO: Rename? Might not be an actual input... (i.e. section)
+ * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
+ * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the path's final segment. TODO: Rename to label?
+ * @property {string}         [description]    - The field's description.
+ * @property {boolean}        [omit=false]     - Whether to prevent storing the property's value in data AND prevent updating any children. Defaults to `false`.
+ * @property {boolean}        [virtual=false]  - Whether to prevent storing the property's value in data. Defaults to `false`.
+ * @property {string|boolean} [visible=true]   - Whether the property is visible. Defaults to `true`.
+ * @property {boolean}        [disabled=false] - Whether the property is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. TODO: Input options?
+ * @property {*}              [value]          - The field's value.
+ * @property {*}              [default]        - The field's default value. Defaults appropriately for the set `type`.
+ * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
+ * @property {string}         [validator]      - The field's validation function. Defaults as appropriate to the `type`.
+ * @property {number}         [min=-100]       - The minimum value of the field if the type is `'number'`. Defaults to -100. TODO: Input options
+ * @property {number}         [max=100]        - The maximum value of the field if the type is `'number'`. Defaults to 100. TODO: Input options
+ * @property {number}         [step]           - The step value of the field if the type is `'number'`. TODO: Input options
+ * @property {string}         [extend]         - Template field for this field to extend.
+ * @property {Field[]}        [children]       - Child fields.
+ * @property {Field|string}   [template]       - Template field for creating new child fields. Can be a `Field` or a `path`.
  */

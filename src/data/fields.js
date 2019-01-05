@@ -559,60 +559,6 @@ const fields = [
 		path: 'offense.combatManeuverBonus.tempModifier'
 	},
 	{
-		path: 'skills',
-		type: 'section'
-	},
-	{
-		path:     'skills.list',
-		type:     'pragma-table',
-		options:  {
-			showLabel: true,
-			headings:     [
-				'Skill',
-				'Trained',
-				'Total',
-				'Ability',
-				'Modifier',
-				'Class', // Class skill
-				'',      // Class bonus
-				'Ranks',
-				'Racial',
-				'Trait',
-				'Misc',
-				'Temp'
-			]
-		},
-		template: 'templates.skill',
-		default:  {
-			acrobatics:     { ability: 'dex' },
-			appraise:       { ability: 'int' },
-			bluff:          { ability: 'cha' },
-			climb:          { ability: 'str' },
-			craft:          { ability: 'int', variant: true }, // TODO: Variant skills
-			diplomacy:      { ability: 'cha' },
-			disableDevice:  { ability: 'dex', trained: true },
-			disguise:       { ability: 'cha' },
-			escapeArtist:   { ability: 'dex' },
-			fly:            { ability: 'dex' },
-			handleAnimal:   { ability: 'cha', trained: true },
-			heal:           { ability: 'wis' },
-			intimidate:     { ability: 'cha' },
-			knowledge:      { ability: 'int', trained: true },  // TODO: Fixed variant skills
-			linguistics:    { ability: 'int', trained: true },
-			perception:     { ability: 'wis' },
-			perform:        { ability: 'cha', variant: true },
-			profession:     { ability: 'wis', trained: true, variant: true },
-			ride:           { ability: 'dex' },
-			senseMotive:    { ability: 'wis' },
-			sleightOfHand:  { ability: 'dex' },
-			spellcraft:     { ability: 'int', trained: true },
-			stealth:        { ability: 'dex' },
-			survival:       { ability: 'wis' },
-			swim:           { ability: 'str' },
-			useMagicDevice: { ability: 'cha', trained: true}
-		}
-	},
-	{
 		path: 'templates.skill',
 		type: 'group'
 	},
@@ -670,12 +616,65 @@ const fields = [
 		path: 'templates.skill.tempModifier'
 	},
 	{
-		// TODO: Get "extend" to work
-		//       Then get it to work inside skills.list without being overwritten
-		path: 'skills.test',
-		name: 'Test skill',
-		type: 'group',
-		extend: 'templates.skill'
+		path: 'skills',
+		type: 'section'
+	},
+	{
+		path:     'skills.list',
+		type:     'pragma-table',
+		options:  {
+			showLabel: true,
+			headings:     [
+				'Skill',
+				'Trained',
+				'Total',
+				'Ability',
+				'Modifier',
+				'Class', // Class skill
+				'',      // Class bonus
+				'Ranks',
+				'Racial',
+				'Trait',
+				'Misc',
+				'Temp'
+			]
+		},
+		template: 'templates.skill',
+		default:  {
+			acrobatics:     { ability: 'dex' },
+			appraise:       { ability: 'int' },
+			bluff:          { ability: 'cha' },
+			climb:          { ability: 'str' },
+			craft:          { ability: 'int', variant: true }, // TODO: Variant skills
+			diplomacy:      { ability: 'cha' },
+			disableDevice:  { ability: 'dex', trained: true },
+			disguise:       { ability: 'cha' },
+			escapeArtist:   { ability: 'dex' },
+			fly:            { ability: 'dex' },
+			handleAnimal:   { ability: 'cha', trained: true },
+			heal:           { ability: 'wis' },
+			intimidate:     { ability: 'cha' },
+			knowledge:      { ability: 'int', trained: true },  // TODO: Fixed variant skills
+			linguistics:    { ability: 'int', trained: true },
+			perception:     { ability: 'wis' },
+			perform:        { ability: 'cha', variant: true },
+			profession:     { ability: 'wis', trained: true, variant: true },
+			ride:           { ability: 'dex' },
+			senseMotive:    { ability: 'wis' },
+			sleightOfHand:  { ability: 'dex' },
+			spellcraft:     { ability: 'int', trained: true },
+			stealth:        { ability: 'dex' },
+			survival:       { ability: 'wis' },
+			swim:           { ability: 'str' },
+			useMagicDevice: { ability: 'cha', trained: true}
+		}
+	},
+	{
+		// TODO: Get inheritance to work
+		path:    'skills.list.test',
+		name:    'Test skill',
+		type:    'group',
+		extends: 'templates.skill'
 	}
 ];
 
