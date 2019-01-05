@@ -263,14 +263,20 @@ export default class FormProcessor
 		value = defaultTo(value, defaultTo(field.default, null));
 		
 		if (field.expression == null || typeof field.expression !== 'string') {
-			// TODO: return value;
-			//       when this.computeDerivation() is removed
-			return this.computeDerivation(field, data, value);
+			return value;
 		}
 		
 		// Parse the expression and substitute special variables
-		// TODO: Perhaps memoize this per-path for performance
-		let expression = this.parser.parse(field.expression);
+		let expression;
+		
+		// TODO: Memoize parsed expressions per-field and/or per-expression
+		try {
+			expression = this.parser.parse(field.expression);
+		} catch (error) {
+			console.error(`Error parsing expression for field '${field.path}': ${error.message}`);
+			
+			return value;
+		}
 		
 		let substitutions = {
 			$parent: field.parent
@@ -303,85 +309,6 @@ export default class FormProcessor
 		//console.log('computeExpression expression', expression);
 		
 		return result;
-	}
-	
-	/**
-	 * Compute a field's value from its derivation expression.
-	 *
-	 * TODO: Remove this when redundant.
-	 *
-	 * @param {Field}  field   - The field to compute the value of.
-	 * @param {Object} data    - The data to derive values from.
-	 * @param {*}      [value] - The runtime default value for the field.
-	 * @return {*} The computed value of the field's derivation expression.
-	 */
-	computeDerivation(field, data, value)
-	{
-		let derivation = field.derivation;
-		
-		let validFunction =
-				derivation &&
-				derivation.function &&
-				this.functions[derivation.function] &&
-				typeof this.functions[derivation.function] === 'function';
-		
-		// Return the value or default if there's no valid derivation
-		if (!validFunction) {
-			return defaultTo(value, defaultTo(field.default, null));
-		}
-		
-		let derivationFunction = derivation.function;
-		
-		// Otherwise, derive any arguments and invoke the function with them
-		let derivationArguments = this.deriveArguments(field, data);
-		
-		return this.functions[derivationFunction](...derivationArguments);
-	}
-	
-	/**
-	 * Derive arguments for a field's derivation.
-	 *
-	 * TODO: Derive arguments from '{this}', etc.
-	 *
-	 * @protected
-	 * @param {Field} field - The field to derive derivation arguments for.
-	 * @param {Object} data - The data to derive arguments from
-	 * @return {*} The derived argument value
-	 */
-	deriveArguments(field, data)
-	{
-		if (!field.derivation || !field.derivation.arguments) {
-			return [];
-		}
-		
-		//
-		let a, argument, args = [];
-		
-		for (a = 0; a < field.derivation.arguments.length; a++) {
-			argument = field.derivation.arguments[a];
-			
-			// TODO: Expression syntax instead of any string, to allow constant string values
-			if (typeof argument === 'string') {
-				if (argument === field.path) {
-					args[a] = get(data, field.path);
-				} else {
-					// Substitute argument variables
-					if (argument.indexOf('$parent') === 0) {
-						//let [parent, ] = splitPath(field.path);
-						
-						//console.log('deriveArguments() before', argument);
-						argument = argument.replace('$parent', field.parent);
-						//console.log('deriveArguments() after', argument);
-					}
-					
-					args[a] = this.deriveValue(argument, data);
-				}
-			} else {
-				args[a] = argument;
-			}
-		}
-		
-		return args;
 	}
 	
 	/**
