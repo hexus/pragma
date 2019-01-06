@@ -35,10 +35,7 @@
 
 			let { name, value } = event.detail;
 
-			// Update a value
 			formProcessor.setValue(this.sheet, name, value);
-
-			console.log(name, value);
 		};
 
 		this.add = function (event) {
@@ -46,11 +43,7 @@
 
 			let { name } = event.detail;
 
-			// Add a new item
 			formProcessor.addItem(this.sheet, name);
-
-			// Update the form
-			formProcessor.update(this.sheet);
 		};
 
 		this.remove = function (event) {
@@ -58,11 +51,7 @@
 
 			let { name } = event.detail;
 
-			// Remove a value
 			formProcessor.remove(this.sheet, name);
-
-			// Update the form
-			formProcessor.update(this.sheet);
 		};
 
 		console.log(this);

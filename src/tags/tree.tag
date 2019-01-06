@@ -7,7 +7,7 @@
 
 	<script>
 		/**
-		 * Determine whether a field should be drawn.
+		 * Determine whether a field should be displayed.
 		 *
 		 * @param {Field} field
 		 * @returns {boolean}

@@ -8,16 +8,13 @@
 			</tr>
 		</thead>
 		<tbody>
-			<!-- TODO: Split up rows into their own tag? -->
-			<tr each="{ row in opts.property.children }">
+			<tr each="{ row in opts.property.children }" key="path">
 				<th if="{ get(opts.property, 'options.showLabel') }">
 					{ row.name }
 				</th>
-				<td each="{ child in row.children }">
+				<td each="{ child in row.children }" key="path">
 					<tree-child data-is="{ child.type }" property="{ child }">
-						<virtual if="{ opts.property.children }">
-							<tree children="{ opts.property.children }" data="{ parent.data }"></tree>
-						</virtual>
+						<tree if="{ opts.property.children }" children="{ opts.property.children }"></tree>
 					</tree-child>
 				</td>
 			</tr>

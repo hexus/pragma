@@ -14,13 +14,13 @@ const fields = [
 	{
 		// Sections placeholder parent
 		path: 'sections',
-		type: 'hidden',
+		type: 'virtual',
 		omit: true
 	},
 	{
 		// Templates placeholder parent
 		path: 'templates',
-		type: 'hidden',
+		type: 'virtual',
 		omit: true
 	},
 	{
@@ -103,9 +103,9 @@ const fields = [
 		description: "The character's classes"
 	},
 	{
-		path: 'templates.class',
-		name: 'Class',
-		type: 'group',
+		path:    'templates.class',
+		name:    'Class',
+		type:    'group',
 		options: {
 			hideLabel: true
 		}
@@ -161,10 +161,10 @@ const fields = [
 	{
 		path: 'abilities.str.score',
 		expression:
-			'$parent.base +' +
-			'$parent.racialBonus +' +
-			'$parent.miscBonus +' +
-			'$parent.tempBonus'
+			  '$parent.base +' +
+				  '$parent.racialBonus +' +
+				  '$parent.miscBonus +' +
+				  '$parent.tempBonus'
 	},
 	{
 		path:       'abilities.str.modifier',
@@ -190,10 +190,10 @@ const fields = [
 	{
 		path: 'abilities.dex.score',
 		expression:
-			'$parent.base +' +
-			'$parent.racialBonus +' +
-			'$parent.miscBonus +' +
-			'$parent.tempBonus'
+			  '$parent.base +' +
+				  '$parent.racialBonus +' +
+				  '$parent.miscBonus +' +
+				  '$parent.tempBonus'
 	},
 	{
 		path:       'abilities.dex.modifier',
@@ -272,8 +272,8 @@ const fields = [
 	},
 	{
 		path:       'defense.hitPoints.current',
-		expression: 'min($self, $parent.total)',
-		disabled: false
+		expression: 'min($value, $parent.total)',
+		disabled:   false
 	},
 	{
 		path:       'defense.hitPoints.total',
@@ -354,7 +354,7 @@ const fields = [
 		type:    'pragma-table',
 		options: {
 			showLabel: true,
-			headings:     [
+			headings:  [
 				'Save',
 				'Total',
 				'Base',
@@ -476,8 +476,8 @@ const fields = [
 		path: 'defense.combatManeuverDefense.tempModifier'
 	},
 	{
-		path: 'offense',
-		type: 'section',
+		path:        'offense',
+		type:        'section',
 		description: 'Offense statistics'
 	},
 	{
@@ -563,7 +563,7 @@ const fields = [
 		type: 'group'
 	},
 	{
-		path: 'templates.skill.trained',
+		path:     'templates.skill.trained',
 		disabled: true
 	},
 	{
@@ -584,11 +584,11 @@ const fields = [
 	},
 	{
 		path:       'templates.skill.abilityModifier',
-		expression: 'abilities.dex.modifier'
+		expression: 'value(concat("abilities.", $parent.ability, ".modifier"))'
 	},
 	{
-		path: 'templates.skill.trained',
-		type: 'boolean',
+		path:     'templates.skill.trained',
+		type:     'boolean',
 		disabled: true
 	},
 	{
@@ -601,7 +601,9 @@ const fields = [
 	},
 	{
 		path: 'templates.skill.ranks',
-		min: 0
+		options: {
+			min: 0
+		}
 	},
 	{
 		path: 'templates.skill.racialBonus'
@@ -624,7 +626,7 @@ const fields = [
 		type:     'pragma-table',
 		options:  {
 			showLabel: true,
-			headings:     [
+			headings:  [
 				'Skill',
 				'Trained',
 				'Total',
@@ -666,8 +668,8 @@ const fields = [
 			stealth:        { ability: 'dex' },
 			survival:       { ability: 'wis' },
 			swim:           { ability: 'str' },
-			useMagicDevice: { ability: 'cha', trained: true},
-			test: {}
+			useMagicDevice: { ability: 'cha', trained: true },
+			test:           {}
 		}
 	},
 	{
