@@ -338,6 +338,9 @@ export default class FormProcessor
 			{
 				keys:  Object.keys,
 				field: (path) => this.dictionary[path],
+				// TODO: value() could add to the list of variables used by the
+				//       expression. this could then become the list of field
+				//       paths that are dependent upon this one. neat bruv!
 				value: (path) => this.deriveValue(path, data)
 			}
 		);
@@ -351,6 +354,8 @@ export default class FormProcessor
 		} catch (error) {
 			console.error(`Error evaluating expression for field '${field}': ${error.message}`);
 		}
+		
+		// TODO: Update the list of fields dependent upon this one
 		
 		return value;
 	}
