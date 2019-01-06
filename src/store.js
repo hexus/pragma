@@ -1,7 +1,6 @@
 export default {
 	characters: {
 		1: {
-			processing: 'processed',
 			general: {
 				name: 'Shade',
 				alignment: 'Chaotic Neutral',
@@ -16,6 +15,7 @@ export default {
 			race: {
 				name: 'Tiefling'
 			},
+			buffs: [],
 			classes: [
 				{
 					name: 'Sorcerer',
@@ -167,7 +167,15 @@ export default {
 					tempModifier: 0
 				}
 			},
-			bonuses: []
+			skills: {
+				list: {
+					bluff: {
+						classSkill: true,
+						ranks: 3,
+						racialBonus: 2
+					}
+				}
+			}
 		},
 		2: {
 			strict: true,

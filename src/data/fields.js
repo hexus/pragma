@@ -253,11 +253,28 @@ const fields = [
 		name: 'Charisma'
 	},
 	{
-		path: 'abilities.cha.score'
+		path: 'abilities.cha.score',
+		expression:
+			  '$parent.base +' +
+				  '$parent.racialBonus +' +
+				  '$parent.miscBonus +' +
+				  '$parent.tempBonus'
 	},
 	{
 		path:       'abilities.cha.modifier',
 		expression: 'abilityModifier($parent.score)'
+	},
+	{
+		path: 'abilities.cha.base'
+	},
+	{
+		path: 'abilities.cha.racialBonus'
+	},
+	{
+		path: 'abilities.cha.miscBonus'
+	},
+	{
+		path: 'abilities.cha.tempBonus'
 	},
 	{
 		path:        'defense',
@@ -600,7 +617,7 @@ const fields = [
 		expression: '$parent.classSkill and (not $parent.trained or $parent.ranks > 0) ? 3 : 0'
 	},
 	{
-		path: 'templates.skill.ranks',
+		path:    'templates.skill.ranks',
 		options: {
 			min: 0
 		}
@@ -642,34 +659,44 @@ const fields = [
 			]
 		},
 		template: 'templates.skill',
+		merge:    true,
 		default:  {
-			acrobatics:     { ability: 'dex' },
-			appraise:       { ability: 'int' },
-			bluff:          { ability: 'cha' },
-			climb:          { ability: 'str' },
-			craft:          { ability: 'int', variant: true }, // TODO: Variant skills
-			diplomacy:      { ability: 'cha' },
-			disableDevice:  { ability: 'dex', trained: true },
-			disguise:       { ability: 'cha' },
-			escapeArtist:   { ability: 'dex' },
-			fly:            { ability: 'dex' },
-			handleAnimal:   { ability: 'cha', trained: true },
-			heal:           { ability: 'wis' },
-			intimidate:     { ability: 'cha' },
-			knowledge:      { ability: 'int', trained: true },  // TODO: Fixed variant skills
-			linguistics:    { ability: 'int', trained: true },
-			perception:     { ability: 'wis' },
-			perform:        { ability: 'cha', variant: true },
-			profession:     { ability: 'wis', trained: true, variant: true },
-			ride:           { ability: 'dex' },
-			senseMotive:    { ability: 'wis' },
-			sleightOfHand:  { ability: 'dex' },
-			spellcraft:     { ability: 'int', trained: true },
-			stealth:        { ability: 'dex' },
-			survival:       { ability: 'wis' },
-			swim:           { ability: 'str' },
-			useMagicDevice: { ability: 'cha', trained: true },
-			test:           {}
+			acrobatics:             { ability: 'dex' },
+			appraise:               { ability: 'int' },
+			bluff:                  { ability: 'cha' },
+			climb:                  { ability: 'str' },
+			craft:                  { ability: 'int', variant: true },
+			diplomacy:              { ability: 'cha' },
+			disableDevice:          { ability: 'dex', trained: true },
+			disguise:               { ability: 'cha' },
+			escapeArtist:           { ability: 'dex' },
+			fly:                    { ability: 'dex' },
+			handleAnimal:           { ability: 'cha', trained: true },
+			heal:                   { ability: 'wis' },
+			intimidate:             { ability: 'cha' },
+			knowledgeArcana:        { ability: 'int', trained: true },  // TODO: Fixed variant skills
+			knowledgeDungeoneering: { ability: 'int', trained: true },
+			knowledgeEngineering:   { ability: 'int', trained: true },
+			knowledgeGeography:     { ability: 'int', trained: true },
+			knowledgeHistory:       { ability: 'int', trained: true },
+			knowledgeLocal:         { ability: 'int', trained: true },
+			knowledgeNature:        { ability: 'int', trained: true },
+			knowledgeNobility:      { ability: 'int', trained: true },
+			knowledgePlanes:        { ability: 'int', trained: true },
+			knowledgeReligion:      { ability: 'int', trained: true },
+			linguistics:            { ability: 'int', trained: true },
+			perception:             { ability: 'wis' },
+			perform:                { ability: 'cha', variant: true },
+			profession:             { ability: 'wis', trained: true, variant: true },
+			ride:                   { ability: 'dex' },
+			senseMotive:            { ability: 'wis' },
+			sleightOfHand:          { ability: 'dex' },
+			spellcraft:             { ability: 'int', trained: true },
+			stealth:                { ability: 'dex' },
+			survival:               { ability: 'wis' },
+			swim:                   { ability: 'str' },
+			useMagicDevice:         { ability: 'cha', trained: true },
+			test:                   {}
 		}
 	},
 	{

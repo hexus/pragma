@@ -10,6 +10,7 @@ import pickBy          from 'lodash/pickBy';
 import defaultTo       from 'lodash/defaultTo';
 import difference      from 'lodash/difference';
 import intersection    from 'lodash/intersection';
+import isPlainObject   from 'lodash/isPlainObject';
 import { util }        from '../mixins/util';
 import sum             from '../functions/sum';
 import multiply        from '../functions/multiply';
@@ -130,7 +131,7 @@ export default class FormProcessor
 		 *
 		 * @type {Object.<string, *>}
 		 */
-		this.values = {};
+		this.valueCache = {};
 		
 		/**
 		 * Fields keyed by path.
@@ -147,6 +148,13 @@ export default class FormProcessor
 		this.tree = this.buildTree(this.dictionary);
 		
 		/**
+		 * Field update dependencies keyed by path.
+		 *
+		 * @type {Object.<string, string[]>}
+		 */
+		this.updateDependencies = {};
+		
+		/**
 		 * Expression parser.
 		 *
 		 * @type {Parser}
@@ -160,7 +168,12 @@ export default class FormProcessor
 		// Provide custom functions to the expression parser
 		this.parser.functions = merge(this.parser.functions, this.functions);
 		
-		// TODO: Override the "+" unary operator to perform concatenation?
+		/**
+		 * Field expression cache keyed by path.
+		 *
+		 * @type {Object.<string, Expression>}
+		 */
+		this.expressionCache = {};
 	}
 	
 	/**
@@ -235,7 +248,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Derive a property's value from some data.
+	 * Derive a field's value from some data.
 	 *
 	 * @protected
 	 * @param {string} path - The path of the field to derive a value for.
@@ -245,8 +258,8 @@ export default class FormProcessor
 	deriveValue(path, data)
 	{
 		// Return from the value cache if a value is set
-		if (this.values.hasOwnProperty(path)) {
-			return this.values[path];
+		if (this.valueCache.hasOwnProperty(path)) {
+			return this.valueCache[path];
 		}
 		
 		let value = get(data, path);
@@ -261,13 +274,13 @@ export default class FormProcessor
 		value = this.castValue(field, value);
 		
 		// Compute the field's expression
-		value = this.computeExpression(field, data, value);
+		value = this.computeFieldExpression(field, data, value);
 		
 		// Fall back to defaults
 		value = defaultTo(value, defaultTo(field.default, null));
 		
 		// Update the value cache
-		this.values[path] = value;
+		this.valueCache[path] = value;
 		
 		return value;
 	}
@@ -282,9 +295,9 @@ export default class FormProcessor
 	 * @param {*}      [value] - The default value for the field.
 	 * @return {*} The computed value of the field's expression.
 	 */
-	computeExpression(field, data, value)
+	computeFieldExpression(field, data, value)
 	{
-		value = defaultTo(value, defaultTo(field.default, null));
+		value = this.getFieldValue(field, data);
 		
 		if (field.expression == null || typeof field.expression !== 'string') {
 			return value;
@@ -294,6 +307,8 @@ export default class FormProcessor
 		let expression;
 		
 		// TODO: Memoize parsed expressions per-field and/or per-expression
+		//       Extract building the expression into its own method to make
+		//       this easier
 		try {
 			expression = this.parser.parse(field.expression);
 		} catch (error) {
@@ -317,7 +332,7 @@ export default class FormProcessor
 		}
 		
 		// Derive values for the variables in the expression
-		let variables = expression.variables({ withMembers: true});
+		let variables = expression.variables({ withMembers: true });
 		
 		let values = {
 			$this: field,
@@ -338,24 +353,39 @@ export default class FormProcessor
 			values,
 			{
 				field: (path) => this.dictionary[path],
-				// TODO: value() could add to the list of variables used by the
-				//       expression. this could then become the list of field
-				//       paths that are dependent upon this one. neat bruv!
-				value: (path) => this.deriveValue(path, data)
+				value: (path) => {
+					// Add to the list of variables used by the expression
+					variables.push(path);
+					
+					// Derive the value for the expression
+					return this.deriveValue(path, data);
+				}
 			}
 		);
 		
 		// Evaluate the expression
 		try {
 			value = expression.evaluate(values);
-			
-			//console.log('computeExpression', field.path, expression.toString(), variables, values, value);
-			//console.log('computeExpression expression', expression);
 		} catch (error) {
 			console.error(`Error evaluating expression for field '${field}': ${error.message}`);
 		}
 		
-		// TODO: Update the list of fields dependent upon this one
+		//console.log('computeFieldExpression', field.path, expression.toString(), variables, values, value);
+		//console.log('computeFieldExpression expression', expression);
+		
+		// Update the map of field update dependencies
+		// TODO: Exclude contextual functions and variables
+		// TODO: Move this to a processing step that evaluates the expression
+		//       with spy functions
+		for (let v = 0; v < variables.length; v++) {
+			let variable = variables[v];
+			
+			this.updateDependencies[variable] = this.updateDependencies[variable] || [];
+			
+			if (this.updateDependencies[variable].indexOf(field.path) < 0) {
+				this.updateDependencies[variable].push(field.path);
+			}
+		}
 		
 		return value;
 	}
@@ -393,7 +423,7 @@ export default class FormProcessor
 	diffTemplateFieldKeys(field, data)
 	{
 		// Grab the data keys and child field keys (path fragments)
-		let childData      = get(data, field.path, field.default);
+		let childData      = this.getFieldValue(field, data);
 		let childDataKeys  = Object.keys(childData);
 		let childFieldKeys = [];
 		
@@ -451,8 +481,41 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Get the current value of a field.
+	 *
+	 * @protected
+	 * @param {Field} field     - The field to derive a value for
+	 * @param {*}     [data={}] - Optional data to read values from
+	 * @return {*} The current value of the field
+	 */
+	getFieldValue(field, data = {})
+	{
+		let value = null;
+		
+		if (!field) {
+			return value;
+		}
+		
+		value = get(data, field.path);
+		
+		// Merge default values if specified
+		if (field.merge) {
+			if (isPlainObject(field.default)) {
+				return merge({}, field.default, field.value, value);
+			}
+			
+			
+			//return defaults(value, field.value, field.default); // Note: This loses object order
+		}
+		
+		// Otherwise use the first defined value
+		return defaultTo(value, defaultTo(field.value, field.default));
+	}
+	
+	/**
 	 * Get the field template of the given field.
 	 *
+	 * @protected
 	 * @param {Field} field - The field to get the template of.
 	 * @return {Field}
 	 */
@@ -515,7 +578,7 @@ export default class FormProcessor
 			//       Just needs to check if all the right fields in the template exist
 			
 			// Build new fields
-			value = get(data, field.path, field.default);
+			value    = this.getFieldValue(field, data);
 			template = this.getFieldTemplate(field);
 			
 			newFields = newFields.concat(
@@ -643,6 +706,18 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Get the value of a property.
+	 *
+	 * Falls back to default values as appropriate, merging objects.
+	 *
+	 * @param {string} path
+	 */
+	getValue(path)
+	{
+	
+	}
+	
+	/**
 	 * Update a property with the given value.
 	 *
 	 * @public
@@ -683,7 +758,7 @@ export default class FormProcessor
 	update(data)
 	{
 		// Clear the value cache
-		this.values = {};
+		this.valueCache = {};
 		
 		// Update template fields
 		this.updateTemplateFields(data);
@@ -960,6 +1035,8 @@ export default class FormProcessor
  * A field description.
  *
  * TODO: Update this to reflect the simplest approach to describing fields.
+ *       Could also be called FieldOptions if passed to the constructor of a
+ *       Field class.
  *
  * @typedef {Object} FieldDescription
  */
@@ -985,12 +1062,13 @@ export default class FormProcessor
  * @property {string|boolean} [disabled=false] - Whether the property is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. String values are interpreted as expressions. TODO: Input options?
  * @property {*}              [value]          - The field's value.
  * @property {*}              [default]        - The field's default value. Defaults appropriately for the set `type`.
+ * @property {boolean}        [merge]          - Whether to merge the field's value with its default value.
  * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
  * @property {string}         [validator]      - The field's validation function. Defaults as appropriate to the `type`.
  * @property {number}         [min=-100]       - The minimum value of the field if the type is `'number'`. Defaults to -100. TODO: Input options
  * @property {number}         [max=100]        - The maximum value of the field if the type is `'number'`. Defaults to 100. TODO: Input options
  * @property {number}         [step]           - The step value of the field if the type is `'number'`. TODO: Input options
- * @property {string}         [extend]         - Template field for this field to extend.
+ * @property {string}         [extends]        - The path of a template field for this field to extend.
  * @property {Field[]}        [children]       - Child fields.
  * @property {Field|string}   [template]       - Template field for creating new child fields. Can be a `Field` or a `path`.
  */
