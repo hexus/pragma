@@ -83,9 +83,10 @@ export default class FormProcessor
 		 * @type {Object.<string, Function>}
 		 */
 		this.functions = merge({
-			sum,
+			concat: (...args) => args.join(''),
+			keys:  Object.keys,
 			multiply,
-			concat: (...args) => args.join('')
+			sum
 		}, functions);
 		
 		/**
@@ -336,7 +337,6 @@ export default class FormProcessor
 		values = merge(
 			values,
 			{
-				keys:  Object.keys,
 				field: (path) => this.dictionary[path],
 				// TODO: value() could add to the list of variables used by the
 				//       expression. this could then become the list of field
