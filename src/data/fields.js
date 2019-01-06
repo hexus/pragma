@@ -666,13 +666,21 @@ const fields = [
 			stealth:        { ability: 'dex' },
 			survival:       { ability: 'wis' },
 			swim:           { ability: 'str' },
-			useMagicDevice: { ability: 'cha', trained: true}
+			useMagicDevice: { ability: 'cha', trained: true},
+			test: {}
 		}
 	},
 	{
-		// TODO: Get inheritance to work
+		// TODO: Implement inheritance
+		//       Implement fixed list items
 		path:    'skills.list.test',
 		name:    'Test skill',
+		type:    'group',
+		extends: 'templates.skill'
+	},
+	{
+		path:    'skills.list.test2',
+		name:    'Test skill 2',
 		type:    'group',
 		extends: 'templates.skill'
 	}

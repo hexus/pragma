@@ -4,16 +4,16 @@ import defaults        from 'lodash/defaultsDeep';
 import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
+import pull            from 'lodash/pull';
 import each            from 'lodash/each';
+import filter          from 'lodash/filter';
 import pickBy          from 'lodash/pickBy';
 import startsWith      from 'lodash/startsWith';
 import defaultTo       from 'lodash/defaultTo';
 import difference      from 'lodash/difference';
 import intersection    from 'lodash/intersection';
 import { util }        from '../mixins/util';
-import identity        from 'lodash/identity';
 import sum             from '../functions/sum';
-import min             from '../functions/min';
 import multiply        from '../functions/multiply';
 import buildDictionary from '../functions/buildDictionary';
 import buildTree       from '../functions/buildTree';
@@ -284,7 +284,11 @@ export default class FormProcessor
 		};
 		
 		for (let s in substitutions) {
-			expression = expression.substitute(s, substitutions[s]);
+			try {
+				expression = expression.substitute(s, substitutions[s]);
+			} catch (error) {
+				console.error(`Error substituting expression variable '${s}' for field '${field.path}: ${error.message}`);
+			}
 		}
 		
 		// Derive values for the variables in the expression
@@ -334,67 +338,112 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Get the keys of fields that need creating, updating or removing.
+	 * Get the keys of child fields that need creating, updating or removing for
+	 * a given field.
 	 *
 	 * @protected
-	 * @param {Field[]} fields
+	 * @param {Field} field
 	 * @param {Object} data
 	 * @return array [newPaths[], existingPaths[], oldPaths[]]
 	 */
-	diffFieldsAndData(fields, data)
+	diffTemplateFieldKeys(field, data)
 	{
-		let i, field;
-		let newPaths = [];
-		let existingPaths = [];
-		let oldPaths = [];
+		// let newPaths = [];
+		// let existingPaths = [];
+		// let oldPaths = [];
 		
-		let prependFieldPath = function (pathFragment) {
-			return joinPath(field.path, pathFragment);
-		};
+		let childData      = get(data, field.path, field.default);
+		let childDataKeys  = Object.keys(childData);
+		let childFieldKeys = [];
 		
-		for (i = 0; i < fields.length; i++) {
-			field = fields[i];
-			
-			let childData      = get(data, field.path, field.default);
-			let childDataKeys  = Object.keys(childData);
-			let childFieldKeys = [];
-			
-			for (let j in this.dictionary) {
-				if (this.dictionary[j].parent === field.path) {
-					let [, pathFragment] = splitPath(this.dictionary[j].path);
-					
-					childFieldKeys.push(pathFragment);
-				}
+		for (let j in this.dictionary) {
+			if (this.dictionary[j].parent === field.path) {
+				let [, pathFragment] = splitPath(this.dictionary[j].path);
+				
+				childFieldKeys.push(pathFragment);
 			}
-			
-			// Keys in data that aren't in fields
-			let newKeys = difference(childDataKeys, childFieldKeys);
-			
-			// Keys in data and fields
-			let existingKeys = intersection(childDataKeys, childFieldKeys);
-			
-			// Keys in fields that aren't in data
-			let oldKeys = difference(childFieldKeys, childDataKeys);
-			
-			// Prepend the field path to the keys and add them to the lists
-			newPaths      = newPaths.concat(newKeys.map(prependFieldPath));
-			existingPaths = existingPaths.concat(existingKeys.map(prependFieldPath));
-			oldPaths      = oldPaths.concat(oldKeys.map(prependFieldPath));
-			
-			console.log('diffFieldsAndData()', field.path, 'newKeys', newKeys);
-			console.log('diffFieldsAndData()', field.path, 'existingKeys', existingKeys);
-			console.log('diffFieldsAndData()', field.path, 'oldKeys', oldKeys);
 		}
 		
-		return [newPaths, existingPaths, oldPaths];
+		console.log('diffTemplateFieldKeys() childDataKeys', childDataKeys);
+		console.log('diffTemplateFieldKeys() childFieldKeys', childFieldKeys);
+		
+		// Keys in data that aren't in fields
+		let newKeys = difference(childDataKeys, childFieldKeys);
+		
+		// Keys in data and fields
+		let existingKeys = intersection(childDataKeys, childFieldKeys);
+		
+		// Keys in fields that aren't in data
+		let oldKeys = difference(childFieldKeys, childDataKeys);
+		
+		// Prepend the field path to the keys and add them to the lists
+		// let prependFieldPath = function (pathFragment) {
+		// 	return joinPath(field.path, pathFragment);
+		// };
+		//
+		// newPaths      = newPaths.concat(newKeys.map(prependFieldPath));
+		// existingPaths = existingPaths.concat(existingKeys.map(prependFieldPath));
+		// oldPaths      = oldPaths.concat(oldKeys.map(prependFieldPath));
+		
+		console.log('diffTemplateFieldKeys()', field.path, 'newKeys', newKeys);
+		console.log('diffTemplateFieldKeys()', field.path, 'existingKeys', existingKeys);
+		console.log('diffTemplateFieldKeys()', field.path, 'oldKeys', oldKeys);
+		
+		return [newKeys, existingKeys, oldKeys];
+		//return [newPaths, existingPaths, oldPaths];
+	}
+	
+	/**
+	 * Remove the field, and its children, at the given path.
+	 *
+	 * @param {string} path - The path to remove.
+	 */
+	removePath(path)
+	{
+		let field = this.dictionary[path];
+		
+		if (!field) {
+			return;
+		}
+		
+		// Recursively remove all child fields
+		if (field.children && field.children.length) {
+			for (let i = 0; i < field.children.length; i++) {
+				this.removePath(field.children[i].path);
+			}
+		}
+		
+		console.log('removePath()', field.path);
+		
+		// Remove the field from its parent
+		let parent = this.dictionary[field.parent];
+
+		pull(parent.children, field);
+		
+		// Remove the field from the dictionary
+		delete this.dictionary[path];
+	}
+	
+	/**
+	 * Get the field template of the given field.
+	 *
+	 * @param {Field} field - The field to get the template of.
+	 * @return {Field}
+	 */
+	getFieldTemplate(field)
+	{
+		let template = field.template;
+
+		// Lookup the path to the template in the dictionary
+		if (typeof field.template === 'string') {
+			template = this.dictionary[field.template];
+		}
+		
+		return template;
 	}
 	
 	/**
 	 * Unravel all templates into fields for the given data.
-	 *
-	 * TODO: Optimise by only rebuilding fields as necessary
-	 *
-	 * TODO: Stop this from replacing the dictionary reference, it causes problems
 	 *
 	 * @protected
 	 * @param {Object} [data] - The data used to unravel field templates
@@ -404,96 +453,90 @@ export default class FormProcessor
 	{
 		let dictionary = this.dictionary,
 			fieldsWithTemplates,
-			newFields = [],
-			value;
+			i,
+			j,
+			key,
+			value,
+			template,
+			newFields = [];
 
 		// Find all fields that have templates for their children
-		fieldsWithTemplates = Object.values(pickBy(dictionary, field => !!field.template));
+		fieldsWithTemplates = Object.values(
+			pickBy(dictionary, field => !!field.template)
+		);
 		
-		console.log('updateTemplateFields() fieldsWithTemplates', Object.keys(fieldsWithTemplates).length);
+		console.log('updateTemplateFields() fieldsWithTemplates', fieldsWithTemplates.length);
 		
-		// Find child fields that need to be added, updated or removed
-		let [newPaths, existingPaths, oldPaths] = this.diffFieldsAndData(fieldsWithTemplates, data);
-		
-		console.log('updateTemplateFields() newPaths', newPaths);
-		console.log('updateTemplateFields() existingPaths', existingPaths);
-		console.log('updateTemplateFields() oldPaths', oldPaths);
-		
-		// TODO: Remove old fields
-		
-		// TODO: Update existing fields
-		
-		// TODO: Build new fields
-		
-		// Clear existing template fields TODO: This is naive, see docblock above
-		each(fieldsWithTemplates, (fieldWithTemplate) => {
-			// Remove them from the dictionary
-			dictionary = pickBy(
-				dictionary,
-				field => !startsWith(field.path, fieldWithTemplate.path + '.')
-			);
+		for (i = 0; i < fieldsWithTemplates.length; i++) {
+			let field = fieldsWithTemplates[i];
 			
-			// Empty the field's children to make way for the next generation
-			fieldWithTemplate.children = [];
-		});
-		
-		// Build new fields for each field with a template
-		each(fieldsWithTemplates, (field) => {
-			let template = field.template;
+			// Find child fields that need to be added, updated or removed
+			let [newKeys, existingKeys, oldKeys] = this.diffTemplateFieldKeys(field, data);
 			
-			// Lookup the path to the template in the dictionary
-			if (typeof field.template === 'string') {
-				template = dictionary[field.template];
+			console.log('updateTemplateFields() newKeys', newKeys);
+			console.log('updateTemplateFields() existingKeys', existingKeys);
+			console.log('updateTemplateFields() oldKeys', oldKeys);
+			
+			// Remove old fields
+			for (j = 0; j < oldKeys.length; j++) {
+				key = oldKeys[j];
+				
+				this.removePath(joinPath(field.path, key));
 			}
 			
-			value = get(data, field.path, field.default);
+			// TODO: Update existing fields
+			//       A dictionary-aware update would be good, without forcing rebuilds
+			//       Just needs to check if all the right fields in the template exist
 			
-			// Build new fields for the template
-			newFields.push(
-				...this.buildTemplateFields(field, template, value)
+			// Build new fields
+			value = get(data, field.path, field.default);
+			template = this.getFieldTemplate(field);
+			
+			newFields = newFields.concat(
+				this.buildTemplateFields(field, template, value, newKeys)
 			);
-		});
+		}
 		
 		//console.log('updateTemplateFields() new fields', newFields);
 		
-		// Update the dictionary with the new fields
+		// Add the new fields to the dictionary
 		each(newFields, (field) => {
 			dictionary[field.path] = field;
 		});
-		
-		this.dictionary = dictionary;
-		
-		return dictionary;
-		
-		// lol
-		// this.tree = this.buildTree(this.dictionary);
 	}
 	
 	/**
 	 * Build fields from a template and its corresponding data.
 	 *
 	 * @protected
-	 * @param {Field} parent   - The parent field
-	 * @param {Field} template - The template field
-	 * @param {*}     [data]   - The data used to build the new fields
+	 * @param {Field}    parent   - The parent field
+	 * @param {Field}    template - The template field
+	 * @param {*}        [data]   - The data used to build the new fields
+	 * @param {string[]} [keys]   - The data keys to build fields for
 	 * @return {Field[]} The new fields
 	 */
-	buildTemplateFields(parent, template, data)
+	buildTemplateFields(parent, template, data, keys)
 	{
 		if (!parent || !parent.path || !template || !data) {
 			return [];
 		}
 		
+		keys = keys || null;
 		let fields = [];
 		
 		// Build new fields for each data item
-		each(data, (item, key) => {
+		for (let key in data) {
+			if (keys && keys.indexOf(key) < 0)
+				continue;
+			
+			let item = data[key];
+			
 			fields.push(
 				...this.buildTemplateField(
-					parent, template, key, item
+					parent, template, key, item, this.dictionary[joinPath(parent.path, key)]
 				)
 			);
-		});
+		}
 		
 		return fields;
 	}
@@ -504,23 +547,23 @@ export default class FormProcessor
 	 *
 	 * Acts recursively on any child fields in the template.
 	 *
-	 * TODO: Accept-as-parameter and merge in existing field in dictionary, if any
-	 *
 	 * @protected
 	 * @param {Field}      parent   - The parent field
 	 * @param {Field}      template - The template field
 	 * @param {string|int} key      - The key of the new field
 	 * @param {*}          value    - The value of the new field
+	 * @param {Field}      [field]  - An existing field to merge with
 	 * @return {Field[]} The built fields
 	 */
-	buildTemplateField(parent, template, key, value)
+	buildTemplateField(parent, template, key, value, field)
 	{
 		//console.log('buildTemplateField', key, value);
 		// TODO: Optional parent?
 		
-		let field = merge(
+		field = merge(
 			{},
 			template,
+			field,
 			{
 				path:   joinPath(parent.path, key),
 				parent: parent.path,
@@ -557,7 +600,6 @@ export default class FormProcessor
 		}
 		
 		// Recursively build the template children as fields
-		// TODO: Use each()
 		for (let c = 0; c < children.length; c++) {
 			let child      = children[c];
 			let childKey   = child.pathFragment;
@@ -590,7 +632,6 @@ export default class FormProcessor
 		
 		// Update the value if one is given
 		if (value !== undefined) {
-			// TODO: Also check whether the field's value is derived, skip setting anything if so
 			if (field) {
 				field.value = value;
 			}
@@ -608,7 +649,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Update every field using the given data.
+	 * Update the form using the given data.
 	 *
 	 * @public
 	 * @param {Object} [data] - The data to update with.
@@ -649,7 +690,7 @@ export default class FormProcessor
 				continue;
 			}
 			
-			// Update the data value
+			// Update the state's value
 			this.updateDataValue(field, data);
 			
 			// Update the field's children
@@ -886,8 +927,8 @@ export default class FormProcessor
  * @property {string}         [description]    - The field's description.
  * @property {boolean}        [omit=false]     - Whether to prevent storing the property's value in data AND prevent updating any children. Defaults to `false`.
  * @property {boolean}        [virtual=false]  - Whether to prevent storing the property's value in data. Defaults to `false`.
- * @property {string|boolean} [visible=true]   - Whether the property is visible. Defaults to `true`.
- * @property {boolean}        [disabled=false] - Whether the property is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. TODO: Input options?
+ * @property {string|boolean} [visible=true]   - Whether the property is visible. Defaults to `true`. String values are interpreted as expressions.
+ * @property {string|boolean} [disabled=false] - Whether the property is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. String values are interpreted as expressions. TODO: Input options?
  * @property {*}              [value]          - The field's value.
  * @property {*}              [default]        - The field's default value. Defaults appropriately for the set `type`.
  * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
