@@ -20,6 +20,8 @@
 		import './input/list.tag';
 		import './input/pragma-table.tag';
 
+		// TODO: Change this tag to accept only a form description and some data
+		//       There should be an easy way to get and set the data after mounting
 		let app = this.opts.app;
 
 		let formProcessor = app.services.formProcessor;
