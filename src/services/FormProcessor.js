@@ -152,7 +152,7 @@ export default class FormProcessor
 		 *
 		 * @type {Object.<string, string[]>}
 		 */
-		this.updateDependencies = {};
+		this.fieldDependencies = {};
 		
 		/**
 		 * Expression parser.
@@ -380,10 +380,10 @@ export default class FormProcessor
 		for (let v = 0; v < variables.length; v++) {
 			let variable = variables[v];
 			
-			this.updateDependencies[variable] = this.updateDependencies[variable] || [];
+			this.fieldDependencies[variable] = this.fieldDependencies[variable] || [];
 			
-			if (this.updateDependencies[variable].indexOf(field.path) < 0) {
-				this.updateDependencies[variable].push(field.path);
+			if (this.fieldDependencies[variable].indexOf(field.path) < 0) {
+				this.fieldDependencies[variable].push(field.path);
 			}
 		}
 		
@@ -481,6 +481,17 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Get the field at the given path.
+	 *
+	 * @param {string} path - The path of the field to get.
+	 * @return {Field}
+	 */
+	getField(path)
+	{
+		return this.dictionary[path];
+	}
+	
+	/**
 	 * Get the current value of a field.
 	 *
 	 * @protected
@@ -504,8 +515,7 @@ export default class FormProcessor
 				return merge({}, field.default, field.value, value);
 			}
 			
-			
-			//return defaults(value, field.value, field.default); // Note: This loses object order
+			// TODO: Handle arrays
 		}
 		
 		// Otherwise use the first defined value
@@ -714,7 +724,7 @@ export default class FormProcessor
 	 */
 	getValue(path)
 	{
-	
+		return this.getFieldValue(this.dictionary[path]);
 	}
 	
 	/**
@@ -742,11 +752,25 @@ export default class FormProcessor
 		// Update all values after this value change
 		// TODO: Build and use a derivation argument map to update only the affected properties? i.e. this.updatePath(path);
 		// TODO: Derive all fields only if arguments aren't specified, our hand is forced in that situation i.e. this.update();
-		this.update(data);
-		//this.updatePath(path, data);
+		//this.update(data);
+		this.updatePath(path, data);
 		
 		// Get the updated value
 		return get(data, path);
+	}
+	
+	/**
+	 * Clear the value cache.
+	 *
+	 * Optionally accepts a path to clear.
+	 *
+	 * @param {string} path
+	 */
+	clearValueCache(path = '')
+	{
+		this.valueCache = {};
+		
+		// TODO: Implement tree traversal for path field and its child fields
 	}
 	
 	/**
@@ -758,25 +782,37 @@ export default class FormProcessor
 	update(data)
 	{
 		// Clear the value cache
-		this.valueCache = {};
+		this.clearValueCache();
 		
 		// Update template fields
 		this.updateTemplateFields(data);
 		
 		// Update the value of every field
+		// TODO: Diff and update any *paths* that changed
 		this.updateFields([this.tree], data);
+	}
+	
+	/**
+	 * Update the field at the given path.
+	 *
+	 * @param {string} path - The path of the field to update.
+	 * @param {Object} data - The data to update with.
+	 */
+	updatePath(path, data)
+	{
+		this.clearValueCache(path);
+		
+		this.updateFields([this.dictionary[path]], data);
 	}
 	
 	/**
 	 * Update the given fields with the given data.
 	 *
-	 * Recursively descends into child fields.
-	 *
-	 * TODO: Optimise, somehow!
+	 * Recursively descends into child fields and updates dependent fields.
 	 *
 	 * @protected
 	 * @param {Field[]} fields - The fields to update.
-	 * @param {Object} data    - The data to update with.
+	 * @param {Object}  data   - The data to update with.
 	 */
 	updateFields(fields, data)
 	{
@@ -805,6 +841,9 @@ export default class FormProcessor
 			
 			// Update the field's children
 			this.updateFields(field.children, data);
+			
+			// Update fields dependent upon this one
+			this.updateFieldDependencies(field, data);
 		}
 	}
 	
@@ -840,14 +879,34 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Update the field at the given path.
+	 * Update fields that are dependent upon the value of the given field.
 	 *
-	 * @param {string} path - The path of the field to update.
-	 * @param {Object} data - The data to update with.
+	 * @protected
+	 * @param {Field} field - The field to update dependent fields of.
+	 * @param {Object} data - The data to update from.
 	 */
-	updatePath(path, data)
+	updateFieldDependencies(field, data)
 	{
-		this.updateFields([this.dictionary[path]], data);
+		let dependencyPaths = this.fieldDependencies[field.path];
+		
+		console.log(field.path, dependencyPaths);
+		
+		// Skip if the field has no dependencies
+		if (!dependencyPaths || !dependencyPaths.length) {
+			return;
+		}
+		
+		let fields = [];
+		
+		for (let i = 0; i < dependencyPaths.length; i++) {
+			if (!this.dictionary[dependencyPaths[i]]) {
+				continue;
+			}
+			
+			fields.push(this.dictionary[dependencyPaths[i]]);
+		}
+		
+		this.updateFields(fields, data);
 	}
 	
 	/**

@@ -701,7 +701,9 @@ const fields = [
 	},
 	{
 		// TODO: Implement inheritance
-		//       Implement fixed list items
+		// TODO: Implement fixed list items; 'fixed' boolean property?
+		//       or, the list field has a 'fixed' array-of-child-keys property?
+		//       or both?
 		path:    'skills.list.test',
 		name:    'Test skill',
 		type:    'group',
