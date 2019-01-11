@@ -1,6 +1,8 @@
 import exprEval        from 'expr-eval';
 import merge           from 'lodash/merge';
 import defaults        from 'lodash/defaultsDeep';
+import map             from 'lodash/map';
+import reduce          from 'lodash/reduce';
 import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
@@ -11,8 +13,10 @@ import defaultTo       from 'lodash/defaultTo';
 import difference      from 'lodash/difference';
 import intersection    from 'lodash/intersection';
 import isPlainObject   from 'lodash/isPlainObject';
+import toNumber        from 'lodash/toNumber';
 import { util }        from '../mixins/util';
 import sum             from '../functions/sum';
+import sumBy           from 'lodash/sumBy';
 import multiply        from '../functions/multiply';
 import buildDictionary from '../functions/buildDictionary';
 import buildTree       from '../functions/buildTree';
@@ -87,7 +91,10 @@ export default class FormProcessor
 			concat: (...args) => args.join(''),
 			keys:  Object.keys,
 			multiply,
-			sum
+			sum,
+			sumBy,
+			map,
+			reduce
 		}, functions);
 		
 		/**
@@ -115,7 +122,7 @@ export default class FormProcessor
 		 */
 		this.casts = {
 			'string':  (f, v) => v == null ? '' : '' + v,
-			'number':  (f, v) => util.clamp(v, f.min, f.max),
+			'number':  (f, v) => toNumber(util.clamp(v, get(f, 'options.min'), get(f, 'options.max'))),
 			'boolean': (f, v) => !!v
 		};
 		
@@ -269,7 +276,7 @@ export default class FormProcessor
 		if (!field) {
 			return value;
 		}
-		
+
 		// Cast the value
 		value = this.castValue(field, value);
 		
@@ -303,7 +310,7 @@ export default class FormProcessor
 			return value;
 		}
 		
-		// Parse the expression and substitute special variables
+		// Parse the expression
 		let expression;
 		
 		// TODO: Memoize parsed expressions per-field and/or per-expression
@@ -317,6 +324,7 @@ export default class FormProcessor
 			return value;
 		}
 		
+		// Substitute contextual variables
 		let substitutions = {
 			$parent: field.parent
 		};
@@ -345,6 +353,8 @@ export default class FormProcessor
 			if (has(values, variable))
 				continue;
 			
+			// TODO: For function like sumBy, values may not be fully derived
+			//       at this point. Work out an execution order that works.
 			set(values, variable, this.deriveValue(variable, data));
 		}
 		
@@ -352,7 +362,11 @@ export default class FormProcessor
 		values = merge(
 			values,
 			{
-				field: (path) => this.dictionary[path],
+				field: (path) => {
+					variables.push(path);
+					
+					return this.dictionary[path];
+				},
 				value: (path) => {
 					// Add to the list of variables used by the expression
 					variables.push(path);
@@ -402,11 +416,14 @@ export default class FormProcessor
 		if (!field)
 			return value;
 		
+		if (field.path.indexOf('classes.list.') >= 0)
+			console.log(field.path, field.type, value);
+		
 		if (!this.casts[field.type])
 			return value;
 
-		if (Array.isArray(value))
-			return value.map(this.casts[field.type]);
+		// if (Array.isArray(value))
+		// 	return value.map(this.casts[field.type]);
 		
 		return this.casts[field.type](field, value);
 	}
@@ -416,8 +433,8 @@ export default class FormProcessor
 	 * a given field.
 	 *
 	 * @protected
-	 * @param {Field} field
-	 * @param {Object} data
+	 * @param {Field} field - The field with a template.
+	 * @param {Object} data - The data to diff against.
 	 * @return array [newPaths[], existingPaths[], oldPaths[]]
 	 */
 	diffTemplateFieldKeys(field, data)
@@ -543,6 +560,8 @@ export default class FormProcessor
 	
 	/**
 	 * Unravel all templates into fields for the given data.
+	 *
+	 * TODO: Accept field argument to start from.
 	 *
 	 * @protected
 	 * @param {Object} [data] - The data used to unravel field templates
@@ -750,8 +769,6 @@ export default class FormProcessor
 		}
 		
 		// Update all values after this value change
-		// TODO: Build and use a derivation argument map to update only the affected properties? i.e. this.updatePath(path);
-		// TODO: Derive all fields only if arguments aren't specified, our hand is forced in that situation i.e. this.update();
 		//this.update(data);
 		this.updatePath(path, data);
 		
@@ -768,9 +785,31 @@ export default class FormProcessor
 	 */
 	clearValueCache(path = '')
 	{
-		this.valueCache = {};
+		// TODO: Remove lazy debugging
+		this.valueCache = {}; return;
 		
-		// TODO: Implement tree traversal for path field and its child fields
+		// Just empty the entire cache if there's no path is or there's no field
+		// at the given path
+		if (!path || !this.getField(path)) {
+			this.valueCache = {};
+			
+			return;
+		}
+		
+		let field = this.getField(path);
+		let children = field.children;
+		
+		// Clear the cached value for this field
+		delete this.valueCache[field.path];
+		
+		// Recursively clear cached values of child fields
+		if (children && children.length) {
+			for (let i = 0; i < children.length; i++) {
+				let child = children[i];
+				
+				this.clearValueCache(child.path);
+			}
+		}
 	}
 	
 	/**
@@ -788,7 +827,8 @@ export default class FormProcessor
 		this.updateTemplateFields(data);
 		
 		// Update the value of every field
-		// TODO: Diff and update any *paths* that changed
+		// TODO: Diff any *paths* that changed and update those
+		//       i.e. implement diffTemplateFieldPaths()
 		this.updateFields([this.tree], data);
 	}
 	
@@ -802,19 +842,60 @@ export default class FormProcessor
 	{
 		this.clearValueCache(path);
 		
-		this.updateFields([this.dictionary[path]], data);
+		// TODO: Lazy. Update template fields smartly.
+		this.updateTemplateFields(data);
+		
+		this.updateFields([this.getField(path)], data);
+	}
+	
+	/**
+	 * Update the given field with the given data.
+	 *
+	 * Recursively descends into child fields and updates dependent fields,
+	 * including parents.
+	 *
+	 * @protected
+	 * @param {Field}   field  - The fields to update.
+	 * @param {Object}  data   - The data to update with.
+	 * @param {boolean} [skipChildren=false] - Bottom-up traversal; ignore children
+	 */
+	updateField(field, data, skipChildren = false)
+	{
+		if (!field) {
+			return;
+		}
+		
+		// Update the field's children
+		if (!skipChildren) {
+			this.updateFields(field.children, data);
+		}
+		
+		if (field.omit) {
+			return;
+		}
+		
+		// Update the state's value
+		this.updateDataValue(field, data);
+		
+		// Update the field's value (and its parents' values)
+		this.updateFieldValue(field, data);
+		
+		// Update fields dependent upon this one
+		this.updateFieldDependencies(field, data);
 	}
 	
 	/**
 	 * Update the given fields with the given data.
 	 *
-	 * Recursively descends into child fields and updates dependent fields.
+	 * Recursively descends into child fields and updates dependent fields,
+	 * including parents.
 	 *
 	 * @protected
 	 * @param {Field[]} fields - The fields to update.
 	 * @param {Object}  data   - The data to update with.
+	 * @param {boolean} [skipChildren=false] - Bottom-up traversal; ignore children
 	 */
-	updateFields(fields, data)
+	updateFields(fields, data, skipChildren = false)
 	{
 		if (!fields || !fields.length) {
 			return;
@@ -823,43 +904,8 @@ export default class FormProcessor
 		let i, field;
 		
 		for (i = 0; i < fields.length; i++) {
-			field = fields[i];
-			
-			if (!field) {
-				continue;
-			}
-			
-			// Update the field's value
-			this.updateFieldValue(field, data);
-			
-			if (field.omit) {
-				continue;
-			}
-			
-			// Update the state's value
-			this.updateDataValue(field, data);
-			
-			// Update the field's children
-			this.updateFields(field.children, data);
-			
-			// Update fields dependent upon this one
-			this.updateFieldDependencies(field, data);
+			this.updateField(fields[i], data, skipChildren);
 		}
-	}
-	
-	/**
-	 * Update a field using the given data.
-	 *
-	 * Derives the field's value, setting it on the field and updating it in the
-	 * data.
-	 *
-	 * @protected
-	 * @param {Field}  field - The field to update.
-	 * @param {Object} data  - The data to update with.
-	 */
-	updateFieldValue(field, data)
-	{
-		field.value = this.deriveValue(field.path, data);
 	}
 	
 	/**
@@ -875,11 +921,36 @@ export default class FormProcessor
 			return;
 		}
 		
-		set(data, field.path, field.value);
+		set(data, field.path, this.deriveValue(field.path, data));
+	}
+	
+	/**
+	 * Update a field using the given data.
+	 *
+	 * Derives the field's value, setting it on the field and updating it in the
+	 * data.
+	 *
+	 * @protected
+	 * @param {Field}  field - The field to update.
+	 * @param {Object} data  - The data to update with.
+	 */
+	updateFieldValue(field, data)
+	{
+		if (!field || !field.path)
+			return;
+		
+		// Update the field value
+		field.value = get(data, field.path);
+		
+		// Recursively update parent values
+		// TODO: Clean this up, no boolean flags please
+		this.updateFields([this.getField(field.parent)], data, true);
 	}
 	
 	/**
 	 * Update fields that are dependent upon the value of the given field.
+	 *
+	 * TODO: Recursively derive parent field values to the top
 	 *
 	 * @protected
 	 * @param {Field} field - The field to update dependent fields of.
@@ -889,7 +960,7 @@ export default class FormProcessor
 	{
 		let dependencyPaths = this.fieldDependencies[field.path];
 		
-		console.log(field.path, dependencyPaths);
+		//console.log('updateFieldDependencies()', field.path, dependencyPaths);
 		
 		// Skip if the field has no dependencies
 		if (!dependencyPaths || !dependencyPaths.length) {
@@ -1045,8 +1116,8 @@ export default class FormProcessor
 		set(data, path, target);
 		
 		// Update the form
-		this.update(data);
-		//this.updatePath(path, data);
+		//this.update(data);
+		this.updatePath(path, data);
 	}
 	
 	/**
@@ -1077,8 +1148,8 @@ export default class FormProcessor
 		set(data, parentPath, parent);
 		
 		// Update the form
-		this.update(data);
-		//this.removePath(path);
+		//this.update(data);
+		this.removePath(path);
 	}
 }
 

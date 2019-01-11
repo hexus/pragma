@@ -16,16 +16,19 @@ export default {
 				name: 'Tiefling'
 			},
 			buffs: [],
-			classes: [
-				{
-					name: 'Sorcerer',
-					levels: 10
-				},
-				{
-					name: 'Test second class',
-					levels: 1
-				}
-			],
+			classes: {
+				list: [
+					{
+						name: 'Sorcerer',
+						levels: 10
+					},
+					{
+						name: 'Test second class',
+						levels: 1
+					}
+				],
+				level: 11
+			},
 			abilities: {
 				str: {
 					base: 8,

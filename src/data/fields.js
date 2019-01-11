@@ -11,6 +11,7 @@
  * @type {Field[]}
  */
 const fields = [
+	// Placeholder sections
 	{
 		// Sections placeholder parent
 		path: 'sections',
@@ -23,6 +24,8 @@ const fields = [
 		type: 'virtual',
 		omit: true
 	},
+	
+	// Profile
 	{
 		path:        'general',
 		type:        'section',
@@ -89,18 +92,12 @@ const fields = [
 		type:        'string',
 		description: "The name of the race"
 	},
+	
+	// Classes
 	{
-		path:    'sections.classes',
-		parent:  '',
-		type:    'section',
-		name:    'Classes',
-		virtual: true
-	},
-	{
-		path:        'classes',
-		type:        'section',
-		name:        'Classes',
-		description: "The character's classes"
+		path: 'templates.class.name',
+		type: 'string',
+		name: 'Class name'
 	},
 	{
 		path:    'templates.class',
@@ -111,24 +108,31 @@ const fields = [
 		}
 	},
 	{
-		path: 'templates.class.name',
-		type: 'string',
-		name: 'Class name'
-	},
-	{
 		path: 'templates.class.levels',
 		type: 'number',
 		name: 'Levels'
 	},
 	{
-		path:     'classes',
-		parent:   'sections.classes',
+		path:        'classes',
+		type:        'section',
+		name:        'Classes',
+		description: "The character's classes"
+	},
+	{
+		path:     'classes.list',
 		type:     'list',
 		options:  {
 			editable: true // TODO: Rename to mutable.. or something more appropriate
 		},
 		template: 'templates.class',
 	},
+	{
+		path: 'classes.level',
+		expression: 'sumBy($parent.list, "levels")'
+		//expression: 'reduce(map($parent.list, "levels"), sum, 0)'
+	},
+
+	// Abilities
 	{
 		path:    'sections.abilities',
 		parent:  '',

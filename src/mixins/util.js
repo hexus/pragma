@@ -31,17 +31,16 @@ const util = {
 	},
 	
 	/**
-	 * Clamp a value but allow it to remain an empty string.
+	 * Clamp a value.
 	 *
-	 * @param {string|number} value
-	 * @param {string|number} min
-	 * @param {string|number} max
+	 * TODO: Seems to be redundant.
+	 *
+	 * @param {number} value
+	 * @param {number} min
+	 * @param {number} max
 	 * @return {string|number}
 	 */
 	clamp: function (value, min, max) {
-		if (value === '')
-			return '';
-		
 		return clamp(value, min, max);
 	},
 	
