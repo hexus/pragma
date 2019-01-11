@@ -1150,6 +1150,9 @@ export default class FormProcessor
 		// Update the form
 		//this.update(data);
 		this.removePath(path);
+		
+		// TODO: Stop being lazy, only update the parent template field
+		this.updateTemplateFields();
 	}
 }
 
