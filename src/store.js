@@ -25,6 +25,18 @@ export default {
 					{
 						name: 'Test second class',
 						levels: 1
+					},
+					{
+						name: 2,
+						levels: 2,
+					},
+					{
+						name: 3,
+						levels: 3
+					},
+					{
+						name: 4,
+						levels: 4
 					}
 				],
 				level: 11

@@ -110,7 +110,8 @@ const fields = [
 	{
 		path: 'templates.class.levels',
 		type: 'number',
-		name: 'Levels'
+		name: 'Levels',
+		default: 1
 	},
 	{
 		path:        'classes',

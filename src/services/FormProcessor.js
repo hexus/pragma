@@ -296,35 +296,31 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Compute a field's value from its expression.
+	 * Build a field's expression.
 	 *
-	 * Causes the computation of any field dependencies.
-	 *
-	 * @param {Field}  field   - The field to compute the value of.
-	 * @param {Object} data    - The data to derive values from.
-	 * @param {*}      [value] - The current value of the field.
-	 * @return {*} The computed value of the field's expression.
+	 * @param {Field} field - The field to build an expression for.
+	 * @return {Expression} The built expression.
 	 */
-	computeFieldExpression(field, data, value)
+	buildFieldExpression(field)
 	{
 		if (field.expression == null || typeof field.expression !== 'string') {
-			return value;
+			return null;
 		}
 		
-		value = this.getFieldValue(field, data);
+		// Use the cached expression if one is available
+		if (this.expressionCache[field.path]) {
+			return this.expressionCache[field.path];
+		}
 		
-		// Parse the expression
+		// Build the initial expression
 		let expression;
 		
-		// TODO: Memoize parsed expressions per-field and/or per-expression
-		//       Extract building the expression into its own method to make
-		//       this easier
 		try {
 			expression = this.parser.parse(field.expression);
 		} catch (error) {
 			console.error(`Error parsing expression for field '${field.path}': ${error.message}`);
 			
-			return value;
+			return null;
 		}
 		
 		// Substitute contextual variables
@@ -338,9 +334,39 @@ export default class FormProcessor
 			} catch (error) {
 				console.error(`Error substituting expression variable '${s}' for field '${field.path}: ${error.message}`);
 				
-				return value;
+				return null;
 			}
 		}
+		
+		this.expressionCache[field.path] = expression;
+		
+		return expression;
+	}
+	
+	/**
+	 * Compute a field's value from its expression.
+	 *
+	 * Causes the computation of any field dependencies.
+	 *
+	 * @param {Field}  field   - The field to compute the value of.
+	 * @param {Object} data    - The data to derive values from.
+	 * @param {*}      [value] - The current value of the field.
+	 * @return {*} The computed value of the field's expression.
+	 */
+	computeFieldExpression(field, data, value)
+	{
+		value = this.getFieldValue(field, data, value);
+		
+		// Parse the expression
+		let expression = this.buildFieldExpression(field);
+		
+		if (!expression) {
+			return value;
+		}
+		
+		// TODO: Extract deriving variables and building contextual functions
+		//       let variables = buildExpressionContext(field, data, expression, value)?
+		//       Contextual functions should still update the same "variables" reference
 		
 		// Derive values for the variables in the expression
 		let variables = expression.variables({ withMembers: true });
@@ -356,8 +382,6 @@ export default class FormProcessor
 			if (has(values, variable))
 				continue;
 			
-			// TODO: For function like sumBy, values may not be fully derived
-			//       at this point. Work out an execution order that works.
 			set(values, variable, this.deriveValue(variable, data));
 		}
 		
@@ -368,7 +392,7 @@ export default class FormProcessor
 				field: (path) => {
 					variables.push(path);
 					
-					return this.dictionary[path];
+					return this.getField(path);
 				},
 				value: (path) => {
 					// Add to the list of variables used by the expression
@@ -391,7 +415,7 @@ export default class FormProcessor
 		//console.log('computeFieldExpression expression', expression);
 		
 		// Update the map of field update dependencies
-		// TODO: Exclude contextual functions and variables
+		// TODO: Exclude contextual variables
 		// TODO: Move this to an earlier processing step that evaluates the
 		//       expression with spy functions
 		for (let v = 0; v < variables.length; v++) {
@@ -471,35 +495,6 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Remove the field, and its children, at the given path.
-	 *
-	 * @param {string} path - The path to remove.
-	 */
-	removePath(path)
-	{
-		let field = this.dictionary[path];
-		
-		if (!field) {
-			return;
-		}
-		
-		// Recursively remove all child fields
-		if (field.children && field.children.length) {
-			for (let i = 0; i < field.children.length; i++) {
-				this.removePath(field.children[i].path);
-			}
-		}
-		
-		// Remove the field from its parent
-		let parent = this.dictionary[field.parent];
-
-		pull(parent.children, field);
-		
-		// Remove the field from the dictionary
-		delete this.dictionary[path];
-	}
-	
-	/**
 	 * Get the field at the given path.
 	 *
 	 * @param {string} path - The path of the field to get.
@@ -511,22 +506,36 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Get the parent field of the field at the given path.
+	 *
+	 * @param {Field} field
+	 * @return {Field|null}
+	 */
+	getFieldParent(field)
+	{
+		if (!field) {
+			return null;
+		}
+		
+		return this.getField(field.parent);
+	}
+	
+	/**
 	 * Get the current value of a field.
 	 *
 	 * @protected
 	 * @param {Field} field     - The field to get the value of
-	 * @param {*}     [data={}] - Optional data to read values from
+	 * @param {*}     [data={}] - Optional data to read current values from
+	 * @param {*}     [value]   - Optional current value
 	 * @return {*} The current value of the field
 	 */
-	getFieldValue(field, data = {})
+	getFieldValue(field, data = {}, value = null)
 	{
-		let value = null;
-		
 		if (!field) {
 			return value;
 		}
 		
-		value = get(data, field.path);
+		value = defaultTo(value, get(data, field.path));
 		
 		// Merge default values if specified
 		if (field.merge) {
@@ -601,7 +610,7 @@ export default class FormProcessor
 			for (j = 0; j < oldKeys.length; j++) {
 				key = oldKeys[j];
 				
-				this.removePath(joinPath(field.path, key));
+				this.removeField(this.getField(joinPath(field.path, key)), data);
 			}
 			
 			// TODO: Update existing fields
@@ -666,6 +675,8 @@ export default class FormProcessor
 	 *
 	 * Acts recursively on any child fields in the template.
 	 *
+	 * TODO: Extract extending a field.
+	 *
 	 * @protected
 	 * @param {Field}      parent   - The parent field
 	 * @param {Field}      template - The template field
@@ -684,12 +695,16 @@ export default class FormProcessor
 			template,
 			field,
 			{
-				path:   joinPath(parent.path, key),
-				parent: parent.path,
-				value:  value
+				path:         joinPath(parent.path, key),
+				pathFragment: key,
+				parent:       parent.path,
+				value:        value
 			}
 		);
 		
+		/**
+		 * @type {Field[]}
+		 */
 		let fields = [field];
 		
 		// Extract template children and template
@@ -710,24 +725,29 @@ export default class FormProcessor
 			// TODO: Implement if we ever need sub templates... would be crazy
 			// each(value, () => this.buildTemplateField(field, fieldTemplate, key, value));
 			console.warn("Nested templates are not supported ('" + field.path + "')");
-			return field;
+			return fields;
 		}
 		
 		// We can finish here if there are no child fields to build
 		if (!children || !children.length) {
-			return field;
+			return fields;
 		}
 		
+		
 		// Recursively build the template children as fields
+		let childFields = [];
+		
 		for (let c = 0; c < children.length; c++) {
 			let child      = children[c];
 			let childKey   = child.pathFragment;
 			let childValue = field.value ? field.value[childKey] : null;
 
-			let childField = this.buildTemplateField(field, child, childKey, childValue);
-			
-			fields.push(childField);
+			childFields = childFields.concat(
+				this.buildTemplateField(field, child, childKey, childValue)
+			);
 		}
+		
+		fields = fields.concat(childFields);
 		
 		// Process the fields
 		fields = this.process(fields);
@@ -858,7 +878,8 @@ export default class FormProcessor
 	{
 		this.clearValueCache(path);
 		
-		// TODO: Lazy. Update template fields smartly.
+		// TODO: Lazy. Update template fields smartly, maybe even as part of
+		//       updateField().
 		this.updateTemplateFields(data);
 		
 		this.updateField(this.getField(path), data);
@@ -937,9 +958,7 @@ export default class FormProcessor
 			return data;
 		}
 		
-		let value = this.deriveValue(field.path, data);
-		
-		set(data, field.path, value);
+		set(data, field.path, this.deriveValue(field.path, data));
 		
 		return data;
 	}
@@ -998,6 +1017,107 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Remove the field at the given path.
+	 *
+	 * @param {string}  path - The path to remove.
+	 * @param {Object}  data - The data to remove the path from.
+	 */
+	removePath(path, data)
+	{
+		let field = this.getField(path);
+		
+		if (!field) {
+			return;
+		}
+		
+		// Remove data
+		this.removeData(field, data);
+		
+		// TODO: Move this call into updateField() once updateTemplateFields()
+		//       only acts on a given field properly
+		this.updateTemplateFields(data);
+		// this.updateField(field, data); // ?
+		// this.updateField(this.getParent(field.path), data); // ?
+		
+		// Remove field
+		// TODO: This only makes sense for non-template fields
+		//       at the moment, work out a smarter algorithm
+		// field = this.getField(path);
+		// this.removeField(field, data);
+	}
+	
+	/**
+	 * Remove a field's path from the given data.
+	 *
+	 * @param {Field} field - The field whose path to remove from data.
+	 * @param {Object} data - The data to remove from.
+	 */
+	removeData(field, data)
+	{
+		if (!field) {
+			return;
+		}
+		
+		let parent = this.getField(field.parent);
+		
+		if (!parent) {
+			return;
+		}
+		
+		let parentPath = parent.path;
+		let parentValue = this.getFieldValue(parent, data);
+		let key = field.pathFragment;
+		
+		console.log('removeData()', field.path, parent.path, key, parentValue);
+		
+		if (Array.isArray(parentValue)) {
+			parentValue.splice(key, 1);
+		} else  {
+			delete parentValue[key];
+		}
+		
+		console.log('removeData()', field.path, field, parent);
+		
+		set(data, parentPath, parentValue);
+	}
+	
+	/**
+	 * Remove a field.
+	 *
+	 * TODO: Avoid boolean flags.
+	 *
+	 * @param {Field}  field - The field to remove.
+	 * @param {Object}  data  - The data to reference.
+	 * @param {boolean} [skipParents=false] - Whether to skip updating parent fields
+	 */
+	removeField(field, data, skipParents = false)
+	{
+		if (!field) {
+			return;
+		}
+		
+		// Recursively remove all child fields
+		if (field.children && field.children.length) {
+			for (let i = 0; i < field.children.length; i++) {
+				this.removeField(field.children[i], data, true);
+			}
+		}
+		
+		// Remove the field from the dictionary and value cache
+		delete this.dictionary[field.path];
+		delete this.valueCache[field.path];
+		
+		// Remove the field from its parent
+		let parent = this.getField(field.parent);
+		pull(parent.children, field);
+		
+		// Update the parent field
+		if (!skipParents) {
+			this.updateField(parent, data);
+		}
+	}
+	
+	/**
 	 * Build a dictionary from the given fields.
 	 *
 	 * @param {Field[]} fields
@@ -1032,7 +1152,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Build data from the current form state.
+	 * Build data from the current field state.
 	 *
 	 * @param {Field}  field  - The root field to traverse from.
 	 * @param {Object} [data] - The target data object.
@@ -1104,9 +1224,8 @@ export default class FormProcessor
 	 */
 	addItem(data, path, key)
 	{
-		let field = this.dictionary[path];
-		
-		// We need to know about the field to do anything here
+		let field = this.getField(path);
+
 		if (!field) {
 			return;
 		}
@@ -1146,30 +1265,7 @@ export default class FormProcessor
 	 */
 	remove(data, path)
 	{
-		let [parentPath, pathFragment] = splitPath(path);
-		
-		let parent = get(data, parentPath);
-		
-		if (!parent) {
-			return;
-		}
-		
-		if (Array.isArray(parent)) {
-			parent.splice(pathFragment, 1);
-		} else {
-			delete parent[pathFragment];
-		}
-		
-		console.log('remove', parentPath, pathFragment, parent);
-		
-		set(data, parentPath, parent);
-		
-		// Update the form
-		//this.update(data);
-		this.removePath(path);
-		
-		// TODO: Stop being lazy, only update the parent template field
-		this.updateTemplateFields();
+		this.removePath(path, data);
 	}
 }
 
