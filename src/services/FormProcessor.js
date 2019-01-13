@@ -283,8 +283,8 @@ export default class FormProcessor
 		// Cast the value
 		value = this.castValue(field, value);
 		
-		// Compute the field's expression
-		value = this.computeFieldExpression(field, data, value);
+		// Evaluate the field's expression
+		value = this.evaluateFieldExpression(field, data, value);
 		
 		// Fall back to defaults
 		value = defaultTo(value, defaultTo(field.default, null));
@@ -344,16 +344,16 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Compute a field's value from its expression.
+	 * Evaluate a field's value from its expression.
 	 *
-	 * Causes the computation of any field dependencies.
+	 * Causes the evaluation of any field dependencies as a result.
 	 *
 	 * @param {Field}  field   - The field to compute the value of.
 	 * @param {Object} data    - The data to derive values from.
 	 * @param {*}      [value] - The current value of the field.
 	 * @return {*} The computed value of the field's expression.
 	 */
-	computeFieldExpression(field, data, value)
+	evaluateFieldExpression(field, data, value)
 	{
 		value = this.getFieldValue(field, data, value);
 		
@@ -411,8 +411,8 @@ export default class FormProcessor
 			console.error(`Error evaluating expression for field '${field}': ${error.message}`);
 		}
 		
-		//console.log('computeFieldExpression', field.path, expression.toString(), variables, values, value);
-		//console.log('computeFieldExpression expression', expression);
+		//console.log('evaluateFieldExpression', field.path, expression.toString(), variables, values, value);
+		//console.log('evaluateFieldExpression expression', expression);
 		
 		// Update the map of field update dependencies
 		// TODO: Exclude contextual variables
@@ -760,7 +760,8 @@ export default class FormProcessor
 	 *
 	 * Falls back to default values as appropriate, merging objects.
 	 *
-	 * @param {string} path
+	 * @param {string} path - The path to the field.
+	 * @return {*} The value of the field
 	 */
 	getValue(path)
 	{
