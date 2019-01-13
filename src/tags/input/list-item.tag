@@ -4,14 +4,16 @@
 			<tree children="{ [opts.property] }"></tree>
 		</div>
 
-		<div style="display:inline-block;" if="{ opts.editable }">
+		<div style="display:inline-block;" if="{ opts.removable }">
 			<button type="button" onclick="{ remove }">Remove</button>
 		</div>
+
+		{ opts.property.pathFragment }
 	</div>
 
 	<script>
 		this.remove = function () {
-			if (!this.opts.editable) {
+			if (!this.opts.removable) {
 				return;
 			}
 

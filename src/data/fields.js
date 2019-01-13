@@ -123,9 +123,10 @@ const fields = [
 		path:     'classes.list',
 		type:     'list',
 		options:  {
-			editable: true // TODO: Rename to mutable.. or something more appropriate
+			editable: true // TODO: Rename to mutable.. or something else more appropriate
 		},
 		template: 'templates.class',
+		fixed: ['0'] // Always keep the first class
 	},
 	{
 		path: 'classes.level',

@@ -555,15 +555,19 @@ export default class FormProcessor
 	 *
 	 * @protected
 	 * @param {Field} field - The field to get the template of.
-	 * @return {Field}
+	 * @return {Field|null}
 	 */
 	getFieldTemplate(field)
 	{
+		if (!field) {
+			return null;
+		}
+		
 		let template = field.template;
 
-		// Lookup the path to the template in the dictionary
+		// Lookup the path to the template field in the dictionary
 		if (typeof field.template === 'string') {
-			template = this.dictionary[field.template];
+			template = this.getField(field.template);
 		}
 		
 		return template;
@@ -585,6 +589,7 @@ export default class FormProcessor
 			i,
 			j,
 			key,
+			path,
 			value,
 			template,
 			newFields = [];
@@ -602,20 +607,24 @@ export default class FormProcessor
 			// Find child fields that need to be added, updated or removed
 			let [newKeys, existingKeys, oldKeys] = this.diffTemplateFieldKeys(field, data);
 			
-			// console.log('updateTemplateFields() newKeys', newKeys);
-			// console.log('updateTemplateFields() existingKeys', existingKeys);
-			// console.log('updateTemplateFields() oldKeys', oldKeys);
-			
 			// Remove old fields
 			for (j = 0; j < oldKeys.length; j++) {
 				key = oldKeys[j];
+				path = joinPath(field.path, key);
 				
-				this.removeField(this.getField(joinPath(field.path, key)), data);
+				this.removeField(this.getField(path), data);
 			}
 			
-			// TODO: Update existing fields
-			//       A dictionary-aware update would be good, without forcing rebuilds
+			// Update existing fields
+			// TODO: A dictionary-aware update would be good, without forcing rebuilds
 			//       Just needs to check if all the right fields in the template exist
+			for (j = 0; j < existingKeys.length; j++) {
+				key = existingKeys[j];
+				path = joinPath(field.path, key);
+				
+				//this.updateField(this.getField(path), data);
+				//this.updatePath(path, data);
+			}
 			
 			// Build new fields
 			value    = this.getFieldValue(field, data);
@@ -857,16 +866,10 @@ export default class FormProcessor
 	 */
 	update(data)
 	{
-		// Clear the value cache
-		this.clearValueCache();
-		
-		// Update template fields
-		this.updateTemplateFields(data);
-		
 		// Update the value of every field
 		// TODO: Diff any *paths* that changed and update those
 		//       i.e. implement diffTemplateFieldPaths()
-		this.updateFields([this.tree], data);
+		this.updatePath('', data);
 	}
 	
 	/**
@@ -973,8 +976,9 @@ export default class FormProcessor
 	 */
 	updateFieldValue(field, data)
 	{
-		if (!field)
+		if (!field) {
 			return;
+		}
 		
 		// Update the field value
 		field.value = get(data, field.path);
@@ -986,8 +990,6 @@ export default class FormProcessor
 	
 	/**
 	 * Update fields that are dependent upon the value of the given field.
-	 *
-	 * TODO: Recursively derive parent field values to the top
 	 *
 	 * @protected
 	 * @param {Field} field - The field to update dependent fields of.
@@ -1020,6 +1022,7 @@ export default class FormProcessor
 	/**
 	 * Remove the field at the given path.
 	 *
+	 * @protected
 	 * @param {string}  path - The path to remove.
 	 * @param {Object}  data - The data to remove the path from.
 	 */
@@ -1031,8 +1034,10 @@ export default class FormProcessor
 			return;
 		}
 		
-		// Remove data
+		// Remove the field's data
 		this.removeData(field, data);
+		
+		// Update the parent field
 		
 		// TODO: Move this call into updateField() once updateTemplateFields()
 		//       only acts on a given field properly
@@ -1073,7 +1078,7 @@ export default class FormProcessor
 		
 		if (Array.isArray(parentValue)) {
 			parentValue.splice(key, 1);
-		} else  {
+		} else {
 			delete parentValue[key];
 		}
 		
