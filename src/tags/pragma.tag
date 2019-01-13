@@ -1,11 +1,10 @@
 <pragma>
-
-	<tree children="{ tree.children }" onedit="{ edit }" onadd="{ add }" onremove="{ remove }"></tree>
+	<tree children="{ tree.children }" onadd="{ add }" onedit="{ edit }" onremove="{ remove }"></tree>
 
 	<div if="{ opts.hasOwnProperty('debug') }" style="position: fixed; top: 0; right: 0; height: 100%; width: 300px; background: rgba(255, 255, 255, 0.5); overflow: auto;">
 		<!-- Debug the data -->
 		<!-- TODO: Pragma debug tag that decorates this tag with debugging functionality -->
-		<h2>Data</h2>
+		<!-- TODO: Pragma edit tag that decorates this tag with form editing functionality -->
 		<pre>{ JSON.stringify(sheet, null, 2) }</pre>
 
 		<!--<h2>Form</h2>-->

@@ -13,7 +13,7 @@
 		 * @returns {boolean}
 		 */
 		this.isVisible = function (field) {
-			return field && field.type !== 'hidden';
+			return field && field.visible;
 		};
 
 		// TODO: Would be amazing to retain and mount custom element tags without data-is
