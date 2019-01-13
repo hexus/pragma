@@ -1,6 +1,6 @@
 <tree>
 	<virtual each="{ child in opts.children }" key="path">
-		<tree-child if="{ isVisible(child) }" data-is="{ child.type }" property="{ child }">
+		<tree-child if="{ isVisible(child) }" data-is="{ child.input }" property="{ child }">
 			<tree if="{ opts.property.children }" children="{ opts.property.children }"></tree>
 		</tree-child>
 	</virtual>

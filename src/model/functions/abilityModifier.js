@@ -1,4 +1,4 @@
-import {util} from "../../mixins/util";
+import { util } from "../../mixins/util";
 
 export default function (score) {
 	if (!util.isNumeric(score))

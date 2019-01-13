@@ -57,28 +57,31 @@ export default class FormProcessor
 				omit: true
 			},
 			'string': {
+				input: 'string',
 				default: ''
 			},
 			'number': {
+				input: 'number',
 				default: 0
 			},
 			'boolean': {
+				input: 'boolean',
 				default: false
 			},
 			'section': {
-			
+				input: 'section'
 			},
 			'group': {
-			
+				input: 'group'
 			},
 			'list': {
-			
+				input: 'list'
 			},
 			'list-item': {
-			
+				input: 'list-item'
 			},
-			'pragma-table': {
-			
+			'table': {
+				input: 'pragma-table'
 			}
 		};
 		
@@ -389,8 +392,8 @@ export default class FormProcessor
 		
 		// Update the map of field update dependencies
 		// TODO: Exclude contextual functions and variables
-		// TODO: Move this to a processing step that evaluates the expression
-		//       with spy functions
+		// TODO: Move this to an earlier processing step that evaluates the
+		//       expression with spy functions
 		for (let v = 0; v < variables.length; v++) {
 			let variable = variables[v];
 			
@@ -845,7 +848,7 @@ export default class FormProcessor
 		// TODO: Lazy. Update template fields smartly.
 		this.updateTemplateFields(data);
 		
-		this.updateFields([this.getField(path)], data);
+		this.updateField(this.getField(path), data);
 	}
 	
 	/**
@@ -917,7 +920,7 @@ export default class FormProcessor
 	 */
 	updateDataValue(field, data)
 	{
-		if (!field.path || field.omit || field.virtual) {
+		if (!field || field.omit || field.virtual) {
 			return;
 		}
 		
@@ -936,7 +939,7 @@ export default class FormProcessor
 	 */
 	updateFieldValue(field, data)
 	{
-		if (!field || !field.path)
+		if (!field)
 			return;
 		
 		// Update the field value
@@ -944,7 +947,7 @@ export default class FormProcessor
 		
 		// Recursively update parent values
 		// TODO: Clean this up, no boolean flags please
-		this.updateFields([this.getField(field.parent)], data, true);
+		this.updateField(this.getField(field.parent), data, true);
 	}
 	
 	/**
@@ -1183,9 +1186,9 @@ export default class FormProcessor
  *
  * @property {string}         path             - The path of the field.
  * @property {string}         [parent]         - The path of the field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
- * @property {string}         [pathFragment]   - The path fragment used to compose the field's final path from its parents', if it's part of a template. Numbers are used if none is given. TODO: Rename to leaf, key, pathKey or pathSegment?
- * @property {string}         [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`. TODO: Make this strictly about data type rather than using for tags. That's what `input` should be for.
- * @property {string}         [input]          - The input type to use for this field, if any. `'none'` shows the value without an input, `'hidden'` hides this field. // TODO: Rename? Might not be an actual input... (i.e. section)
+ * @property {string}         [pathFragment]   - The leaf of the field's path. TODO: Rename to key
+ * @property {string}         [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`.
+ * @property {string}         [input]          - The input type to use for this field, if any. // TODO: Rename? Might not be an actual input... (i.e. section)
  * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
  * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the path's final segment. TODO: Rename to label?
  * @property {string}         [description]    - The field's description.
@@ -1195,13 +1198,11 @@ export default class FormProcessor
  * @property {string|boolean} [disabled=false] - Whether the property is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. String values are interpreted as expressions. TODO: Input options?
  * @property {*}              [value]          - The field's value.
  * @property {*}              [default]        - The field's default value. Defaults appropriately for the set `type`.
- * @property {boolean}        [merge]          - Whether to merge the field's value with its default value.
+ * @property {boolean}        [merge]          - Whether to merge the field's non-scalar value with its default value.
  * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
  * @property {string}         [validator]      - The field's validation function. Defaults as appropriate to the `type`.
- * @property {number}         [min=-100]       - The minimum value of the field if the type is `'number'`. Defaults to -100. TODO: Input options
- * @property {number}         [max=100]        - The maximum value of the field if the type is `'number'`. Defaults to 100. TODO: Input options
- * @property {number}         [step]           - The step value of the field if the type is `'number'`. TODO: Input options
- * @property {string}         [extends]        - The path of a template field for this field to extend.
+ * @property {string}         [extends]        - The path of a field to extend.
  * @property {Field[]}        [children]       - Child fields.
- * @property {Field|string}   [template]       - Template field for creating new child fields. Can be a `Field` or a `path`.
+ * @property {Field|string}   [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
+ * @property {Object}         [fixed]          - A map of child keys that cannot be removed at runtime, if present.
  */

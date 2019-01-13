@@ -143,7 +143,7 @@ const fields = [
 	{
 		path:    'abilities',
 		parent:  'sections.abilities',
-		type:    'pragma-table',
+		type:    'table',
 		options: {
 			showLabel: true,
 			headings:  [
@@ -372,7 +372,7 @@ const fields = [
 	{
 		path:    'defense.saves',
 		parent:  'sections.saves',
-		type:    'pragma-table',
+		type:    'table',
 		options: {
 			showLabel: true,
 			headings:  [
@@ -644,7 +644,7 @@ const fields = [
 	},
 	{
 		path:     'skills.list',
-		type:     'pragma-table',
+		type:     'table',
 		options:  {
 			showLabel: true,
 			headings:  [
