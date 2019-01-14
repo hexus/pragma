@@ -8,7 +8,7 @@
 			<button type="button" onclick="{ remove }">Remove</button>
 		</div>
 
-		{ opts.property.pathFragment }
+		Key: { opts.property.pathFragment }
 	</div>
 
 	<script>

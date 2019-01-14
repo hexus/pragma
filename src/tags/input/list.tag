@@ -1,6 +1,6 @@
 <list>
 	<div class="list-container">
-		<div if="{ !!get(opts.property, 'options.showLabel') }">{ opts.property.name }</div>
+		<div if="{ showLabel() }">{ opts.property.name }</div>
 
 		<virtual each="{ child in opts.property.children }" key="path">
 			<list-item property="{ child }" removable="{ editable() && !fixed(child.pathFragment) }"></list-item>
@@ -30,6 +30,15 @@
 			this.triggerDom('add', {
 				name: this.opts.property.path
 			});
+		};
+
+		/**
+		 * Determine whether to show the list's label.
+		 *
+		 * @return boolean
+		 */
+		this.showLabel = function () {
+			return !!get(this.opts.property, 'options.showLabel');
 		};
 
 		/**

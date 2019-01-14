@@ -23,6 +23,10 @@ import buildTree       from '../functions/buildTree';
 import splitPath       from '../functions/splitPath';
 import joinPath        from '../functions/joinPath';
 
+const UP = -1;
+const BOTH = 0;
+const DOWN = 1;
+
 /**
  * Pragma form.
  *
@@ -579,61 +583,49 @@ export default class FormProcessor
 	 * TODO: Accept field argument to start from.
 	 *
 	 * @protected
+	 * @param {Field} field - The field to start from.
 	 * @param {Object} [data] - The data used to unravel field templates
 	 * @return {FieldDictionary}
 	 */
-	updateTemplateFields(data)
+	updateTemplateFields(field, data)
 	{
 		let dictionary = this.dictionary,
-			fieldsWithTemplates,
 			i,
-			j,
 			key,
 			path,
 			value,
 			template,
 			newFields = [];
 
-		// Find all fields that have templates for their children
-		fieldsWithTemplates = Object.values(
-			pickBy(dictionary, field => !!field.template)
-		);
+		// Find child fields that need to be added, updated or removed
+		let [newKeys, existingKeys, oldKeys] = this.diffTemplateFieldKeys(field, data);
 		
-		//console.log('updateTemplateFields() fieldsWithTemplates', fieldsWithTemplates.length);
-		
-		for (i = 0; i < fieldsWithTemplates.length; i++) {
-			let field = fieldsWithTemplates[i];
+		// Remove old fields
+		for (i = 0; i < oldKeys.length; i++) {
+			key  = oldKeys[i];
+			path = joinPath(field.path, key);
 			
-			// Find child fields that need to be added, updated or removed
-			let [newKeys, existingKeys, oldKeys] = this.diffTemplateFieldKeys(field, data);
-			
-			// Remove old fields
-			for (j = 0; j < oldKeys.length; j++) {
-				key = oldKeys[j];
-				path = joinPath(field.path, key);
-				
-				this.removeField(this.getField(path), data);
-			}
-			
-			// Update existing fields
-			// TODO: A dictionary-aware update would be good, without forcing rebuilds
-			//       Just needs to check if all the right fields in the template exist
-			for (j = 0; j < existingKeys.length; j++) {
-				key = existingKeys[j];
-				path = joinPath(field.path, key);
-				
-				//this.updateField(this.getField(path), data);
-				//this.updatePath(path, data);
-			}
-			
-			// Build new fields
-			value    = this.getFieldValue(field, data);
-			template = this.getFieldTemplate(field);
-			
-			newFields = newFields.concat(
-				this.buildTemplateFields(field, template, value, newKeys)
-			);
+			this.removeField(this.getField(path), data);
 		}
+		
+		// Update existing fields
+		// TODO: A dictionary-aware update would be good, without forcing rebuilds
+		//       Just needs to check if all the right fields in the template exist
+		for (i = 0; i < existingKeys.length; i++) {
+			key  = existingKeys[i];
+			path = joinPath(field.path, key);
+			
+			this.updateField(this.getField(path), data);
+			//this.updatePath(path, data);
+		}
+		
+		// Build new fields
+		value    = this.getFieldValue(field, data);
+		template = this.getFieldTemplate(field);
+		
+		newFields = newFields.concat(
+			this.buildTemplateFields(field, template, value, newKeys)
+		);
 		
 		//console.log('updateTemplateFields() new fields', newFields);
 		
@@ -882,10 +874,6 @@ export default class FormProcessor
 	{
 		this.clearValueCache(path);
 		
-		// TODO: Lazy. Update template fields smartly, maybe even as part of
-		//       updateField().
-		this.updateTemplateFields(data);
-		
 		this.updateField(this.getField(path), data);
 	}
 	
@@ -898,17 +886,25 @@ export default class FormProcessor
 	 * @protected
 	 * @param {Field}   field  - The fields to update.
 	 * @param {Object}  data   - The data to update with.
-	 * @param {boolean} [skipChildren=false] - Bottom-up traversal; ignore children
+	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
 	 */
-	updateField(field, data, skipChildren = false)
+	updateField(field, data, direction = BOTH)
 	{
 		if (!field) {
 			return;
 		}
 		
 		// Update the field's children
-		if (!skipChildren && field.children) {
-			this.updateFields(field.children, data);
+		if (direction >= 0) {
+			let template = this.getFieldTemplate(field);
+			
+			// TODO: This would be a good spot for an event to fire to allow plugins
+			//       (like templates) to intercept child update behaviour
+			if (template) {
+				this.updateTemplateFields(field, data);
+			} else if (field.children) {
+				this.updateFields(field.children, data);
+			}
 		}
 		
 		// Skip omitted fields
@@ -919,11 +915,8 @@ export default class FormProcessor
 		// Update the state's value
 		this.updateDataValue(field, data);
 		
-		// Update the field's value (and parent field values)
+		// Update the field's value (and update all fields dependent on this one)
 		this.updateFieldValue(field, data);
-		
-		// Update fields dependent upon this one
-		this.updateFieldDependencies(field, data);
 	}
 	
 	/**
@@ -935,16 +928,16 @@ export default class FormProcessor
 	 * @protected
 	 * @param {Field[]} fields - The fields to update.
 	 * @param {Object}  data   - The data to update with.
-	 * @param {boolean} [skipChildren=false] - Bottom-up traversal; ignore children
+	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
 	 */
-	updateFields(fields, data, skipChildren = false)
+	updateFields(fields, data, direction)
 	{
 		if (!Array.isArray(fields) || !fields.length) {
 			return;
 		}
 		
 		for (let i = 0; i < fields.length; i++) {
-			this.updateField(fields[i], data, skipChildren);
+			this.updateField(fields[i], data, direction);
 		}
 	}
 	
@@ -983,9 +976,8 @@ export default class FormProcessor
 		// Update the field value
 		field.value = get(data, field.path);
 		
-		// Recursively update parent field values
-		// TODO: Clean this up, no boolean flags please
-		this.updateField(this.getField(field.parent), data, true);
+		// Update all fields dependent on this one
+		this.updateFieldDependencies(field, data);
 	}
 	
 	/**
@@ -997,6 +989,9 @@ export default class FormProcessor
 	 */
 	updateFieldDependencies(field, data)
 	{
+		// Recursively update parent field values
+		this.updateField(this.getField(field.parent), data, UP);
+		
 		let dependencyPaths = this.fieldDependencies[field.path];
 		
 		//console.log('updateFieldDependencies()', field.path, dependencyPaths);
@@ -1038,12 +1033,13 @@ export default class FormProcessor
 		this.removeData(field, data);
 		
 		// Update the parent field
+		this.updateField(this.getFieldParent(field), data);
 		
 		// TODO: Move this call into updateField() once updateTemplateFields()
 		//       only acts on a given field properly
-		this.updateTemplateFields(data);
+		//this.updateTemplateFields(data);
 		// this.updateField(field, data); // ?
-		// this.updateField(this.getParent(field.path), data); // ?
+		//  // ?
 		
 		// Remove field
 		// TODO: This only makes sense for non-template fields
