@@ -126,7 +126,9 @@ const fields = [
 			editable: true // TODO: Rename to mutable.. or something else more appropriate
 		},
 		template: 'templates.class',
-		fixed: ['0'] // Always keep the first class
+		fixed: {
+			0: true // Always keep the first class
+		}
 	},
 	{
 		path: 'classes.level',

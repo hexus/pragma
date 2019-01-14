@@ -1320,5 +1320,5 @@ export default class FormProcessor
  * @property {string}         [extends]        - The path of a field to extend.
  * @property {Field[]}        [children]       - Child fields.
  * @property {Field|string}   [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
- * @property {Object}         [fixed]          - A map of child keys that cannot be removed at runtime, if present.
+ * @property {Object|array}   [fixed]          - A map or list of child keys that cannot be removed at runtime, if present.
  */

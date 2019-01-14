@@ -18,8 +18,7 @@
 	<script>
 		import get from 'lodash/get';
 		import findIndex from 'lodash/findIndex';
-		this.get = get;
-		this.findIndex = findIndex;
+		import isPlainObject from 'lodash/isPlainObject';
 
 		import './list-item.tag';
 
@@ -49,10 +48,16 @@
 		 * @return {boolean} Whether the list item is fixed.
 		 */
 		this.fixed = function (key) {
-			if (!this.opts.property.fixed || !Array.isArray(this.opts.property.fixed))
+			if (!this.opts.property.fixed)
 				return false;
 
-			return findIndex(this.opts.property.fixed, key) >= 0;
+			if (Array.isArray(this.opts.property.fixed))
+				return findIndex(this.opts.property.fixed, key) >= 0;
+
+			if (isPlainObject(this.opts.property.fixed))
+				return !!this.opts.property.fixed[key];
+
+			return false;
 		};
 	</script>
 </list>
