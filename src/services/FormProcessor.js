@@ -601,7 +601,7 @@ export default class FormProcessor
 			key  = oldKeys[i];
 			path = joinPath(field.path, key);
 			
-			this.removeField(this.getField(path), data, DOWN);
+			this.removeField(this.getField(path));
 		}
 		
 		// Update existing fields
@@ -1014,7 +1014,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Remove the field at the given path.
+	 * Remove data at the given path and update parent fields.
 	 *
 	 * @protected
 	 * @param {string}  path - The path to remove.
@@ -1022,36 +1022,46 @@ export default class FormProcessor
 	 */
 	removePath(path, data)
 	{
-		this.removeField(this.getField(path), data);
+		let field = this.getField(path);
+		
+		if (!field) {
+			return;
+		}
+		
+		// Remove the state data
+		this.removeData(field, data);
+		
+		// Update the parent field
+		this.updateField(this.getFieldParent(field), data);
 	}
 	
 	/**
 	 * Remove the given fields.
 	 *
 	 * @param {Field[]} fields - The fields to remove.
-	 * @param {Object}  data   - The data to remove from.
-	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
 	 */
-	removeFields(fields, data, direction)
+	removeFields(fields)
 	{
 		if (!Array.isArray(fields) || !fields.length) {
 			return;
 		}
 		
 		for (let i = 0; i < fields.length; i++) {
-			this.removeField(fields[i], data, direction);
+			this.removeField(fields[i]);
 		}
 	}
 	
 	/**
 	 * Remove a field.
 	 *
+	 * Clears dictionary and parent references to the field.
+	 *
+	 * Doesn't remove data or update parent field values.
+	 *
 	 * @protected
 	 * @param {Field}  field - The field to remove.
-	 * @param {Object}  data  - The data to reference.
-	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
 	 */
-	removeField(field, data, direction = BOTH)
+	removeField(field)
 	{
 		if (!field) {
 			return;
@@ -1059,38 +1069,15 @@ export default class FormProcessor
 		
 		this.clearValueCache(field.path);
 		
-		let parent = this.getFieldParent(field);
-		
-		// Remove the state data
-		this.removeData(field, data);
-		
-		// Bail here if the parent has a template
-		// TODO: Fix this mess, updateTemplateFields() needs a way to remove
-		//       fields and their children, and nothing else
-		if (direction === BOTH && this.getFieldTemplate(parent)) {
-			this.updateField(parent, data, BOTH);
-			
-			return;
-		}
-		
 		// Remove the field's children
-		if (direction >= 0) {
-			this.removeFields(field.children, data, DOWN);
-		}
+		this.removeFields(field.children);
 		
 		// Remove the field from the dictionary
 		delete this.dictionary[field.path];
 		
 		// Remove the field from its parent
-		//let parent = this.getFieldParent(field);
+		let parent = this.getFieldParent(field);
 		pull(parent.children, field);
-		
-		// Update the parent field
-		if (direction <= 0) {
-			this.updateField(parent, data, UP);
-		}
-		
-		// TODO: Update dependencies
 	}
 	
 	/**
