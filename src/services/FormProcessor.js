@@ -566,13 +566,43 @@ export default class FormProcessor
 		}
 		
 		let template = field.template;
-
+		
 		// Lookup the path to the template field in the dictionary
 		if (typeof field.template === 'string') {
 			template = this.getField(field.template);
 		}
 		
 		return template;
+	}
+	
+	/**
+	 * Get the fields dependent upon the given field.
+	 *
+	 * @param {Field} field
+	 * @return {Field[]} The dependent fields
+	 */
+	getFieldDependencies(field)
+	{
+		let dependencies = this.fieldDependencies[field.path];
+		
+		// Skip if the field has no dependencies
+		if (!dependencies || !dependencies.length) {
+			return [];
+		}
+		
+		let fields = [];
+		
+		for (let i = 0; i < dependencies.length; i++) {
+			let dependency = this.getField(dependencies[i]);
+			
+			if (!dependency) {
+				continue;
+			}
+			
+			fields.push(dependency);
+		}
+		
+		return fields;
 	}
 	
 	/**
@@ -607,12 +637,12 @@ export default class FormProcessor
 		// Update existing fields
 		// TODO: A dictionary-aware update would be good, without forcing rebuilds
 		//       Just needs to check if all the right fields in the template exist
-		for (i = 0; i < existingKeys.length; i++) {
-			key  = existingKeys[i];
-			path = joinPath(field.path, key);
-			
-			this.updateField(this.getField(path), data);
-		}
+		// for (i = 0; i < existingKeys.length; i++) {
+		// 	key  = existingKeys[i];
+		// 	path = joinPath(field.path, key);
+		//
+		// 	this.updateField(this.getField(path), data);
+		// }
 		
 		// Build new fields
 		value    = this.getFieldValue(field, data);
@@ -624,9 +654,11 @@ export default class FormProcessor
 		
 		//console.log('updateTemplateFields() new fields', newFields);
 		
-		// Add the new fields to the dictionary
+		// Add the new fields to the dictionary and update them
 		each(newFields, (field) => {
 			dictionary[field.path] = field;
+			
+			//this.updateField(field, data, DOWN);
 		});
 	}
 	
@@ -908,6 +940,8 @@ export default class FormProcessor
 			return;
 		}
 		
+		//console.log('updateField()', field.path);
+		
 		this.clearValueCache(field.path);
 		
 		// Update the field's children
@@ -918,7 +952,9 @@ export default class FormProcessor
 			//       (like templates) to intercept child update behaviour
 			if (template) {
 				this.updateTemplateFields(field, data);
-			} else if (field.children) {
+			}
+			
+			if (field.children) {
 				this.updateFields(field.children, data);
 			}
 		}
@@ -984,33 +1020,26 @@ export default class FormProcessor
 	updateFieldDependencies(field, data)
 	{
 		// Recursively update parent field values
-		// TODO: Extract updateFieldParents(field, data)
-		this.updateField(this.getField(field.parent), data, UP);
-		
-		// Update fields listed as dependencies
-		// TODO: Extract getFieldDependencies(field): Field[]
-		let dependencies = this.fieldDependencies[field.path];
+		this.updateFieldParents(field, data);
 		
 		//console.log('updateFieldDependencies()', field.path, dependencyPaths);
 		
-		// Skip if the field has no dependencies
-		if (!dependencies || !dependencies.length) {
-			return;
-		}
+		// Update fields listed as dependencies
+		let dependencies = this.getFieldDependencies(field);
 		
-		let fields = [];
-		
-		for (let i = 0; i < dependencies.length; i++) {
-			let dependency = this.getField(dependencies[i]);
-			
-			if (!dependency) {
-				continue;
-			}
-			
-			fields.push(dependency);
-		}
-		
-		this.updateFields(fields, data);
+		this.updateFields(dependencies, data);
+	}
+	
+	/**
+	 * Update the parent fields of the given field.
+	 *
+	 * @protected
+	 * @param {Field}  field - The field to update parents of.
+	 * @param {Object} data  - The data to update with.
+	 */
+	updateFieldParents(field, data)
+	{
+		this.updateField(this.getFieldParent(field), data, UP);
 	}
 	
 	/**
@@ -1038,6 +1067,7 @@ export default class FormProcessor
 	/**
 	 * Remove the given fields.
 	 *
+	 * @protected
 	 * @param {Field[]} fields - The fields to remove.
 	 */
 	removeFields(fields)
@@ -1072,8 +1102,9 @@ export default class FormProcessor
 		// Remove the field's children
 		this.removeFields(field.children);
 		
-		// Remove the field from the dictionary
+		// Remove the field from the dictionary and dependency list
 		delete this.dictionary[field.path];
+		delete this.fieldDependencies[field.path];
 		
 		// Remove the field from its parent
 		let parent = this.getFieldParent(field);
