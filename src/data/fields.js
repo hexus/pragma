@@ -111,6 +111,9 @@ const fields = [
 		path: 'templates.class.levels',
 		type: 'number',
 		name: 'Levels',
+		options: {
+			min: 1
+		},
 		default: 1
 	},
 	{
