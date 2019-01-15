@@ -20,7 +20,7 @@ export default {
 				list: [
 					{
 						name: 'Sorcerer',
-						levels: 10
+						levels: 11
 					},
 					{
 						name: 'Test second class',
@@ -37,6 +37,10 @@ export default {
 					{
 						name: 4,
 						levels: 4
+					},
+					{
+						name: 5,
+						levels: 5
 					}
 				],
 				level: 11

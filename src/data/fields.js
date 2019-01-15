@@ -133,7 +133,6 @@ const fields = [
 	{
 		path: 'classes.level',
 		expression: 'sumBy($parent.list, "levels")'
-		//expression: 'reduce(map($parent.list, "levels"), sum, 0)'
 	},
 
 	// Abilities
