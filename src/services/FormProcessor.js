@@ -606,7 +606,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Unravel all templates into fields for the given data.
+	 * Unravel all templates into fields for the given field and data.
 	 *
 	 * @protected
 	 * @param {Field}  field  - The field to update template fields for.

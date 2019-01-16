@@ -11,7 +11,7 @@
  * @type {Field[]}
  */
 const fields = [
-	// Placeholder sections
+	// Placeholder fields
 	{
 		// Sections placeholder parent
 		path: 'sections',
@@ -27,56 +27,56 @@ const fields = [
 	
 	// Profile
 	{
-		path:        'general',
+		path:        'profile',
 		type:        'section',
-		name:        'General',
-		description: 'General character information'
+		name:        'Profile',
+		description: 'Character profile'
 	},
 	{
-		path:        'general.name',
+		path:        'profile.name',
 		type:        'string',
 		name:        'Name',
 		description: "The character's given or chosen name"
 	},
 	{
-		path:        'general.alignment',
+		path:        'profile.alignment',
 		type:        'string',
 		name:        'Alignment',
 		description: "The character's general and moral attitude",
 		default:     'Chaotic Neutral'
 	},
 	{
-		path:        'general.age',
+		path:        'profile.age',
 		type:        'string',
 		name:        'Age',
 		description: "The character's age"
 	},
 	{
-		path:        'general.gender',
+		path:        'profile.gender',
 		type:        'string',
 		name:        'Gender',
 		description: "The character's gender"
 	},
 	{
-		path:        'general.height',
+		path:        'profile.height',
 		type:        'string',
 		name:        'Height',
 		description: "The character's height"
 	},
 	{
-		path:        'general.weight',
+		path:        'profile.weight',
 		type:        'string',
 		name:        'Weight',
 		description: "The character's weight"
 	},
 	{
-		path:        'general.hair',
+		path:        'profile.hair',
 		type:        'string',
 		name:        'Hair',
 		description: "The character's eye color"
 	},
 	{
-		path:        'general.eyes',
+		path:        'profile.eyes',
 		type:        'string',
 		name:        'Eyes',
 		description: "The character's eye color"

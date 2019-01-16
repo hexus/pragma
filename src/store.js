@@ -1,7 +1,7 @@
 export default {
 	characters: {
 		1: {
-			general: {
+			profile: {
 				name: 'Shade',
 				alignment: 'Chaotic Neutral',
 				age: 27,
@@ -197,8 +197,7 @@ export default {
 			}
 		},
 		2: {
-			strict: true,
-			general: {
+			profile: {
 				name: 'Zyra',
 				age: 22,
 				gender: 'Female',
@@ -212,22 +211,22 @@ export default {
 			class: 'Mindblade',
 			abilities: {
 				str: {
-					score: 14
+					base: 14
 				},
 				dex: {
-					score: 12
+					base: 12
 				},
 				con: {
-					score: 13
+					base: 13
 				},
 				int: {
-					score: 16
+					base: 16
 				},
 				wis: {
-					score: 10
+					base: 10
 				},
 				cha: {
-					score: 10
+					base: 10
 				}
 			}
 		}
