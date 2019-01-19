@@ -7,8 +7,6 @@
 		<div style="display:inline-block;" if="{ opts.removable }">
 			<button type="button" onclick="{ remove }">Remove</button>
 		</div>
-
-		Key: { opts.property.pathFragment }
 	</div>
 
 	<script>

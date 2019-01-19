@@ -588,11 +588,11 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Get the field template of the given field.
+	 * Get the child template of a field.
 	 *
 	 * @protected
 	 * @param {Field} field - The field to get the template of.
-	 * @return {Field|null}
+	 * @return {Field|null} The template field.
 	 */
 	getFieldTemplate(field)
 	{
@@ -603,12 +603,35 @@ export default class FormProcessor
 		let template = field.template;
 		
 		// Lookup the path to the template field in the dictionary
-		if (typeof field.template === 'string') {
-			template = this.getField(field.template);
+		if (typeof template === 'string') {
+			template = this.getField(template);
 		}
 		
 		return template;
 	}
+	
+	/**
+	 * Get the base field of the a field.
+	 *
+	 * @param {Field} field - The field to get the base field of.
+	 * @return {Field|null} The base field.
+	 */
+	getBaseField(field)
+	{
+		if (!field) {
+			return null;
+		}
+		
+		let base = field.extends;
+		
+		// Lookup the path to the base field in the dictionary
+		if (typeof base === 'string') {
+			base = this.getField(base);
+		}
+		
+		return base;
+	}
+	
 	
 	/**
 	 * Get the fields dependent upon the given field.
@@ -646,16 +669,20 @@ export default class FormProcessor
 	 * @protected
 	 * @param {Field}  field  - The field to update template fields for.
 	 * @param {Object} [data] - The data used to unravel field templates.
-	 * @return {FieldDictionary}
 	 */
 	updateTemplateFields(field, data)
 	{
+		let template = this.getFieldTemplate(field);
+		
+		if (!template) {
+			return;
+		}
+		
 		let dictionary = this.dictionary,
 			i,
 			key,
 			path,
 			value,
-			template,
 			newFields = [];
 
 		// Find child fields that need to be added, updated or removed
@@ -680,8 +707,7 @@ export default class FormProcessor
 		// }
 		
 		// Build new fields
-		value    = this.getFieldValue(field, data);
-		template = this.getFieldTemplate(field);
+		value = this.getFieldValue(field, data);
 		
 		newFields = newFields.concat(
 			this.buildTemplateFields(field, template, value, newKeys)
@@ -689,7 +715,7 @@ export default class FormProcessor
 		
 		//console.log('updateTemplateFields() new fields', newFields);
 		
-		// Add the new fields to the dictionary and update them
+		// Add the new fields to the dictionary
 		for (i = 0; i < newFields.length; i++) {
 			dictionary[newFields[i].path] = newFields[i];
 		}
@@ -979,15 +1005,13 @@ export default class FormProcessor
 		
 		// Update the field's children
 		if (direction >= 0) {
-			let template = this.getFieldTemplate(field);
-			
 			// TODO: This would be a good spot for an event to fire to allow plugins
 			//       (like templates) to intercept child update behaviour
-			if (template) {
-				this.updateTemplateFields(field, data);
-			}
+			this.updateTemplateFields(field, data);
 			
-			if (field.children && !field.omit) {
+			this.updateFieldInheritance(field, data);
+			
+			if (!field.omit) {
 				this.updateFields(field.children, data);
 			}
 		}
@@ -996,7 +1020,7 @@ export default class FormProcessor
 		this.updateDataValue(field, data);
 		
 		// Update the field's value (and update all fields dependent on this one)
-		this.updateFieldValue(field, data, direction <= 0);
+		this.updateFieldValue(field, data, true);
 	}
 	
 	/**
@@ -1022,9 +1046,9 @@ export default class FormProcessor
 	 * Update a field using the given data.
 	 *
 	 * @protected
-	 * @param {Field}         field              - The field to update.
-	 * @param {Object}        data               - The data to update with.
-	 * @param {boolean=false} updateParents      - Whether to update the field's parents.
+	 * @param {Field}         field         - The field to update.
+	 * @param {Object}        data          - The data to update with.
+	 * @param {boolean=false} updateParents - Whether to update the field's parents.
 	 */
 	updateFieldValue(field, data, updateParents = false)
 	{
@@ -1043,9 +1067,9 @@ export default class FormProcessor
 	 * Update fields that are dependent upon the value of the given field.
 	 *
 	 * @protected
-	 * @param {Field} field - The field to update dependencies of.
-	 * @param {Object} data - The data to update from.
-	 * @param {boolean=false} updateParents
+	 * @param {Field}         field         - The field to update dependencies of.
+	 * @param {Object}        data          - The data to update from.
+	 * @param {boolean=false} updateParents - Whether to update the field's parents.
 	 */
 	updateFieldDependencies(field, data, updateParents)
 	{
@@ -1072,6 +1096,25 @@ export default class FormProcessor
 		for (i = 0; i < parents.length; i++) {
 			this.updateFieldValue(parents[i], data);
 		}
+	}
+	
+	/**
+	 * Update a field's inheritance.
+	 *
+	 * Ensures that inherited child fields exist.
+	 *
+	 * @param {Field}  field - The field to update the inheritance of.
+	 * @param {Object} data  - The date to update with.
+	 */
+	updateFieldInheritance(field, data)
+	{
+		let base = this.getBaseField(field);
+		
+		if (!base) {
+			return;
+		}
+		
+		// TODO: Implement
 	}
 	
 	/**
@@ -1371,7 +1414,8 @@ export default class FormProcessor
  * @property {boolean}        [merge]          - Whether to merge the field's non-scalar value with its default value.
  * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
  * @property {string}         [validator]      - The field's validation function. Defaults as appropriate to the `type`.
- * @property {string}         [extends]        - The path of a field to extend.
+ * @property {Field|string}   [extends]        - The path of a field to inherit.
+ * @property {Field|string}   [mirror]         - The path of a field to mirror.
  * @property {Field[]}        [children]       - Child fields.
  * @property {Field|string}   [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
  * @property {Object|array}   [fixed]          - A map or list of child keys that cannot be removed at runtime, if present.
