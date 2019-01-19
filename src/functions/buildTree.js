@@ -30,6 +30,11 @@ export default function (dictionary) {
 	for (path in dictionary) {
 		property = dictionary[path];
 		
+		// Skip the root node silently
+		if (property === tree) {
+			continue;
+		}
+		
 		if (!property || property.path == null || path !== property.path) {
 			// You're weird and don't belong in our tree, bye Felicia
 			// TODO: "path" could be valid here, set it to property.path if so

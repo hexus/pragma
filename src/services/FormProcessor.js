@@ -19,6 +19,7 @@ import sumBy           from 'lodash/sumBy';
 import multiply        from '../functions/multiply';
 import buildDictionary from '../functions/buildDictionary';
 import buildTree       from '../functions/buildTree';
+import traverseTree    from '../functions/traverseTree';
 import splitPath       from '../functions/splitPath';
 import joinPath        from '../functions/joinPath';
 
@@ -497,8 +498,21 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Check whether a field exists at the given path.
+	 *
+	 * @protected
+	 * @param {string} path - The path of the field to check.
+	 * @return {boolean}
+	 */
+	hasField(path)
+	{
+		return has(this.dictionary, path);
+	}
+	
+	/**
 	 * Get the field at the given path.
 	 *
+	 * @protected
 	 * @param {string} path - The path of the field to get.
 	 * @return {Field}
 	 */
@@ -510,6 +524,7 @@ export default class FormProcessor
 	/**
 	 * Get the parent field of the field at the given path.
 	 *
+	 * @protected
 	 * @param {Field} field
 	 * @return {Field|null}
 	 */
@@ -520,6 +535,26 @@ export default class FormProcessor
 		}
 		
 		return this.getField(field.parent);
+	}
+	
+	/**
+	 * Get the ancestors of a field.
+	 *
+	 * @protected
+	 * @param {Field} field
+	 * @return {Field[]}
+	 */
+	getFieldAncestors(field)
+	{
+		let ancestors = [];
+		
+		while (field.hasOwnProperty('parent') && this.hasField(field.parent)) {
+			field = this.getFieldParent(field);
+			
+			ancestors.push(field);
+		}
+		
+		return ancestors;
 	}
 	
 	/**
@@ -655,11 +690,9 @@ export default class FormProcessor
 		//console.log('updateTemplateFields() new fields', newFields);
 		
 		// Add the new fields to the dictionary and update them
-		each(newFields, (field) => {
-			dictionary[field.path] = field;
-			
-			//this.updateField(field, data, DOWN);
-		});
+		for (i = 0; i < newFields.length; i++) {
+			dictionary[newFields[i].path] = newFields[i];
+		}
 	}
 	
 	/**
@@ -716,7 +749,6 @@ export default class FormProcessor
 	buildTemplateField(parent, template, key, value, field)
 	{
 		//console.log('buildTemplateField', key, value);
-		// TODO: Optional parent?
 		
 		field = merge(
 			{},
@@ -736,7 +768,7 @@ export default class FormProcessor
 		let fields = [field];
 		
 		// Extract template children and template
-		let children = field.children;
+		let children = field.children || [];
 		delete field.children;
 		let fieldTemplate = field.template;
 		delete field.template;
@@ -756,12 +788,6 @@ export default class FormProcessor
 			return fields;
 		}
 		
-		// We can finish here if there are no child fields to build
-		if (!children || !children.length) {
-			return fields;
-		}
-		
-		
 		// Recursively build the template children as fields
 		let childFields = [];
 		
@@ -775,6 +801,7 @@ export default class FormProcessor
 			);
 		}
 		
+		// Add the child fields to the list
 		fields = fields.concat(childFields);
 		
 		// Process the fields
@@ -887,7 +914,12 @@ export default class FormProcessor
 		// Update the value of every field
 		// TODO: Diff any *paths* that changed and update those
 		//       i.e. implement diffTemplateFieldPaths()
-		this.updatePath('', data);
+		// TODO: True depth-first traversal should help performance considerably
+		this.updatePath('', data, DOWN);
+		
+		// traverseTree(this.tree, null, (field) => {
+		// 	console.log(field.path);
+		// });
 	}
 	
 	/**
@@ -895,10 +927,11 @@ export default class FormProcessor
 	 *
 	 * @param {string} path - The path of the field to update.
 	 * @param {Object} data - The data to update with.
+	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
 	 */
-	updatePath(path, data)
+	updatePath(path, data, direction = BOTH)
 	{
-		this.updateField(this.getField(path), data);
+		this.updateField(this.getField(path), data, direction);
 	}
 	
 	/**
@@ -954,21 +987,16 @@ export default class FormProcessor
 				this.updateTemplateFields(field, data);
 			}
 			
-			if (field.children) {
+			if (field.children && !field.omit) {
 				this.updateFields(field.children, data);
 			}
-		}
-		
-		// Skip omitted fields
-		if (field.omit) {
-			return;
 		}
 		
 		// Update the state's value
 		this.updateDataValue(field, data);
 		
 		// Update the field's value (and update all fields dependent on this one)
-		this.updateFieldValue(field, data);
+		this.updateFieldValue(field, data, direction <= 0);
 	}
 	
 	/**
@@ -994,10 +1022,11 @@ export default class FormProcessor
 	 * Update a field using the given data.
 	 *
 	 * @protected
-	 * @param {Field}  field - The field to update.
-	 * @param {Object} data  - The data to update with.
+	 * @param {Field}         field              - The field to update.
+	 * @param {Object}        data               - The data to update with.
+	 * @param {boolean=false} updateParents      - Whether to update the field's parents.
 	 */
-	updateFieldValue(field, data)
+	updateFieldValue(field, data, updateParents = false)
 	{
 		if (!field) {
 			return;
@@ -1007,7 +1036,7 @@ export default class FormProcessor
 		field.value = get(data, field.path);
 		
 		// Update all fields dependent on this one
-		this.updateFieldDependencies(field, data);
+		this.updateFieldDependencies(field, data, updateParents);
 	}
 	
 	/**
@@ -1016,18 +1045,17 @@ export default class FormProcessor
 	 * @protected
 	 * @param {Field} field - The field to update dependencies of.
 	 * @param {Object} data - The data to update from.
+	 * @param {boolean=false} updateParents
 	 */
-	updateFieldDependencies(field, data)
+	updateFieldDependencies(field, data, updateParents)
 	{
 		// Recursively update parent field values
-		this.updateFieldParents(field, data);
-		
-		//console.log('updateFieldDependencies()', field.path, dependencyPaths);
+		if (updateParents) {
+			this.updateFieldParents(field, data);
+		}
 		
 		// Update fields listed as dependencies
-		let dependencies = this.getFieldDependencies(field);
-		
-		this.updateFields(dependencies, data);
+		this.updateFields(this.getFieldDependencies(field), data);
 	}
 	
 	/**
@@ -1039,7 +1067,11 @@ export default class FormProcessor
 	 */
 	updateFieldParents(field, data)
 	{
-		this.updateField(this.getFieldParent(field), data, UP);
+		let i, parents = this.getFieldAncestors(field);
+		
+		for (i = 0; i < parents.length; i++) {
+			this.updateFieldValue(parents[i], data);
+		}
 	}
 	
 	/**

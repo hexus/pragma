@@ -27,19 +27,19 @@ export default {
 						levels: 1
 					},
 					{
-						name: 2,
+						name: 'Two',
 						levels: 2,
 					},
 					{
-						name: 3,
+						name: 'Three',
 						levels: 3
 					},
 					{
-						name: 4,
+						name: 'Four',
 						levels: 4
 					},
 					{
-						name: 5,
+						name: 'Five',
 						levels: 5
 					}
 				],
