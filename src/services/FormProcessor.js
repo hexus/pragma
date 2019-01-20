@@ -7,7 +7,6 @@ import has             from 'lodash/has';
 import get             from 'lodash/get';
 import set             from 'lodash/set';
 import pull            from 'lodash/pull';
-import each            from 'lodash/each';
 import defaultTo       from 'lodash/defaultTo';
 import difference      from 'lodash/difference';
 import intersection    from 'lodash/intersection';
@@ -595,6 +594,7 @@ export default class FormProcessor
 	/**
 	 * Get the fields dependent upon the given field.
 	 *
+	 * @protected
 	 * @param {Field} field
 	 * @return {Field[]} The dependent fields
 	 */
@@ -635,7 +635,7 @@ export default class FormProcessor
 	{
 		// Grab the data keys and child field keys (path fragments)
 		let childData      = this.getFieldValue(field, data);
-		let childDataKeys  = Object.keys(childData);
+		let childDataKeys  = childData ? Object.keys(childData) : [];
 		let childFieldKeys = [];
 		
 		for (let j in this.dictionary) {
@@ -671,6 +671,10 @@ export default class FormProcessor
 	 */
 	updateTemplateFields(field, data)
 	{
+		// if (!field) {
+		// 	return;
+		// }
+		
 		let template = this.getFieldChildrenTemplate(field);
 		
 		if (!template) {
@@ -682,6 +686,7 @@ export default class FormProcessor
 			key,
 			path,
 			value,
+			existingField,
 			newField,
 			newFields = [];
 
@@ -697,46 +702,46 @@ export default class FormProcessor
 		}
 		
 		// Update existing fields
-		// TODO: Set existingField.template, then call inheritTemplate()
-		// for (i = 0; i < existingKeys.length; i++) {
-		// 	key  = existingKeys[i];
-		// 	path = joinPath(field.path, key);
-		//
-		// 	this.updateField(this.getField(path), data);
-		// }
+		for (i = 0; i < existingKeys.length; i++) {
+			key  = existingKeys[i];
+			path = joinPath(field.path, key);
+			
+			// Ensure the existing field has the correct template
+			existingField          = this.getField(path);
+			existingField.extends  = template.path;
+			
+			//this.inheritTemplate(existingField, template);
+		}
 		
 		// Build new fields
 		value = this.getFieldValue(field, data);
 		
-		newFields = newFields.concat(
-			this.buildTemplateFields(field, template, value, newKeys)
-		);
-		
-		// TODO: Refactor to use inheritTemplate, using buildTemplateField to
-		//       to build a single field where one doesn't already exist
-		
-		// for (i = 0; i < newKeys.length; i++) {
-		// 	key  = newKeys[i];
-		// 	path = joinPath(field.path, key);
-		//
-		// 	// Build the basics for the new field
-		// 	newField = {
-		// 		path:         path,
-		// 		pathFragment: key,
-		// 		parent:       field.path,
-		// 		value:        value[key],   // Sub-value
-		// 		extends:      template.path
-		// 	};
-		//
-		// 	newField = this.inheritTemplate(field, template);
-		// }
-		
-		// Process the new fields
-		this.process(newFields);
+		for (i = 0; i < newKeys.length; i++) {
+			key  = newKeys[i];
+			path = joinPath(field.path, key);
+			
+			// Build the basics for the new field
+			newField = {
+				path:         path,
+				pathFragment: key,
+				parent:       field.path,
+				value:        value[key], // Sub-value
+				extends:      template.path
+			};
+			
+			// Inherit from the template
+			//newField = this.inheritTemplate(field);
+			
+			newFields.push(newField);
+		}
 		
 		//console.log('updateTemplateFields() new fields', newFields);
 		
-		// Add the new fields to the dictionary
+		// Add the new fields to the parent field and dictionary
+		if (newFields.length && field.children && field.children.length) {
+			field.children = field.children.concat(newFields);
+		}
+		
 		for (i = 0; i < newFields.length; i++) {
 			dictionary[newFields[i].path] = newFields[i];
 		}
@@ -1166,6 +1171,21 @@ export default class FormProcessor
 		
 		// Inherit template properties
 		field = merge(template, field);
+		
+		this.process([field]);
+		
+		// Mark the children to inherit children of the template
+		// TODO: Diff template child path keys with field child path keys,
+		//       create and push any that are missing, update the existing with
+		//       `extends`, much like updateTemplateFields() is doing... maybe
+		//       even that behaviour needs generalising.
+		//       After that, the inheritance functionality can essentially be
+		//       extracted to a plugin, because it's isolated.
+		let children = field.children || [];
+		
+		for (let i = 0; i < children.length; i++) {
+			//
+		}
 		
 		return field;
 	}
