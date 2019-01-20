@@ -49,7 +49,7 @@
 		this.remove = function (event) {
 			let { name } = event.detail;
 
-			formProcessor.remove(this.sheet, name);
+			formProcessor.removeValue(this.sheet, name);
 		};
 	</script>
 </pragma>

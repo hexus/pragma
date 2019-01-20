@@ -458,46 +458,6 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Get the keys of child fields that need creating, updating or removing for
-	 * a given field.
-	 *
-	 * @protected
-	 * @param {Field} field - The field with a template.
-	 * @param {Object} data - The data to diff against.
-	 * @return array [newPaths[], existingPaths[], oldPaths[]]
-	 */
-	diffTemplateFieldKeys(field, data)
-	{
-		// Grab the data keys and child field keys (path fragments)
-		let childData      = this.getFieldValue(field, data);
-		let childDataKeys  = Object.keys(childData);
-		let childFieldKeys = [];
-		
-		for (let j in this.dictionary) {
-			if (this.dictionary[j].parent === field.path) {
-				let [, pathFragment] = splitPath(this.dictionary[j].path);
-				
-				childFieldKeys.push(pathFragment);
-			}
-		}
-		
-		// Keys in data that aren't in fields
-		let newKeys = difference(childDataKeys, childFieldKeys);
-		
-		// Keys in data and fields
-		let existingKeys = intersection(childDataKeys, childFieldKeys);
-		
-		// Keys in fields that aren't in data
-		let oldKeys = difference(childFieldKeys, childDataKeys);
-		
-		// console.log('diffTemplateFieldKeys()', field.path, 'newKeys', newKeys);
-		// console.log('diffTemplateFieldKeys()', field.path, 'existingKeys', existingKeys);
-		// console.log('diffTemplateFieldKeys()', field.path, 'oldKeys', oldKeys);
-		
-		return [newKeys, existingKeys, oldKeys];
-	}
-	
-	/**
 	 * Check whether a field exists at the given path.
 	 *
 	 * @protected
@@ -588,35 +548,12 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Get the child template of a field.
+	 * Get the template field that a field should a extend.
 	 *
-	 * @protected
-	 * @param {Field} field - The field to get the template of.
+	 * @param {Field} field - The field to get the template for.
 	 * @return {Field|null} The template field.
 	 */
 	getFieldTemplate(field)
-	{
-		if (!field) {
-			return null;
-		}
-		
-		let template = field.template;
-		
-		// Lookup the path to the template field in the dictionary
-		if (typeof template === 'string') {
-			template = this.getField(template);
-		}
-		
-		return template;
-	}
-	
-	/**
-	 * Get the base field of the a field.
-	 *
-	 * @param {Field} field - The field to get the base field of.
-	 * @return {Field|null} The base field.
-	 */
-	getBaseField(field)
 	{
 		if (!field) {
 			return null;
@@ -632,6 +569,28 @@ export default class FormProcessor
 		return base;
 	}
 	
+	/**
+	 * Get the template that a field's children should extend.
+	 *
+	 * @protected
+	 * @param {Field} field - The field to get the child template for.
+	 * @return {Field|null} The template field.
+	 */
+	getFieldChildrenTemplate(field)
+	{
+		if (!field) {
+			return null;
+		}
+		
+		let template = field.template;
+		
+		// Lookup the path to the template field in the dictionary
+		if (typeof template === 'string') {
+			template = this.getField(template);
+		}
+		
+		return template;
+	}
 	
 	/**
 	 * Get the fields dependent upon the given field.
@@ -664,6 +623,46 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Get the keys of child fields that need creating, updating or removing for
+	 * a given field.
+	 *
+	 * @protected
+	 * @param {Field} field - The field with a template.
+	 * @param {Object} data - The data to diff against.
+	 * @return array [newPaths[], existingPaths[], oldPaths[]]
+	 */
+	diffTemplateFieldKeys(field, data)
+	{
+		// Grab the data keys and child field keys (path fragments)
+		let childData      = this.getFieldValue(field, data);
+		let childDataKeys  = Object.keys(childData);
+		let childFieldKeys = [];
+		
+		for (let j in this.dictionary) {
+			if (this.dictionary[j].parent === field.path) {
+				let [, pathFragment] = splitPath(this.dictionary[j].path);
+				
+				childFieldKeys.push(pathFragment);
+			}
+		}
+		
+		// Keys in data that aren't in fields
+		let newKeys = difference(childDataKeys, childFieldKeys);
+		
+		// Keys in data and fields
+		let existingKeys = intersection(childDataKeys, childFieldKeys);
+		
+		// Keys in fields that aren't in data
+		let oldKeys = difference(childFieldKeys, childDataKeys);
+		
+		// console.log('diffTemplateFieldKeys()', field.path, 'newKeys', newKeys);
+		// console.log('diffTemplateFieldKeys()', field.path, 'existingKeys', existingKeys);
+		// console.log('diffTemplateFieldKeys()', field.path, 'oldKeys', oldKeys);
+		
+		return [newKeys, existingKeys, oldKeys];
+	}
+	
+	/**
 	 * Unravel all templates into fields for the given field and data.
 	 *
 	 * @protected
@@ -672,7 +671,7 @@ export default class FormProcessor
 	 */
 	updateTemplateFields(field, data)
 	{
-		let template = this.getFieldTemplate(field);
+		let template = this.getFieldChildrenTemplate(field);
 		
 		if (!template) {
 			return;
@@ -683,6 +682,7 @@ export default class FormProcessor
 			key,
 			path,
 			value,
+			newField,
 			newFields = [];
 
 		// Find child fields that need to be added, updated or removed
@@ -697,8 +697,7 @@ export default class FormProcessor
 		}
 		
 		// Update existing fields
-		// TODO: A dictionary-aware update would be good, without forcing rebuilds
-		//       Just needs to check if all the right fields in the template exist
+		// TODO: Set existingField.template, then call inheritTemplate()
 		// for (i = 0; i < existingKeys.length; i++) {
 		// 	key  = existingKeys[i];
 		// 	path = joinPath(field.path, key);
@@ -713,6 +712,28 @@ export default class FormProcessor
 			this.buildTemplateFields(field, template, value, newKeys)
 		);
 		
+		// TODO: Refactor to use inheritTemplate, using buildTemplateField to
+		//       to build a single field where one doesn't already exist
+		
+		// for (i = 0; i < newKeys.length; i++) {
+		// 	key  = newKeys[i];
+		// 	path = joinPath(field.path, key);
+		//
+		// 	// Build the basics for the new field
+		// 	newField = {
+		// 		path:         path,
+		// 		pathFragment: key,
+		// 		parent:       field.path,
+		// 		value:        value[key],   // Sub-value
+		// 		extends:      template.path
+		// 	};
+		//
+		// 	newField = this.inheritTemplate(field, template);
+		// }
+		
+		// Process the new fields
+		this.process(newFields);
+		
 		//console.log('updateTemplateFields() new fields', newFields);
 		
 		// Add the new fields to the dictionary
@@ -723,6 +744,9 @@ export default class FormProcessor
 	
 	/**
 	 * Build fields from a template and its corresponding data.
+	 *
+	 * TODO: Could extract this up to updateTemplateFields() and iterate over newKeys
+	 *       This method by itself seems a bit redundant now
 	 *
 	 * @protected
 	 * @param {Field}    parent   - The parent field
@@ -748,7 +772,7 @@ export default class FormProcessor
 			
 			fields.push(
 				...this.buildTemplateField(
-					parent, template, key, item, this.getField(joinPath(parent.path, key))
+					parent, template, key, item
 				)
 			);
 		}
@@ -760,68 +784,71 @@ export default class FormProcessor
 	 * Build a child field, and all of its child fields, from a parent field's
 	 * template.
 	 *
-	 * Acts recursively on any child fields in the template.
+	 * Merges with any fields that already exist.
 	 *
-	 * TODO: Extract extending a field.
+	 * Acts recursively on any child fields in the template.
 	 *
 	 * @protected
 	 * @param {Field}      parent   - The parent field
 	 * @param {Field}      template - The template field
 	 * @param {string|int} key      - The key of the new field
 	 * @param {*}          value    - The value of the new field
-	 * @param {Field}      [field]  - An existing field to merge with
 	 * @return {Field[]} The built fields
 	 */
-	buildTemplateField(parent, template, key, value, field)
+	buildTemplateField(parent, template, key, value)
 	{
 		//console.log('buildTemplateField', key, value);
+
+		if (!template) {
+			return [];
+		}
 		
-		field = merge(
-			{},
-			template,
-			field,
+		let path = joinPath(parent.path, key);
+
+		// Merge required properties into the existing field
+		let field = merge(
+			this.getField(path) || {},
 			{
-				path:         joinPath(parent.path, key),
+				path:         path,
 				pathFragment: key,
 				parent:       parent.path,
 				value:        value
 			}
 		);
 		
+		// Drop the name so it can be derived from the new path
+		// TODO: options.deriveNames for 'list' types
+		delete field.name;
+		
+		// Inherit the template
+		field = this.inheritTemplate(field, template);
+		
 		/**
-		 * @type {Field[]}
+		 * @type {Field[]} fields
 		 */
 		let fields = [field];
 		
-		// Extract template children and template
-		let children = field.children || [];
-		delete field.children;
-		let fieldTemplate = field.template;
-		delete field.template;
-		
-		// Drop the name so it can be derived from the new path
-		delete field.name;
-		
-		// Add the new field to the parent children
+		// Add the new field to the parent's children
 		parent.children = parent.children || [];
 		parent.children.push(field);
 		
 		// Create template children or explicit child fields
-		if (fieldTemplate) {
-			// TODO: Implement if we ever need sub templates... would be crazy
+		if (template.template) {
+			// TODO: Implement if we ever need nested templates... would be crazy
 			// each(value, () => this.buildTemplateField(field, fieldTemplate, key, value));
 			console.warn("Nested templates are not supported ('" + field.path + "')");
 			return fields;
 		}
 		
 		// Recursively build the template children as fields
+		let templateChildren = template.children || [];
 		let childFields = [];
 		
-		for (let c = 0; c < children.length; c++) {
-			let child      = children[c];
+		for (let c = 0; c < templateChildren.length; c++) {
+			let child      = templateChildren[c];
 			let childKey   = child.pathFragment;
 			let childValue = field.value ? field.value[childKey] : null;
-
+			
 			childFields = childFields.concat(
 				this.buildTemplateField(field, child, childKey, childValue)
 			);
@@ -831,7 +858,7 @@ export default class FormProcessor
 		fields = fields.concat(childFields);
 		
 		// Process the fields
-		fields = this.process(fields);
+		//this.process(fields);
 		
 		return fields;
 	}
@@ -841,6 +868,7 @@ export default class FormProcessor
 	 *
 	 * Falls back to default values as appropriate, merging objects.
 	 *
+	 * @public
 	 * @param {string} path - The path to the field.
 	 * @return {*} The value of the field
 	 */
@@ -889,43 +917,43 @@ export default class FormProcessor
 	{
 		// Just empty the entire cache if there's no path is or there's no field
 		// at the given path
-		if (true || !path || !this.getField(path)) {
-			// TODO: Remove lazy debugging
+		if (!path || !this.getField(path)) {
 			this.valueCache = {};
-			
+
 			return;
 		}
 		
-		let field = this.getField(path);
+		let i, field = this.getField(path);
+		
+		// Clear cached values of child fields iteratively
+		let child,
+			children = field.children,
+			nextChildren = [];
+		
+		while (children && children.length) {
+			nextChildren = [];
+			
+			for (i = 0; i < children.length; i++) {
+				child = children[i];
+				
+				delete this.valueCache[child.path];
+				
+				if (child.children) {
+					nextChildren = nextChildren.concat(child.children);
+				}
+			}
+			
+			children = nextChildren;
+		}
 		
 		// Clear the cached value for this field
 		delete this.valueCache[field.path];
 		
-		// Clear cached values of parent fields
-		let parent = this.getField(field.parent);
+		// Clear cached values of parent fields iteratively
+		let ancestors = this.getFieldAncestors(field);
 		
-		while (parent) {
-			delete this.valueCache[parent.path];
-			
-			parent = this.getField(parent.parent);
-		}
-		
-		// Clear cached values of child fields
-		let children = field.children;
-		
-		while (children && children.length) {
-			let nextChildren = [];
-			
-			for (let i = 0; i < children.length; i++) {
-				let child = children[i];
-				
-				delete this.valueCache[child.path];
-				
-				if (child.children)
-					nextChildren = nextChildren.concat(child.children);
-			}
-			
-			children = nextChildren;
+		for (i = 0; i < ancestors.length; i++) {
+			delete this.valueCache[ancestors[i].path];
 		}
 	}
 	
@@ -1006,9 +1034,7 @@ export default class FormProcessor
 		// Update the field's children
 		if (direction >= 0) {
 			// TODO: This would be a good spot for an event to fire to allow plugins
-			//       (like templates) to intercept child update behaviour
-			this.updateTemplateFields(field, data);
-			
+			//       (like inheritance) to intercept child update behaviour
 			this.updateFieldInheritance(field, data);
 			
 			if (!field.omit) {
@@ -1108,13 +1134,52 @@ export default class FormProcessor
 	 */
 	updateFieldInheritance(field, data)
 	{
-		let base = this.getBaseField(field);
+		this.updateTemplateFields(field, data);
 		
-		if (!base) {
-			return;
+		this.inheritTemplate(field);
+	}
+	
+	/**
+	 * Apply a field's inheritance.
+	 *
+	 * Ensures that a field inherits from its base field.
+	 *
+	 * @param {Field}  field      - The inheriting field.
+	 * @param {Field}  [template] - The template field to inherit from.
+	 * @return {Field}
+	 */
+	inheritTemplate(field, template)
+	{
+		template = template || this.getFieldTemplate(field);
+		
+		if (!template) {
+			return field;
 		}
 		
-		// TODO: Implement
+		// Extract template children
+		template = merge({}, template);
+		
+		//let templateChildren = template.children || [];
+		delete template.children;
+		//let templateTemplate = template.template;
+		delete template.template;
+		
+		// Inherit template properties
+		field = merge(template, field);
+		
+		return field;
+	}
+	
+	/**
+	 * Remove data from the given path.
+	 *
+	 * @public
+	 * @param {Object} data - The data to change.
+	 * @param {string} path - The path to remove.
+	 */
+	removeValue(data, path)
+	{
+		this.removePath(path, data);
 	}
 	
 	/**
@@ -1296,9 +1361,9 @@ export default class FormProcessor
 	 */
 	buildTemplateData(field, data)
 	{
-		let template = this.getFieldTemplate(field);
+		let template = this.getFieldChildrenTemplate(field);
 		
-		if (!field.template) {
+		if (!template) {
 			return null;
 		}
 		
@@ -1346,10 +1411,13 @@ export default class FormProcessor
 		} else if (key != null && typeof target === 'object') {
 			target[key] = newData;
 		} else {
+			// Bail if we're not dealing with a collection
 			console.warn(
 				`Could not create new child data for '${path}';` +
 				` either it wasn't an array or wasn't an object with a key provided`
 			);
+			
+			return;
 		}
 		
 		// Set it back
@@ -1357,18 +1425,6 @@ export default class FormProcessor
 		
 		// Update the form
 		this.updatePath(path, data);
-	}
-	
-	/**
-	 * Remove data from the given path.
-	 *
-	 * @public
-	 * @param {Object} data - The data to change.
-	 * @param {string} path - The path to remove.
-	 */
-	remove(data, path)
-	{
-		this.removePath(path, data);
 	}
 }
 
@@ -1403,7 +1459,7 @@ export default class FormProcessor
  * @property {string}         [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`.
  * @property {string}         [input]          - The input type to use for this field, if any. // TODO: Rename? Might not be an actual input... (i.e. section)
  * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
- * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the path's final segment. TODO: Rename to label?
+ * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the field's key. TODO: Rename to label?
  * @property {string}         [description]    - The field's description.
  * @property {boolean}        [omit=false]     - Whether to prevent storing the property's value in data AND prevent updating any children. Defaults to `false`.
  * @property {boolean}        [virtual=false]  - Whether to prevent storing the property's value in data. Defaults to `false`.

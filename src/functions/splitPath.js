@@ -1,21 +1,22 @@
 /**
- * Split a field path into its parent-path and base-path segments.
+ * Split a field path into its "parent path" and "key" segments.
  *
- * @param {string} path - The field path to split.
- * @return {string[]} [parentPath, pathFragment]
+ * @param {string} path            - The field path to split.
+ * @param {string} [delimiter='.'] - The path delimiter to use.
+ * @return {string[]} [parentPath, key]
  */
-export default function (path) {
-	let parentPath, pathFragment;
+export default function (path, delimiter = '.') {
+	let parentPath, key;
 
-	let lastDotIndex = path.lastIndexOf('.');
+	let lastDelimiterIndex = path.lastIndexOf(delimiter);
 	
-	if (lastDotIndex < 1) {
+	if (lastDelimiterIndex < 1) {
 		parentPath = '';
-		pathFragment = path;
+		key = path;
 	} else {
-		parentPath = path.substring(0, lastDotIndex);
-		pathFragment = path.substring(lastDotIndex + 1);
+		parentPath = path.substring(0, lastDelimiterIndex);
+		key = path.substring(lastDelimiterIndex + 1);
 	}
 	
-	return [parentPath, pathFragment];
+	return [parentPath, key];
 }
