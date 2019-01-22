@@ -743,7 +743,7 @@ export default class FormProcessor
 				path:         path,
 				pathFragment: key,
 				parent:       field.path,
-				value:        value[key], // Sub-value
+				//value:        value[key], // Sub-value
 				extends:      template.path
 			};
 			
@@ -759,7 +759,8 @@ export default class FormProcessor
 		let children = field.children || [];
 		
 		if (newFields.length) {
-			field.children = children.concat(newFields);
+			field.children = field.children || [];
+			field.children.push(...newFields);
 		}
 		
 		for (i = 0; i < newFields.length; i++) {
@@ -1177,35 +1178,22 @@ export default class FormProcessor
 	{
 		template = template || this.getFieldTemplate(field);
 		
-		console.log('inheritTemplate()', field.path, template);
-		
 		if (!template) {
 			return field;
 		}
 		
-		// Extract template children
-		template = merge({}, template);
+		console.log('inheritTemplate()', field.path, template.path);
 		
-		//let templateChildren = template.children || [];
-		delete template.children;
-		//let templateTemplate = template.template;
-		delete template.template;
-		
-		// Inherit template properties
-		field = merge(field, merge({}, template, field));
+		// Inherit the template without its children
+		let templateClone = merge({}, template);
+		delete templateClone.children;
+		delete templateClone.template;
+
+		field = merge(field, merge(templateClone, field));
 		
 		this.process([field]);
 		
 		// Mark the field's children to inherit the template's children
-		
-		// TODO: Diff template child path keys with field child path keys,
-		//       create and push any that are missing, update the existing with
-		//       `extends`, much like updateTemplateFields() is doing... maybe
-		//       even that behaviour needs generalising.
-		//       After that works, the inheritance functionality can essentially
-		//       be extracted to a plugin, because it's isolated and occurs in
-		//       the natural order of the tree traversal.
-		
 		let i,
 			key,
 			path,
@@ -1222,8 +1210,6 @@ export default class FormProcessor
 		
 		// Keys in template children and field children
 		let existingKeys = intersection(fieldChildKeys, templateChildKeys);
-		
-		console.log(field.path, templateChildKeys, fieldChildKeys, newKeys, existingKeys);
 		
 		// Update existing template fields
 		for (let i = 0; i < existingKeys.length; i++) {
@@ -1243,7 +1229,7 @@ export default class FormProcessor
 				path: path,
 				pathFragment: key,
 				parent: field.path,
-				value: this.getFieldValue(path/*, data*/),
+				//value: this.getFieldValue(path/*, data*/),
 				extends: joinPath(template.path, key)
 			};
 			
@@ -1251,10 +1237,9 @@ export default class FormProcessor
 		}
 		
 		// Add the new fields to the parent field and dictionary
-		let children = field.children || [];
-		
 		if (newFields.length) {
-			field.children = children.concat(newFields);
+			field.children = field.children || [];
+			field.children.push(...newFields);
 		}
 		
 		for (i = 0; i < newFields.length; i++) {
