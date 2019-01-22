@@ -558,14 +558,36 @@ export default class FormProcessor
 			return null;
 		}
 		
-		let base = field.extends;
+		let template = field.extends;
 		
-		// Lookup the path to the base field in the dictionary
-		if (typeof base === 'string') {
-			base = this.getField(base);
+		// Lookup the path to the template in the dictionary
+		if (typeof template === 'string') {
+			template = this.getField(template);
 		}
 		
-		return base;
+		return template;
+	}
+	
+	/**
+	 * Get the keys of the field's children.
+	 *
+	 * @protected
+	 * @param {Field} field - The field to get the child keys of.
+	 * @return {array} The keys of the field's children.
+	 */
+	getFieldChildrenKeys(field)
+	{
+		let i,
+			keys = [],
+			children = field.children || [];
+		
+		for (i = 0; i < children.length; i++) {
+			keys.push(children[i].pathFragment);
+		}
+		
+		console.log('getFieldChildrenKeys()', field.path, keys);
+		
+		return keys;
 	}
 	
 	/**
@@ -623,28 +645,22 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Get the keys of child fields that need creating, updating or removing for
-	 * a given field.
+	 * Get the keys of child fields that don't exist in the given data.
+	 *
+	 * Retrieves the new keys, existing keys and old keys of a field compared
+	 * to its data.
 	 *
 	 * @protected
 	 * @param {Field} field - The field with a template.
 	 * @param {Object} data - The data to diff against.
 	 * @return array [newPaths[], existingPaths[], oldPaths[]]
 	 */
-	diffTemplateFieldKeys(field, data)
+	diffFieldDataKeys(field, data)
 	{
-		// Grab the data keys and child field keys (path fragments)
+		// Grab the data keys and child field keys
 		let childData      = this.getFieldValue(field, data);
 		let childDataKeys  = childData ? Object.keys(childData) : [];
-		let childFieldKeys = [];
-		
-		for (let j in this.dictionary) {
-			if (this.dictionary[j].parent === field.path) {
-				let [, pathFragment] = splitPath(this.dictionary[j].path);
-				
-				childFieldKeys.push(pathFragment);
-			}
-		}
+		let childFieldKeys = this.getFieldChildrenKeys(field);
 		
 		// Keys in data that aren't in fields
 		let newKeys = difference(childDataKeys, childFieldKeys);
@@ -689,9 +705,11 @@ export default class FormProcessor
 			existingField,
 			newField,
 			newFields = [];
-
+		
 		// Find child fields that need to be added, updated or removed
-		let [newKeys, existingKeys, oldKeys] = this.diffTemplateFieldKeys(field, data);
+		let [newKeys, existingKeys, oldKeys] = this.diffFieldDataKeys(field, data);
+		
+		console.log('updateTemplateFields()', field.path, newKeys, existingKeys, oldKeys);
 		
 		// Remove old fields
 		for (i = 0; i < oldKeys.length; i++) {
@@ -738,8 +756,10 @@ export default class FormProcessor
 		//console.log('updateTemplateFields() new fields', newFields);
 		
 		// Add the new fields to the parent field and dictionary
-		if (newFields.length && field.children && field.children.length) {
-			field.children = field.children.concat(newFields);
+		let children = field.children || [];
+		
+		if (newFields.length) {
+			field.children = children.concat(newFields);
 		}
 		
 		for (i = 0; i < newFields.length; i++) {
@@ -1157,6 +1177,8 @@ export default class FormProcessor
 	{
 		template = template || this.getFieldTemplate(field);
 		
+		console.log('inheritTemplate()', field.path, template);
+		
 		if (!template) {
 			return field;
 		}
@@ -1170,21 +1192,73 @@ export default class FormProcessor
 		delete template.template;
 		
 		// Inherit template properties
-		field = merge(template, field);
+		field = merge(field, merge({}, template, field));
 		
 		this.process([field]);
 		
-		// Mark the children to inherit children of the template
+		// Mark the field's children to inherit the template's children
+		
 		// TODO: Diff template child path keys with field child path keys,
 		//       create and push any that are missing, update the existing with
 		//       `extends`, much like updateTemplateFields() is doing... maybe
 		//       even that behaviour needs generalising.
-		//       After that, the inheritance functionality can essentially be
-		//       extracted to a plugin, because it's isolated.
+		//       After that works, the inheritance functionality can essentially
+		//       be extracted to a plugin, because it's isolated and occurs in
+		//       the natural order of the tree traversal.
+		
+		let i,
+			key,
+			path,
+			existingField,
+			newField,
+			newFields = [];
+		
+		// Diff field child keys and template child keys
+		let templateChildKeys = this.getFieldChildrenKeys(template);
+		let fieldChildKeys    = this.getFieldChildrenKeys(field);
+		
+		// Keys of template children that aren't in field children
+		let newKeys = difference(templateChildKeys, fieldChildKeys);
+		
+		// Keys in template children and field children
+		let existingKeys = intersection(fieldChildKeys, templateChildKeys);
+		
+		console.log(field.path, templateChildKeys, fieldChildKeys, newKeys, existingKeys);
+		
+		// Update existing template fields
+		for (let i = 0; i < existingKeys.length; i++) {
+			key  = existingKeys[i];
+			path = joinPath(field.path, key);
+			
+			existingField         = this.getField(path);
+			existingField.extends = joinPath(template.path, key);
+		}
+		
+		// Build new template fields
+		for (let i = 0; i < newKeys.length; i++) {
+			key  = newKeys[i];
+			path = joinPath(field.path, key);
+			
+			newField = {
+				path: path,
+				pathFragment: key,
+				parent: field.path,
+				value: this.getFieldValue(path/*, data*/),
+				extends: joinPath(template.path, key)
+			};
+			
+			newFields.push(newField);
+		}
+		
+		// Add the new fields to the parent field and dictionary
 		let children = field.children || [];
 		
-		for (let i = 0; i < children.length; i++) {
-			//
+		if (newFields.length) {
+			field.children = children.concat(newFields);
+		}
+		
+		for (i = 0; i < newFields.length; i++) {
+			this.dictionary[newFields[i].path] = newFields[i];
 		}
 		
 		return field;
