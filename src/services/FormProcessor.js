@@ -275,7 +275,7 @@ export default class FormProcessor
 		}
 		
 		let field = this.getField(path);
-		let value = get(data, path);
+		let value = this.getFieldValue(field, data);
 		
 		// Return the raw value if there's no such field
 		if (!field) {
@@ -289,7 +289,8 @@ export default class FormProcessor
 		value = this.evaluateFieldExpression(field, data, value);
 		
 		// Fall back to defaults
-		value = defaultTo(value, defaultTo(field.default, null));
+		//value = defaultTo(value, defaultTo(field.default, null));
+		value = this.getFieldValue(field, data, value);
 		
 		// Update the value cache
 		this.valueCache[path] = value;
@@ -349,6 +350,8 @@ export default class FormProcessor
 	 * Evaluate a field's value from its expression.
 	 *
 	 * Causes the evaluation of any field dependencies as a result.
+	 *
+	 * TODO: Evaluate (and cache) expressions for other field properties! :D
 	 *
 	 * @param {Field}  field   - The field to compute the value of.
 	 * @param {Object} data    - The data to derive values from.
@@ -520,9 +523,9 @@ export default class FormProcessor
 	 * Get the current value of a field.
 	 *
 	 * @protected
-	 * @param {Field} field     - The field to get the value of
-	 * @param {*}     [data={}] - Optional data to read current values from
-	 * @param {*}     [value]   - Optional current value
+	 * @param {Field} field     - The field to get the value of.
+	 * @param {*}     [data={}] - Optional data to read current values from.
+	 * @param {*}     [value]   - Optional current value.
 	 * @return {*} The current value of the field
 	 */
 	getFieldValue(field, data = {}, value = null)
@@ -707,6 +710,13 @@ export default class FormProcessor
 		// Find child fields that need to be added, updated or removed
 		let [newKeys, existingKeys, oldKeys] = this.diffFieldDataKeys(field, data);
 		
+		// TODO: Remove field.fixed from oldKeys, add them to
+		//       newKeys/existingKeys instead
+		//       And, to be honest, it could be field.options.fixed; should this
+		//       really apply to anything with children, or just lists?
+		
+		//let existingKeys = this.getFieldChildrenKeys(field);
+		
 		// Remove old fields
 		for (i = 0; i < oldKeys.length; i++) {
 			key  = oldKeys[i];
@@ -720,6 +730,8 @@ export default class FormProcessor
 			key  = existingKeys[i];
 			path = joinPath(field.path, key);
 			
+			//console.log('existingField', field.path, path);
+			
 			// Ensure the existing field has the correct template
 			existingField          = this.getField(path);
 			existingField.extends  = template.path;
@@ -732,7 +744,8 @@ export default class FormProcessor
 			key  = newKeys[i];
 			path = joinPath(field.path, key);
 			
-			// Build the basics for the new field
+			//console.log('template newKey', path, value[key]);
+			
 			newField = {
 				path:         path,
 				pathFragment: key,
@@ -747,7 +760,7 @@ export default class FormProcessor
 		// Add the new fields to the parent field and dictionary
 		if (newFields.length) {
 			field.children = field.children || [];
-			field.children.push(...newFields);
+			field.children = field.children.concat(newFields);
 		}
 		
 		for (i = 0; i < newFields.length; i++) {
@@ -859,13 +872,12 @@ export default class FormProcessor
 	{
 		// Update the value of every field
 		// TODO: Diff any *paths* that changed and update those
-		//       i.e. implement diffTemplateFieldPaths()
-		// TODO: True depth-first traversal should help performance considerably
+		//       i.e. implement diffFieldDataPaths()
 		this.updatePath('', data, DOWN);
 		
-		// traverseTree(this.tree, null, (field) => {
+		// traverseTree(this.tree, null, (field, data) => {
 		// 	console.log(field.path);
-		// });
+		// }, data);
 	}
 	
 	/**
@@ -919,7 +931,7 @@ export default class FormProcessor
 			return;
 		}
 		
-		console.log('updateField()', field.path);
+		//console.log('updateField()', field.path);
 		
 		this.clearValueCache(field.path);
 		
@@ -938,7 +950,7 @@ export default class FormProcessor
 		this.updateDataValue(field, data);
 		
 		// Update the field's value (and update all fields dependent on this one)
-		this.updateFieldValue(field, data, true);
+		this.updateFieldValue(field, data, direction <= 0);
 	}
 	
 	/**
@@ -1026,9 +1038,11 @@ export default class FormProcessor
 	 */
 	updateFieldInheritance(field, data)
 	{
+		// Update child template fields
 		this.updateTemplateFields(field, data);
 		
-		this.inheritTemplate(field);
+		// Inherit the field's template
+		this.inheritTemplate(field, data);
 	}
 	
 	/**
@@ -1036,13 +1050,13 @@ export default class FormProcessor
 	 *
 	 * Ensures that a field inherits from its base field.
 	 *
-	 * @param {Field}  field      - The inheriting field.
-	 * @param {Field}  [template] - The template field to inherit from.
+	 * @param {Field}  field - The inheriting field.
+	 * @param {Object} data  - The template field to inherit from.
 	 * @return {Field}
 	 */
-	inheritTemplate(field, template)
+	inheritTemplate(field, data)
 	{
-		template = template || this.getFieldTemplate(field);
+		let template = this.getFieldTemplate(field);
 		
 		if (!template) {
 			return field;
@@ -1059,10 +1073,11 @@ export default class FormProcessor
 		
 		this.process([field]);
 		
-		// Mark the field's children to inherit the template's children
+		// Update child fields
 		let i,
 			key,
 			path,
+			value,
 			existingField,
 			newField,
 			newFields = [];
@@ -1087,16 +1102,20 @@ export default class FormProcessor
 		}
 		
 		// Build new template fields
+		value = this.getFieldValue(field, data);
+		
 		for (let i = 0; i < newKeys.length; i++) {
 			key  = newKeys[i];
 			path = joinPath(field.path, key);
 			
+			//console.log('inherit newKey', path, value[key]);
+			
 			newField = {
-				path: path,
+				path:         path,
 				pathFragment: key,
-				parent: field.path,
-				//value: this.getFieldValue(path/*, data*/),
-				extends: joinPath(template.path, key)
+				parent:       field.path,
+				value:        value[key], // Sub-value
+				extends:      joinPath(template.path, key)
 			};
 			
 			newFields.push(newField);
@@ -1105,7 +1124,7 @@ export default class FormProcessor
 		// Add the new fields to the parent field and dictionary
 		if (newFields.length) {
 			field.children = field.children || [];
-			field.children.push(...newFields);
+			field.children = field.children.concat(newFields);
 		}
 		
 		for (i = 0; i < newFields.length; i++) {

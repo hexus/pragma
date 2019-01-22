@@ -636,9 +636,6 @@ const fields = [
 		path: 'templates.skill.racialBonus'
 	},
 	{
-		path: 'templates.skill.traitBonus'
-	},
-	{
 		path: 'templates.skill.miscModifier'
 	},
 	{
@@ -663,13 +660,22 @@ const fields = [
 				'',      // Class bonus
 				'Ranks',
 				'Racial',
-				'Trait',
 				'Misc',
 				'Temp'
 			]
 		},
 		template: 'templates.skill',
 		merge:    true,
+		fixed: [
+			'acrobatics', 'appraise', 'bluff', 'climb', 'craft', 'diplomacy',
+			'disableDevice', 'disguise', 'escapeArtist', 'fly', 'handleAnimal',
+			'heal', 'intimidate', 'knowledgeArcana', 'knowledgeDungeoneering',
+			'knowledgeEngineering', 'knowledgeGeography', 'knowledgeHistory',
+			'knowledgeLocal', 'knowledgeNature', 'knowledgeNobility',
+			'knowledgePlanes', 'knowledgeReligion', 'linguistics', 'perception',
+			'perform', 'profession', 'ride', 'senseMotive', 'sleightOfHand',
+			'spellcraft', 'stealth', 'survival', 'swim', 'useMagicDevice'
+		],
 		default:  {
 			acrobatics:             { ability: 'dex' },
 			appraise:               { ability: 'int' },
@@ -705,15 +711,10 @@ const fields = [
 			stealth:                { ability: 'dex' },
 			survival:               { ability: 'wis' },
 			swim:                   { ability: 'str' },
-			useMagicDevice:         { ability: 'cha', trained: true },
-			test:                   {}
+			useMagicDevice:         { ability: 'cha', trained: true }
 		}
 	},
 	{
-		// TODO: Implement inheritance
-		// TODO: Implement fixed list items; 'fixed' boolean property?
-		//       or, the list field has a 'fixed' array-of-child-keys property?
-		//       or both?
 		path:    'skills.list.test',
 		name:    'Test skill',
 		type:    'group',
@@ -722,8 +723,7 @@ const fields = [
 	{
 		path:    'skills.list.test2',
 		name:    'Test skill 2',
-		type:    'group',
-		extends: 'templates.skill'
+		type:    'group'
 	}
 ];
 
