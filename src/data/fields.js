@@ -587,6 +587,7 @@ const fields = [
 	},
 	{
 		path: 'templates.skill',
+		name: null,
 		type: 'group'
 	},
 	{
@@ -716,14 +717,11 @@ const fields = [
 	},
 	{
 		path:    'skills.list.test',
-		name:    'Test skill',
-		type:    'group',
-		extends: 'templates.skill'
+		name:    'Test skill'
 	},
 	{
 		path:    'skills.list.test2',
-		name:    'Test skill 2',
-		type:    'group'
+		name:    'Test skill 2'
 	}
 ];
 

@@ -400,7 +400,7 @@ export default class FormProcessor
 					return this.getField(path);
 				},
 				value: (path) => {
-					// Add to the list of variables used by the expression
+					// Add the path to the list of expression variables
 					variables.push(path);
 					
 					// Derive the value for the expression
@@ -577,14 +577,7 @@ export default class FormProcessor
 			return null;
 		}
 		
-		let template = field.extends;
-		
-		// Lookup the path to the template in the dictionary
-		if (typeof template === 'string') {
-			template = this.getField(template);
-		}
-		
-		return template;
+		return this.getField(field.extends);
 	}
 	
 	/**
@@ -620,14 +613,7 @@ export default class FormProcessor
 			return null;
 		}
 		
-		let template = field.template;
-		
-		// Lookup the path to the template field in the dictionary
-		if (typeof template === 'string') {
-			template = this.getField(template);
-		}
-		
-		return template;
+		return this.getField(field.template);
 	}
 	
 	/**
@@ -1078,14 +1064,20 @@ export default class FormProcessor
 	 */
 	inheritTemplate(field, data)
 	{
+		if (!field) {
+			return field;
+		}
+		
 		let template = this.getFieldTemplate(field);
 		
 		if (!template) {
 			return field;
 		}
 		
-		// TODO: Find a way to bail if this field has already inherited its
-		//       template
+		// Skip inheritance that has already been applied
+		if (field.extended === template.path) {
+			return field;
+		}
 		
 		//console.log('inheritTemplate()', field.path, template.path);
 		
@@ -1096,7 +1088,10 @@ export default class FormProcessor
 
 		field = merge(field, merge(templateClone, field));
 		
-		delete field.name; // TODO: Do this conditionally.. somehow
+		if (field.name == null) {
+			field.name = this.deriveName(field);
+		}
+		
 		this.process([field]);
 		
 		// Update child fields
@@ -1164,6 +1159,8 @@ export default class FormProcessor
 		for (i = 0; i < newFields.length; i++) {
 			this.dictionary[newFields[i].path] = newFields[i];
 		}
+		
+		field.extended = template.path;
 		
 		return field;
 	}
@@ -1452,9 +1449,10 @@ export default class FormProcessor
  * @property {boolean}        [merge]          - Whether to merge the field's non-scalar value with its default value.
  * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
  * @property {string}         [validator]      - The field's validation function. Defaults as appropriate to the `type`.
- * @property {Field|string}   [extends]        - The path of a field to inherit.
- * @property {Field|string}   [mirror]         - The path of a field to mirror.
+ * @property {string}         [extends]        - The path of a field to inherit.
+ * @property {string}         [extended]       - The path of a field that been inherited.
+ * @property {string}         [mirror]         - The path of a field to mirror. TODO: Implement
  * @property {Field[]}        [children]       - Child fields.
- * @property {Field|string}   [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
+ * @property {string}         [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
  * @property {Object|array}   [fixed]          - A map or list of child keys that cannot be removed at runtime, if present.
  */
