@@ -526,7 +526,7 @@ export default class FormProcessor
 	 * @param {Field} field     - The field to get the value of.
 	 * @param {*}     [data={}] - Optional data to read current values from.
 	 * @param {*}     [value]   - Optional current value.
-	 * @return {*} The current value of the field
+	 * @return {*} The current value of the field.
 	 */
 	getFieldValue(field, data = {}, value = null)
 	{
@@ -547,6 +547,22 @@ export default class FormProcessor
 		
 		// Otherwise use the first defined value
 		return defaultTo(value, defaultTo(field.value, field.default));
+	}
+	
+	/**
+	 * Get the default value of a field.
+	 *
+	 * @protected
+	 * @param {Field} field - The field to get the default value of.
+	 * @return {*} The default value of the field.
+	 */
+	getFieldDefaultValue(field)
+	{
+		if (!field) {
+			return null;
+		}
+		
+		return field.default;
 	}
 	
 	/**
@@ -703,6 +719,7 @@ export default class FormProcessor
 			key,
 			path,
 			value,
+			defaultValue,
 			existingField,
 			newField,
 			newFields = [];
@@ -738,7 +755,8 @@ export default class FormProcessor
 		}
 		
 		// Build new fields
-		value = this.getFieldValue(field, data);
+		value        = this.getFieldValue(field, data);
+		defaultValue = this.getFieldDefaultValue(field);
 		
 		for (i = 0; i < newKeys.length; i++) {
 			key  = newKeys[i];
@@ -753,6 +771,10 @@ export default class FormProcessor
 				value:        value[key], // Sub-value
 				extends:      template.path
 			};
+			
+			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
+				newField.default = defaultValue[key];
+			}
 			
 			newFields.push(newField);
 		}
@@ -1078,6 +1100,7 @@ export default class FormProcessor
 			key,
 			path,
 			value,
+			defaultValue,
 			existingField,
 			newField,
 			newFields = [];
@@ -1102,7 +1125,10 @@ export default class FormProcessor
 		}
 		
 		// Build new template fields
-		value = this.getFieldValue(field, data);
+		value        = this.getFieldValue(field, data);
+		defaultValue = this.getFieldDefaultValue(field);
+		
+		//console.log('inheritTemplate()', field.path, value);
 		
 		for (let i = 0; i < newKeys.length; i++) {
 			key  = newKeys[i];
@@ -1117,6 +1143,10 @@ export default class FormProcessor
 				value:        value[key], // Sub-value
 				extends:      joinPath(template.path, key)
 			};
+			
+			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
+				newField.default = defaultValue[key];
+			}
 			
 			newFields.push(newField);
 		}
