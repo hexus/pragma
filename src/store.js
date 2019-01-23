@@ -57,23 +57,18 @@ export default {
 					tempBonus: 0
 				},
 				con: {
-					score: 12,
-					modifier: +1
+					base: 12
 				},
 				int: {
-					score: 12,
-					modifier: +1
+					base: 12,
 				},
 				wis: {
-					score: 14,
-					modifier: +2
+					base: 14,
 				},
 				cha: {
-					score: 17,
-					modifier: +3,
 					base: 17,
 					miscBonus: +4,
-					tempBonus: +0 // +2 for spellcasting...
+					tempBonus: +0 // +2 for spell-casting...
 				}
 			},
 			defense: {
@@ -88,7 +83,7 @@ export default {
 					total: 20,
 					touch: 11,
 					flatFooted: 15,
-					// TODO: Move the below into defense.bonuses?
+					// TODO: Move everything below into defense.bonuses?
 					armorBonus: 3,
 					shieldBonus: 2,
 					abilityModifier: +1, // Dex

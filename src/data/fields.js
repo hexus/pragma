@@ -140,6 +140,35 @@ const fields = [
 
 	// Abilities
 	{
+		path: 'templates.ability',
+		type: 'group',
+		name: 'Ability'
+	},
+	{
+		path: 'templates.ability.score',
+		expression:
+			  '$parent.base +' +
+				  '$parent.racialBonus +' +
+				  '$parent.miscBonus +' +
+				  '$parent.tempBonus'
+	},
+	{
+		path:       'templates.ability.modifier',
+		expression: 'abilityModifier($parent.score)'
+	},
+	{
+		path: 'templates.ability.base'
+	},
+	{
+		path: 'templates.ability.racialBonus'
+	},
+	{
+		path: 'templates.ability.miscBonus'
+	},
+	{
+		path: 'templates.ability.tempBonus'
+	},
+	{
 		path:    'sections.abilities',
 		parent:  '',
 		type:    'section',
@@ -150,6 +179,8 @@ const fields = [
 		path:    'abilities',
 		parent:  'sections.abilities',
 		type:    'table',
+		template: 'templates.ability',
+		fixed:   ['str', 'dex', 'con', 'int', 'wis', 'cha'],
 		options: {
 			showLabel: true,
 			headings:  [
@@ -169,57 +200,9 @@ const fields = [
 		name: 'Strength'
 	},
 	{
-		path: 'abilities.str.score',
-		expression:
-			  '$parent.base +' +
-				  '$parent.racialBonus +' +
-				  '$parent.miscBonus +' +
-				  '$parent.tempBonus'
-	},
-	{
-		path:       'abilities.str.modifier',
-		expression: 'abilityModifier($parent.score)'
-	},
-	{
-		path: 'abilities.str.base'
-	},
-	{
-		path: 'abilities.str.racialBonus'
-	},
-	{
-		path: 'abilities.str.miscBonus'
-	},
-	{
-		path: 'abilities.str.tempBonus'
-	},
-	{
 		path: 'abilities.dex',
 		type: 'group',
 		name: 'Dexterity'
-	},
-	{
-		path: 'abilities.dex.score',
-		expression:
-			  '$parent.base +' +
-				  '$parent.racialBonus +' +
-				  '$parent.miscBonus +' +
-				  '$parent.tempBonus'
-	},
-	{
-		path:       'abilities.dex.modifier',
-		expression: 'abilityModifier($parent.score)'
-	},
-	{
-		path: 'abilities.dex.base'
-	},
-	{
-		path: 'abilities.dex.racialBonus'
-	},
-	{
-		path: 'abilities.dex.miscBonus'
-	},
-	{
-		path: 'abilities.dex.tempBonus'
 	},
 	{
 		path: 'abilities.con',
@@ -227,23 +210,9 @@ const fields = [
 		name: 'Constitution'
 	},
 	{
-		path: 'abilities.con.score'
-	},
-	{
-		path:       'abilities.con.modifier',
-		expression: 'abilityModifier($parent.score)'
-	},
-	{
 		path: 'abilities.int',
 		type: 'group',
 		name: 'Intelligence'
-	},
-	{
-		path: 'abilities.int.score'
-	},
-	{
-		path:       'abilities.int.modifier',
-		expression: 'abilityModifier($parent.score)'
 	},
 	{
 		path: 'abilities.wis',
@@ -251,40 +220,9 @@ const fields = [
 		name: 'Wisdom'
 	},
 	{
-		path: 'abilities.wis.score'
-	},
-	{
-		path:       'abilities.wis.modifier',
-		expression: 'abilityModifier($parent.score)'
-	},
-	{
 		path: 'abilities.cha',
 		type: 'group',
 		name: 'Charisma'
-	},
-	{
-		path: 'abilities.cha.score',
-		expression:
-			  '$parent.base +' +
-				  '$parent.racialBonus +' +
-				  '$parent.miscBonus +' +
-				  '$parent.tempBonus'
-	},
-	{
-		path:       'abilities.cha.modifier',
-		expression: 'abilityModifier($parent.score)'
-	},
-	{
-		path: 'abilities.cha.base'
-	},
-	{
-		path: 'abilities.cha.racialBonus'
-	},
-	{
-		path: 'abilities.cha.miscBonus'
-	},
-	{
-		path: 'abilities.cha.tempBonus'
 	},
 	{
 		path:        'defense',
@@ -648,7 +586,8 @@ const fields = [
 	},
 	{
 		path:     'skills.list',
-		type:     'table',
+		type:     'list',
+		input:    'pragma-table',
 		options:  {
 			showLabel: true,
 			headings:  [
@@ -675,7 +614,8 @@ const fields = [
 			'knowledgeLocal', 'knowledgeNature', 'knowledgeNobility',
 			'knowledgePlanes', 'knowledgeReligion', 'linguistics', 'perception',
 			'perform', 'profession', 'ride', 'senseMotive', 'sleightOfHand',
-			'spellcraft', 'stealth', 'survival', 'swim', 'useMagicDevice'
+			'spellcraft', 'stealth', 'survival', 'swim', 'useMagicDevice',
+			'test', 'test2'
 		],
 		default:  {
 			acrobatics:             { ability: 'dex' },
@@ -718,6 +658,11 @@ const fields = [
 	{
 		path:    'skills.list.test',
 		name:    'Test skill'
+	},
+	{
+		// TODO: Fix inheritance for this
+		path:    'skills.list.test.ability',
+		value:   'dex'
 	},
 	{
 		path:    'skills.list.test2',

@@ -648,135 +648,6 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Get the keys of child fields that don't exist in the given data.
-	 *
-	 * Retrieves the new keys, existing keys and old keys of a field compared
-	 * to its data.
-	 *
-	 * @protected
-	 * @param {Field} field - The field with a template.
-	 * @param {Object} data - The data to diff against.
-	 * @return array [newPaths[], existingPaths[], oldPaths[]]
-	 */
-	diffFieldDataKeys(field, data)
-	{
-		// Grab the data keys and child field keys
-		let childData      = this.getFieldValue(field, data);
-		let childDataKeys  = childData ? Object.keys(childData) : [];
-		let childFieldKeys = this.getFieldChildrenKeys(field);
-		
-		// Keys in data that aren't in fields
-		let newKeys = difference(childDataKeys, childFieldKeys);
-		
-		// Keys in data and fields
-		let existingKeys = intersection(childDataKeys, childFieldKeys);
-		
-		// Keys in fields that aren't in data
-		let oldKeys = difference(childFieldKeys, childDataKeys);
-		
-		// console.log('diffTemplateFieldKeys()', field.path, 'newKeys', newKeys);
-		// console.log('diffTemplateFieldKeys()', field.path, 'existingKeys', existingKeys);
-		// console.log('diffTemplateFieldKeys()', field.path, 'oldKeys', oldKeys);
-		
-		return [newKeys, existingKeys, oldKeys];
-	}
-	
-	/**
-	 * Unravel all templates into fields for the given field and data.
-	 *
-	 * @protected
-	 * @param {Field}  field  - The field to update template fields for.
-	 * @param {Object} [data] - The data used to unravel field templates.
-	 */
-	updateTemplateFields(field, data)
-	{
-		if (!field) {
-			return;
-		}
-		
-		let template = this.getFieldChildrenTemplate(field);
-		
-		if (!template) {
-			return;
-		}
-		
-		let dictionary = this.dictionary,
-			i,
-			key,
-			path,
-			value,
-			defaultValue,
-			existingField,
-			newField,
-			newFields = [];
-		
-		// Find child fields that need to be added, updated or removed
-		let [newKeys, existingKeys, oldKeys] = this.diffFieldDataKeys(field, data);
-		
-		// TODO: Remove field.fixed from oldKeys, add them to
-		//       newKeys/existingKeys instead
-		//       And, to be honest, it could be field.options.fixed; should this
-		//       really apply to anything with children, or just lists?
-		
-		//let existingKeys = this.getFieldChildrenKeys(field);
-		
-		// Remove old fields
-		for (i = 0; i < oldKeys.length; i++) {
-			key  = oldKeys[i];
-			path = joinPath(field.path, key);
-			
-			this.removeField(this.getField(path));
-		}
-		
-		// Update existing fields
-		for (i = 0; i < existingKeys.length; i++) {
-			key  = existingKeys[i];
-			path = joinPath(field.path, key);
-			
-			//console.log('existingField', field.path, path);
-			
-			// Ensure the existing field has the correct template
-			existingField          = this.getField(path);
-			existingField.extends  = template.path;
-		}
-		
-		// Build new fields
-		value        = this.getFieldValue(field, data);
-		defaultValue = this.getFieldDefaultValue(field);
-		
-		for (i = 0; i < newKeys.length; i++) {
-			key  = newKeys[i];
-			path = joinPath(field.path, key);
-			
-			//console.log('template newKey', path, value[key]);
-			
-			newField = {
-				path:         path,
-				pathFragment: key,
-				parent:       field.path,
-				value:        value[key], // Sub-value
-				extends:      template.path
-			};
-			
-			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
-				newField.default = defaultValue[key];
-			}
-			
-			newFields.push(newField);
-		}
-		
-		// Add the new fields to the parent field and dictionary
-		if (newFields.length) {
-			field.children = field.children || [];
-			field.children = field.children.concat(newFields);
-		}
-		
-		for (i = 0; i < newFields.length; i++) {
-			dictionary[newFields[i].path] = newFields[i];
-		}
-	}
-	
-	/**
 	 * Get the current value of a field.
 	 *
 	 * Falls back to default values as appropriate.
@@ -1054,6 +925,153 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Get the keys of child fields that don't exist in the given data.
+	 *
+	 * Retrieves the new keys, existing keys and old keys of a field compared
+	 * to its data.
+	 *
+	 * @protected
+	 * @param {Field} field - The field with a template.
+	 * @param {Object} data - The data to diff against.
+	 * @return array [newPaths[], existingPaths[], oldPaths[]]
+	 */
+	diffFieldDataKeys(field, data)
+	{
+		// Grab the data keys and child field keys
+		let childData      = this.getFieldValue(field, data);
+		let childDataKeys  = childData ? Object.keys(childData) : [];
+		let childFieldKeys = this.getFieldChildrenKeys(field);
+		
+		// Keys in data that aren't in fields
+		let newKeys = difference(childDataKeys, childFieldKeys);
+		
+		// Keys in data and fields
+		let existingKeys = intersection(childDataKeys, childFieldKeys);
+		
+		// Keys in fields that aren't in data
+		let oldKeys = difference(childFieldKeys, childDataKeys);
+		
+		// console.log('diffTemplateFieldKeys()', field.path, 'newKeys', newKeys);
+		// console.log('diffTemplateFieldKeys()', field.path, 'existingKeys', existingKeys);
+		// console.log('diffTemplateFieldKeys()', field.path, 'oldKeys', oldKeys);
+		
+		return [newKeys, existingKeys, oldKeys];
+	}
+	
+	/**
+	 * Unravel all templates into fields for the given field and data.
+	 *
+	 * @protected
+	 * @param {Field}  field  - The field to update template fields for.
+	 * @param {Object} [data] - The data used to unravel field templates.
+	 */
+	updateTemplateFields(field, data)
+	{
+		if (!field) {
+			return;
+		}
+		
+		let template = this.getFieldChildrenTemplate(field);
+		
+		if (!template) {
+			return;
+		}
+		
+		let dictionary = this.dictionary,
+			i,
+			key,
+			path,
+			value,
+			defaultValue,
+			existingField,
+			newField,
+			newFields = [];
+		
+		// Find child fields that need to be added, updated or removed
+		let [newKeys, existingKeys, oldKeys] = this.diffFieldDataKeys(field, data);
+		
+		let existingFieldKeys = this.getFieldChildrenKeys(field);
+		
+		let fixedKeys = field.fixed || [];
+		
+		// TODO: Extract to... diffFixedFieldDataKeys()...?
+		// Remove fixed keys from the keys that need removing
+		oldKeys = difference(oldKeys, fixedKeys);
+		
+		// Add the existent fixed keys to the keys that need updating
+		existingKeys = existingKeys.concat(
+			difference(
+				intersection(fixedKeys, existingFieldKeys),
+				existingKeys,
+				newKeys
+			)
+		);
+		
+		// Add the non-existent fixed keys to the keys that need creating
+		newKeys = newKeys.concat(difference(fixedKeys, existingFieldKeys, newKeys));
+		
+		// TODO: Remove field.fixed from oldKeys, add them to
+		//       newKeys/existingKeys instead
+		//       And, to be honest, it could be field.options.fixed; should this
+		//       really apply to anything with children, or just lists?
+		
+		// Remove old fields
+		for (i = 0; i < oldKeys.length; i++) {
+			key  = oldKeys[i];
+			path = joinPath(field.path, key);
+			
+			this.removeField(this.getField(path));
+		}
+		
+		// Update existing fields
+		for (i = 0; i < existingKeys.length; i++) {
+			key  = existingKeys[i];
+			path = joinPath(field.path, key);
+			
+			console.log('existingField', field.path, path);
+			
+			// Ensure the existing field has the correct template
+			existingField          = this.getField(path);
+			existingField.extends  = template.path;
+		}
+		
+		// Build new fields
+		value        = this.getFieldValue(field, data);
+		defaultValue = this.getFieldDefaultValue(field);
+		
+		for (i = 0; i < newKeys.length; i++) {
+			key  = newKeys[i];
+			path = joinPath(field.path, key);
+			
+			//console.log('template newKey', path, value[key]);
+			
+			newField = {
+				path:         path,
+				pathFragment: key,
+				parent:       field.path,
+				value:        value[key], // Sub-value
+				extends:      template.path
+			};
+			
+			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
+				newField.default = defaultValue[key];
+			}
+			
+			newFields.push(newField);
+		}
+		
+		// Add the new fields to the parent field and dictionary
+		if (newFields.length) {
+			field.children = field.children || [];
+			field.children = field.children.concat(newFields);
+		}
+		
+		for (i = 0; i < newFields.length; i++) {
+			dictionary[newFields[i].path] = newFields[i];
+		}
+	}
+	
+	/**
 	 * Apply a field's inheritance.
 	 *
 	 * Ensures that a field inherits from its base field.
@@ -1105,6 +1123,7 @@ export default class FormProcessor
 			newFields = [];
 		
 		// Diff field child keys and template child keys
+		// TODO: Extract diffFieldChildrenKeys(firstField, secondField)
 		let templateChildKeys = this.getFieldChildrenKeys(template);
 		let fieldChildKeys    = this.getFieldChildrenKeys(field);
 		
