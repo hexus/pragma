@@ -1084,6 +1084,9 @@ export default class FormProcessor
 			return field;
 		}
 		
+		// TODO: Find a way to bail if this field has already inherited its
+		//       template
+		
 		//console.log('inheritTemplate()', field.path, template.path);
 		
 		// Inherit the template without its children
@@ -1093,6 +1096,7 @@ export default class FormProcessor
 
 		field = merge(field, merge(templateClone, field));
 		
+		delete field.name; // TODO: Do this conditionally.. somehow
 		this.process([field]);
 		
 		// Update child fields
