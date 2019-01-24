@@ -1,4 +1,5 @@
 import exprEval        from 'expr-eval';
+import clone           from 'lodash/clone';
 import merge           from 'lodash/merge';
 import defaults        from 'lodash/defaultsDeep';
 import map             from 'lodash/map';
@@ -12,6 +13,8 @@ import difference      from 'lodash/difference';
 import intersection    from 'lodash/intersection';
 import isPlainObject   from 'lodash/isPlainObject';
 import toNumber        from 'lodash/toNumber';
+import zipObject       from 'lodash/zipObject';
+import sortBy          from 'lodash/sortBy';
 import { util }        from '../mixins/util';
 import sum             from '../functions/sum';
 import sumBy           from 'lodash/sumBy';
@@ -1071,13 +1074,27 @@ export default class FormProcessor
 		}
 	}
 	
+	diffFieldChildrenKeys(firstField, secondField)
+	{
+		let firstFieldKeys  = this.getFieldChildrenKeys(firstField);
+		let secondFieldKeys = this.getFieldChildrenKeys(secondField);
+		
+		// Child keys of the first field that aren't of the second field
+		let newKeys = difference(firstFieldKeys, secondFieldKeys);
+		
+		// Keys in the children of both fields
+		let existingKeys = intersection(firstFieldKeys, secondFieldKeys);
+		
+		return [newKeys, existingKeys];
+	}
+	
 	/**
 	 * Apply a field's inheritance.
 	 *
 	 * Ensures that a field inherits from its base field.
 	 *
 	 * @param {Field}  field - The inheriting field.
-	 * @param {Object} data  - The template field to inherit from.
+	 * @param {Object} data  - The data to update with.
 	 * @return {Field}
 	 */
 	inheritTemplate(field, data)
@@ -1088,31 +1105,39 @@ export default class FormProcessor
 		
 		let template = this.getFieldTemplate(field);
 		
+		// Skip fields without a template
 		if (!template) {
 			return field;
 		}
 		
-		// Skip inheritance that has already been applied
-		if (field.extended === template.path) {
-			return field;
+		// Inherit the template
+		if (field.extended !== template.path) {
+			let templateClone = clone(template);
+			
+			// We don't want to inherit children, nor do we support more than a
+			// single layer of inheritance
+			delete templateClone.children;
+			delete templateClone.template;
+			
+			if (field.path === 'skills.list.test.ability') {
+				console.log('skills.list.test.ability', clone(field), templateClone);
+			}
+			
+			// Merge sandwich to retain original values
+			field = merge(field, templateClone, clone(field));
+			
+			if (field.name == null) {
+				field.name = this.deriveName(field);
+			}
+			
+			field.extended = template.path;
+			
+			this.process([field]);
 		}
 		
 		//console.log('inheritTemplate()', field.path, template.path);
 		
-		// Inherit the template without its children
-		let templateClone = merge({}, template);
-		delete templateClone.children;
-		delete templateClone.template;
-
-		field = merge(field, merge(templateClone, field));
-		
-		if (field.name == null) {
-			field.name = this.deriveName(field);
-		}
-		
-		this.process([field]);
-		
-		// Update child fields
+		// Update child field inheritance
 		let i,
 			key,
 			path,
@@ -1123,15 +1148,7 @@ export default class FormProcessor
 			newFields = [];
 		
 		// Diff field child keys and template child keys
-		// TODO: Extract diffFieldChildrenKeys(firstField, secondField)
-		let templateChildKeys = this.getFieldChildrenKeys(template);
-		let fieldChildKeys    = this.getFieldChildrenKeys(field);
-		
-		// Keys of template children that aren't in field children
-		let newKeys = difference(templateChildKeys, fieldChildKeys);
-		
-		// Keys in template children and field children
-		let existingKeys = intersection(fieldChildKeys, templateChildKeys);
+		let [newKeys, existingKeys] = this.diffFieldChildrenKeys(template, field);
 		
 		// Update existing template fields
 		for (let i = 0; i < existingKeys.length; i++) {
@@ -1140,6 +1157,8 @@ export default class FormProcessor
 			
 			existingField         = this.getField(path);
 			existingField.extends = joinPath(template.path, key);
+			
+			console.log('inheritTemplate() existingField', path, existingField);
 		}
 		
 		// Build new template fields
@@ -1154,13 +1173,18 @@ export default class FormProcessor
 			
 			//console.log('inherit newKey', path, value[key]);
 			
+			// Build the new field
 			newField = {
 				path:         path,
 				pathFragment: key,
 				parent:       field.path,
-				value:        value[key], // Sub-value
 				extends:      joinPath(template.path, key)
 			};
+			
+			// Propagate values
+			if (value != null && value.hasOwnProperty(key)) {
+				newField.value = value[key];
+			}
 			
 			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
 				newField.default = defaultValue[key];
@@ -1170,16 +1194,32 @@ export default class FormProcessor
 		}
 		
 		// Add the new fields to the parent field and dictionary
+		// TODO: Extract addFieldChildren(field, children)
 		if (newFields.length) {
 			field.children = field.children || [];
 			field.children = field.children.concat(newFields);
+			
+			// We then want to sort these in the order of template's children
+			// TODO: Extract sortFieldChildren(field)
+			let templateChildKeys = this.getFieldChildrenKeys(template);
+			
+			// We flip the child keys into an object where the values are the
+			// indices of the child keys array
+			templateChildKeys = zipObject(
+				templateChildKeys,
+				[...templateChildKeys.keys()]
+			);
+			
+			// This makes it easier to sort
+			field.children = sortBy(field.children, (child) => {
+				return templateChildKeys[child.pathFragment];
+			});
+			
 		}
 		
 		for (i = 0; i < newFields.length; i++) {
 			this.dictionary[newFields[i].path] = newFields[i];
 		}
-		
-		field.extended = template.path;
 		
 		return field;
 	}

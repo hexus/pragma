@@ -1,7 +1,5 @@
 /**
- * A set of fields that define the structure of a Pathfinder Character Sheet.
- *
- * Used for generating character sheets and UI.
+ * A set of fields that describe a Pathfinder Character Sheet.
  *
  * TODO: Worth splitting these out to separate files and composing them here.
  * TODO: Consider defining UI layout somewhere else... maybe.
@@ -306,6 +304,9 @@ const fields = [
 	{
 		path: 'defense.spellResistance'
 	},
+	// {
+	// 	path: 'templates.save'
+	// },
 	{
 		path:    'sections.saves',
 		parent:  'defense',
@@ -662,7 +663,9 @@ const fields = [
 	{
 		// TODO: Fix inheritance for this
 		path:    'skills.list.test.ability',
-		value:   'dex'
+		type:    'string',
+		value:   'dex',
+		extends: 'templates.skill.ability' // TODO: Shouldn't be necessary
 	},
 	{
 		path:    'skills.list.test2',
