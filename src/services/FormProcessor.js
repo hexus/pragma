@@ -1001,6 +1001,9 @@ export default class FormProcessor
 	/**
 	 * Unravel all templates into fields for the given field and data.
 	 *
+	 * TODO: Try to merge this into inheritTemplate(), or extract a method
+	 *       that can handle both cases, like updateFieldChildrenInheritance().
+	 *
 	 * @protected
 	 * @param {Field}  field  - The field to update template fields for.
 	 * @param {Object} [data] - The data used to unravel field templates.
@@ -1050,11 +1053,6 @@ export default class FormProcessor
 		// Add the non-existent fixed keys to the keys that need creating
 		newKeys = newKeys.concat(difference(fixedKeys, existingFieldKeys, newKeys));
 		
-		// TODO: Remove field.fixed from oldKeys, add them to
-		//       newKeys/existingKeys instead
-		//       And, to be honest, it could be field.options.fixed; should this
-		//       really apply to anything with children, or just lists?
-		
 		// Remove old fields
 		for (i = 0; i < oldKeys.length; i++) {
 			key  = oldKeys[i];
@@ -1068,7 +1066,7 @@ export default class FormProcessor
 			key  = existingKeys[i];
 			path = joinPath(field.path, key);
 			
-			console.log('existingField', field.path, path);
+			//console.log('existingField', field.path, path);
 			
 			// Ensure the existing field has the correct template
 			existingField          = this.getField(path);
@@ -1089,9 +1087,12 @@ export default class FormProcessor
 				path:         path,
 				pathFragment: key,
 				parent:       field.path,
-				value:        value[key], // Sub-value
 				extends:      template.path
 			};
+			
+			if (value != null && value.hasOwnProperty(key)) {
+				newField.value = value[key];
+			}
 			
 			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
 				newField.default = defaultValue[key];
@@ -1111,6 +1112,15 @@ export default class FormProcessor
 		}
 	}
 	
+	/**
+	 * Diff the keys of the first field's children with those of the second
+	 * field's children.
+	 *
+	 * @protected
+	 * @param {Field} firstField
+	 * @param {Field} secondField
+	 * @returns {array} [newKeys, existingKeys]
+	 */
 	diffFieldChildrenKeys(firstField, secondField)
 	{
 		let firstFieldKeys  = this.getFieldChildrenKeys(firstField);
@@ -1122,7 +1132,10 @@ export default class FormProcessor
 		// Keys in the children of both fields
 		let existingKeys = intersection(firstFieldKeys, secondFieldKeys);
 		
-		return [newKeys, existingKeys];
+		// Child keys of the second field that aren't of the first
+		let oldKeys = difference(secondFieldKeys, firstFieldKeys);
+		
+		return [newKeys, existingKeys, oldKeys];
 	}
 	
 	/**
@@ -1155,10 +1168,10 @@ export default class FormProcessor
 			// single layer of inheritance
 			delete templateClone.children;
 			delete templateClone.template;
-			
-			if (field.path === 'skills.list.test.ability') {
-				console.log('skills.list.test.ability', clone(field), templateClone);
-			}
+
+			// if (field.path === 'skills.list.test.ability') {
+			// 	console.log('skills.list.test.ability', clone(field), templateClone);
+			// }
 			
 			// Merge sandwich to retain original values
 			field = merge(field, templateClone, clone(field));
@@ -1531,7 +1544,7 @@ export default class FormProcessor
  * @property {string}         path             - The path of the field.
  * @property {string}         [parent]         - The path of the field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
  * @property {string}         [pathFragment]   - The leaf of the field's path. TODO: Rename to key
- * @property {string}         [type]           - The type of the field. Determines the tag used to render the field. Defaults to `'number'`.
+ * @property {string}         [type]           - The type of the field. Determines the type of value to read and store. Defaults to `'number'`.
  * @property {string}         [input]          - The input type to use for this field, if any. // TODO: Rename? Might not be an actual input... (i.e. section)
  * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
  * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the field's key. TODO: Rename to label?

@@ -12,8 +12,6 @@
 
 		this.mixin(edit);
 
-		console.log(this.opts.property.path, this.opts.property.options);
-
 		this.getSelectionOptions = function () {
 			// TODO: Support arrays *and* objects, convert objects to arrays or
 			//       vice versa (remember arrays are faster in riot)
