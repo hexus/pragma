@@ -74,6 +74,9 @@ export default class FormProcessor
 				input: 'boolean',
 				default: false
 			},
+			'selection': {
+				input: 'selection'
+			},
 			'section': {
 				input: 'section'
 			},
@@ -92,6 +95,27 @@ export default class FormProcessor
 		};
 		
 		/**
+		 * Default input options for each input type.
+		 *
+		 * @type {Object.<string, Object>}
+		 */
+		this.inputOptions = merge(
+			{
+				'number': {
+					min: -100,
+					max: 100,
+					step: 1
+				}
+			},
+			{
+				'selection': {
+					options: {}
+				}
+			},
+			inputOptions
+		);
+		
+		/**
 		 * Expression functions.
 		 *
 		 * @type {Object.<string, Function>}
@@ -105,22 +129,6 @@ export default class FormProcessor
 			map,
 			reduce
 		}, functions);
-		
-		/**
-		 * Default input options for each input type.
-		 *
-		 * @type {Object.<string, Object>}
-		 */
-		this.inputOptions = merge(
-			{
-				'number': {
-					min: -100,
-					max: 100,
-					step: 1
-				}
-			},
-			inputOptions
-		);
 		
 		/**
 		 * Typecasting functions.

@@ -16,6 +16,7 @@
 		import './input/string.tag';
 		import './input/number.tag';
 		import './input/boolean.tag';
+		import './input/selection.tag';
 		import './input/section.tag';
 		import './input/group.tag';
 		import './input/list.tag';

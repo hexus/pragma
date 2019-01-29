@@ -542,11 +542,18 @@ const fields = [
 	},
 	{
 		path:     'templates.skill.ability',
-		// TODO: "Select" input
-		type:     'string',
+		type:     'selection',
 		options:  {
-			options: '`abilities`'
+			options: {
+				'str': 'Strength',
+				'dex': 'Dexterity',
+				'con': 'Constitution',
+				'int': 'Intelligence',
+				'wis': 'Wisdom',
+				'cha': 'Charisma'
+			}
 		},
+		default: 'str',
 		disabled: true
 	},
 	{
@@ -632,7 +639,7 @@ const fields = [
 			handleAnimal:           { ability: 'cha', trained: true },
 			heal:                   { ability: 'wis' },
 			intimidate:             { ability: 'cha' },
-			knowledgeArcana:        { ability: 'int', trained: true },  // TODO: Fixed variant skills
+			knowledgeArcana:        { ability: 'int', trained: true },
 			knowledgeDungeoneering: { ability: 'int', trained: true },
 			knowledgeEngineering:   { ability: 'int', trained: true },
 			knowledgeGeography:     { ability: 'int', trained: true },
@@ -658,19 +665,18 @@ const fields = [
 	},
 	{
 		path:    'skills.list.test',
-		name:    'Test skill'
-	},
-	{
-		// TODO: Fix inheritance for this
-		path:    'skills.list.test.ability',
-		type:    'string',
-		value:   'dex',
-		extends: 'templates.skill.ability' // TODO: Shouldn't be necessary
+		name:    'Test skill',
+		default: {
+			ability: 'dex'
+		}
 	},
 	{
 		path:    'skills.list.test2',
-		name:    'Test skill 2'
-	}
+		name:    'Test skill 2',
+		default: {
+			ability: 'cha'
+		}
+	},
 ];
 
 export default fields;
