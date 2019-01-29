@@ -140,7 +140,7 @@ export default class FormProcessor
 		 *
 		 * @type {Field[]}
 		 */
-		this.fields = this.process(fields);
+		this.fields = this.createFields(fields);
 		
 		/**
 		 * Value cache for each field.
@@ -193,15 +193,17 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Process raw field definitions.
+	 * Prepare the paths of a raw field definition.
 	 *
-	 * Fills in default values, derives default names.
+	 * Gives field definitions all they need to become a field object.
+	 *
+	 * TODO: Field class, FieldDescription typedef.
 	 *
 	 * @protected
-	 * @param {Field[]} fields - The field to process
+	 * @param {Field[]} fields - The field description.
 	 * @returns {Field[]} The given fields with derived names and default values
 	 */
-	process(fields)
+	createFields(fields)
 	{
 		if (!fields || !fields.length) {
 			return fields;
@@ -217,12 +219,36 @@ export default class FormProcessor
 			
 			field.pathFragment = defaultTo(field.pathFragment, pathFragment);
 			field.parent = defaultTo(field.parent, parentPath);
+		}
+		
+		return fields;
+	}
+	
+	/**
+	 * Apply the form's default values to the given fields.
+	 *
+	 * Fills in default values, derives default names.
+	 *
+	 * @protected
+	 * @param {Field[]} fields - The fields to apply default values to.
+	 * @returns {Field[]}
+	 */
+	applyDefaultValues(fields)
+	{
+		if (!fields || !fields.length) {
+			return fields;
+		}
+		
+		let i, field;
+		
+		for (i = 0; i < fields.length; i++) {
+			field = fields[i];
 			
 			// Derive a name
 			if (field.name === undefined) {
 				field.name = this.deriveName(field);
 			}
-
+			
 			// Apply global defaults
 			field = defaults(field, this.defaultValues['*']);
 			
@@ -828,6 +854,9 @@ export default class FormProcessor
 			}
 		}
 		
+		// Apply default values
+		this.applyDefaultValues([field]);
+		
 		// Update the state's value
 		this.updateDataValue(field, data);
 		
@@ -1132,7 +1161,7 @@ export default class FormProcessor
 			
 			field.extended = template.path;
 			
-			this.process([field]);
+			this.createFields([field]);
 		}
 		
 		//console.log('inheritTemplate()', field.path, template.path);
