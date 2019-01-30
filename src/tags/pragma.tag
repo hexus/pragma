@@ -32,29 +32,23 @@
 		this.form  = null;
 		this.state = null;
 
-		// Register event handlers
+		// Define event handlers
 		this.add = function (event) {
 			let { name } = event.detail;
 
 			form.addItem(this.state, name);
-
-			event.preventUpdate = true;
 		};
 
 		this.edit = function (event) {
 			let { name, value } = event.detail;
 
 			form.setValue(this.state, name, value);
-
-			event.preventUpdate = true;
 		};
 
 		this.remove = function (event) {
 			let { name } = event.detail;
 
-			form.removeValue(this.sheet, name);
-
-			event.preventUpdate = true;
+			form.removeValue(this.state, name);
 		};
 
 		this.sync = function () {
@@ -72,6 +66,6 @@
 
 		this.sync();
 		//this.on('mount', this.sync);
-		this.on('update', this.sync);
+		//this.on('update', this.sync);
 	</script>
 </pragma>

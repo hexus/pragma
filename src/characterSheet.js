@@ -10,4 +10,4 @@ pragma.functions = {
 	abilityModifier
 };
 
-pragma._tag.update();
+//pragma.sync();
