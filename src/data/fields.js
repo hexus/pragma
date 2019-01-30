@@ -38,10 +38,22 @@ const fields = [
 	},
 	{
 		path:        'profile.alignment',
-		type:        'string',
+		type:        'selection',
 		name:        'Alignment',
 		description: "The character's general and moral attitude",
-		default:     'Chaotic Neutral'
+		options:     {
+			options: {
+				'lawfulGood':     'Lawful Good',
+				'neutralGood':    'Neutral Good',
+				'chaoticGood':    'Chaotic Good',
+				'lawfulNeutral':  'Lawful Neutral',
+				'trueNeutral':    'True Neutral',
+				'chaoticNeutral': 'Chaotic Neutral',
+				'lawfulEvil':     'Lawful Evil',
+				'neutralEvil':    'Neutral Evil',
+				'chaoticEvil':    'Chaotic Evil'
+			}
+		}
 	},
 	{
 		path:        'profile.age',

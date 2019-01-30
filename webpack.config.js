@@ -2,11 +2,16 @@ const path = require('path');
 
 module.exports = {
 	mode: 'development',
+	entry: {
+		characterSheet: './src/characterSheet.js',
+		pragma: './src/pragma.js',
+		old: './src/old.js'
+	},
 	output: {
 		path: path.join(__dirname, 'build'),
-		filename: 'pragma.js',
+		filename: '[name].js',
 		publicPath: '/build/',
-		library: 'pragma',
+		library: '[name]',
 		libraryExport: 'default',
 		libraryTarget: 'umd'
 	},

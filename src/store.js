@@ -3,7 +3,7 @@ export default {
 		1: {
 			profile: {
 				name: 'Shade',
-				alignment: 'Chaotic Neutral',
+				alignment: 'chaoticNeutral',
 				age: 27,
 				gender: 'Male',
 				height: "5'9\"",
@@ -194,6 +194,7 @@ export default {
 		2: {
 			profile: {
 				name: 'Zyra',
+				alignment: 'neutralGood',
 				age: 22,
 				gender: 'Female',
 				height: "5'6\"",

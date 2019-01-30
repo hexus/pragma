@@ -450,7 +450,9 @@ export default class FormProcessor
 		try {
 			value = expression.evaluate(values);
 		} catch (error) {
-			console.error(`Error evaluating expression for field '${field}': ${error.message}`);
+			console.log('evaluateFieldExpression', field, data, value);
+			
+			console.error(`Error evaluating expression for field '${field.path}': ${error.message}`);
 		}
 		
 		//console.log('evaluateFieldExpression', field.path, expression.toString(), variables, values, value);
@@ -1119,7 +1121,7 @@ export default class FormProcessor
 	 * @protected
 	 * @param {Field} firstField
 	 * @param {Field} secondField
-	 * @returns {array} [newKeys, existingKeys]
+	 * @returns {array} [newKeys, existingKeys, oldKeys]
 	 */
 	diffFieldChildrenKeys(firstField, secondField)
 	{

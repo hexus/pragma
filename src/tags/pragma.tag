@@ -1,17 +1,16 @@
 <pragma>
-	<tree children="{ tree.children }" onadd="{ add }" onedit="{ edit }" onremove="{ remove }"></tree>
+	<tree children="{ form.tree.children }" onadd="{ add }" onedit="{ edit }" onremove="{ remove }"></tree>
 
-	<div if="{ opts.hasOwnProperty('debug') }" style="position: fixed; top: 0; right: 0; height: 100%; width: 300px; background: rgba(255, 255, 255, 0.5); overflow: auto;">
+	<div if="{ opts.hasOwnProperty('debug') }"
+		 style="position: fixed; top: 0; right: 0; height: 100%; width: 300px; background: rgba(255, 255, 255, 0.5); overflow: auto;">
 		<!-- Debug the data -->
 		<!-- TODO: Pragma debug tag that decorates this tag with debugging functionality -->
 		<!-- TODO: Pragma edit tag that decorates this tag with form editing functionality -->
-		<pre>{ JSON.stringify(sheet, null, 2) }</pre>
-
-		<!--<h2>Form</h2>-->
-		<!--<pre>{ JSON.stringify(tree, null, 2) }</pre>-->
+		<pre>{ JSON.stringify(state, null, 2) }</pre>
 	</div>
 
 	<script>
+		// Import default tags, mixins, and the Form class
 		import './tree.tag';
 		import './input/string.tag';
 		import './input/number.tag';
@@ -21,36 +20,58 @@
 		import './input/group.tag';
 		import './input/list.tag';
 		import './input/pragma-table.tag';
+		import domEvent      from '../mixins/domEvent';
+		import FormProcessor from "../services/FormProcessor";
 
-		// TODO: Change this tag to accept only a form description and some data
-		//       Fire events to communicate data updates, handle data attribute
-		//       changes to allow external changes to data
-		let app = this.opts.app;
+		// Globally mixin the DOM event helper
+		riot.mixin(domEvent);
 
-		let formProcessor = app.services.formProcessor;
+		// Retrieve tag options
+		let fields, functions, state, form;
 
-		this.tree = formProcessor.tree;
+		this.form  = null;
+		this.state = null;
 
-		this.sheet = app.state.sheet;
+		// Register event handlers
+		this.add = function (event) {
+			let { name } = event.detail;
 
-		formProcessor.update(this.sheet);
+			form.addItem(this.state, name);
+
+			event.preventUpdate = true;
+		};
 
 		this.edit = function (event) {
 			let { name, value } = event.detail;
 
-			formProcessor.setValue(this.sheet, name, value);
-		};
+			form.setValue(this.state, name, value);
 
-		this.add = function (event) {
-			let { name } = event.detail;
-
-			formProcessor.addItem(this.sheet, name);
+			event.preventUpdate = true;
 		};
 
 		this.remove = function (event) {
 			let { name } = event.detail;
 
-			formProcessor.removeValue(this.sheet, name);
+			form.removeValue(this.sheet, name);
+
+			event.preventUpdate = true;
 		};
+
+		this.sync = function () {
+			fields    = this.opts.fields || this.root.fields || {};
+			functions = this.opts.functions || this.root.functions || {};
+			state     = this.opts.state || this.root.state || {};
+
+			form = new FormProcessor(fields, functions);
+
+			this.form  = form;
+			this.state = state;
+
+			form.update(this.state);
+		};
+
+		this.sync();
+		//this.on('mount', this.sync);
+		this.on('update', this.sync);
 	</script>
 </pragma>
