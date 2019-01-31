@@ -2,9 +2,19 @@
 <html lang="en">
 	<head>
 		<title>Pragma - Character Sheet</title>
+		<link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"/>
+		<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+		<style>
+			.container {
+				width: 968px;
+				margin: 0 auto;
+			}
+		</style>
 	</head>
 	<body>
-		<pragma id="characterSheet" debug></pragma>
+		<div class="container">
+			<pragma id="characterSheet" debug></pragma>
+		</div>
 		<script src="build/pragma.js"></script>
 		<script src="build/index.js"></script>
 	</body>

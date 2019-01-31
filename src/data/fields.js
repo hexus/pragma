@@ -133,6 +133,10 @@ const fields = [
 		description: "The character's classes"
 	},
 	{
+		path: 'classes.level',
+		expression: 'sumBy($parent.list, "levels")'
+	},
+	{
 		path:     'classes.list',
 		type:     'list',
 		options:  {
@@ -142,10 +146,6 @@ const fields = [
 		fixed: {
 			0: true // Always keep the first class
 		}
-	},
-	{
-		path: 'classes.level',
-		expression: 'sumBy($parent.list, "levels")'
 	},
 
 	// Abilities

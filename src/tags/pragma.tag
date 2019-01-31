@@ -50,10 +50,12 @@
 		};
 
 		this.sync = function () {
-			let fields    = this.opts.fields || this.root.fields || {};
-			let functions = this.opts.functions || this.root.functions || {};
-			this.state    = this.opts.state || this.root.state || {};
+			let fields                 = this.opts.fields || this.root.fields || {};
+			let functions              = this.opts.functions || this.root.functions || {};
+			let defaultFieldProperties = this.opts.defaultFieldProperties || this.root.defaultFieldProperties || {};
+			this.state                 = this.opts.state || this.root.state || {};
 
+			this.form.setDefaultFieldProperties(defaultFieldProperties);
 			this.form.addFunctions(functions);
 			this.form.setFields(fields);
 			this.form.update(this.state);

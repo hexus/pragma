@@ -67,7 +67,9 @@ export default class FormProcessor
 		 *
 		 * @type {Object}
 		 */
-		this.defaultValues = {
+		this.defaultFieldProperties = {};
+		
+		this.setDefaultFieldProperties({
 			'*': {
 				type: 'number',
 				visible: true
@@ -83,14 +85,22 @@ export default class FormProcessor
 			},
 			'number': {
 				input: 'number',
-				default: 0
+				default: 0,
+				options: {
+					min: -100,
+					max: 100,
+					step: 1
+				}
 			},
 			'boolean': {
 				input: 'boolean',
 				default: false
 			},
 			'selection': {
-				input: 'selection'
+				input: 'selection',
+				options: {
+					options: {}
+				}
 			},
 			'section': {
 				input: 'section'
@@ -107,28 +117,14 @@ export default class FormProcessor
 			'table': {
 				input: 'pragma-table'
 			}
-		};
+		});
 		
 		/**
 		 * Default input options for each input type.
 		 *
 		 * @type {Object.<string, Object>}
 		 */
-		this.inputOptions = merge(
-			{
-				'number': {
-					min: -100,
-					max: 100,
-					step: 1
-				}
-			},
-			{
-				'selection': {
-					options: {}
-				}
-			},
-			inputOptions
-		);
+		this.inputOptions = merge({}, inputOptions);
 		
 		/**
 		 * Expression functions.
@@ -232,7 +228,7 @@ export default class FormProcessor
 	setFields(fields)
 	{
 		// Prepare the fields
-		this.fields = this.createFields(fields);
+		this.fields = this.prepareFields(fields);
 		
 		// Key the fields by path
 		this.dictionary = this.buildDictionary(this.fields);
@@ -247,7 +243,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Create fields from a set of field descriptions.
+	 * Prepare fields from a set of field descriptions.
 	 *
 	 * TODO: Field class, FieldDescription typedef.
 	 *
@@ -255,7 +251,7 @@ export default class FormProcessor
 	 * @param {Field[]} fields - The field description.
 	 * @returns {Field[]} The given fields with derived names and default values
 	 */
-	createFields(fields)
+	prepareFields(fields)
 	{
 		if (!fields || !fields.length) {
 			return fields;
@@ -277,7 +273,20 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Apply the form's default values to the given fields.
+	 * Set the default field properties.
+	 *
+	 * @param {Object.<string, Object>} fieldProperties
+	 */
+	setDefaultFieldProperties(fieldProperties)
+	{
+		this.defaultFieldProperties = merge(
+			this.defaultFieldProperties,
+			fieldProperties
+		);
+	}
+	
+	/**
+	 * Apply the form's default properties to the given fields.
 	 *
 	 * Fills in default values, derives default names.
 	 *
@@ -285,7 +294,7 @@ export default class FormProcessor
 	 * @param {Field[]} fields - The fields to apply default values to.
 	 * @returns {Field[]}
 	 */
-	applyDefaultValues(fields)
+	applyDefaultFieldProperties(fields)
 	{
 		if (!fields || !fields.length) {
 			return fields;
@@ -302,11 +311,11 @@ export default class FormProcessor
 			}
 			
 			// Apply global defaults
-			field = defaults(field, this.defaultValues['*']);
+			field = defaults(field, this.defaultFieldProperties['*']);
 			
 			// Apply type-specific defaults
-			if (this.defaultValues[field.type]) {
-				field = defaults(field, this.defaultValues[field.type]);
+			if (this.defaultFieldProperties[field.type]) {
+				field = defaults(field, this.defaultFieldProperties[field.type]);
 			}
 			
 			// Apply default input options
@@ -909,7 +918,7 @@ export default class FormProcessor
 		}
 		
 		// Apply default values
-		this.applyDefaultValues([field]);
+		this.applyDefaultFieldProperties([field]);
 		
 		// Update the state's value
 		this.updateDataValue(field, data);
@@ -1228,7 +1237,7 @@ export default class FormProcessor
 			
 			field.extended = template.path;
 			
-			this.createFields([field]);
+			this.prepareFields([field]);
 		}
 		
 		//console.log('inheritTemplate()', field.path, template.path);
