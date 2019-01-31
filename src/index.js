@@ -1,4 +1,13 @@
-import riot   from 'riot';
-import pragma from './tags/pragma.tag';
+import fields from './data/fields.js';
+import store  from './store.js';
+import abilityModifier from './model/functions/abilityModifier';
 
-riot.mount('*', {});
+let pragma = document.getElementById('characterSheet');
+
+pragma.fields = fields;
+pragma.state  = store.characters[1];
+pragma.functions = {
+	abilityModifier
+};
+
+pragma.sync();

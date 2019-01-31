@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
 	mode: 'development',
 	entry: {
-		characterSheet: './src/characterSheet.js',
+		index: './src/index.js',
 		pragma: './src/pragma.js',
 		old: './src/old.js'
 	},

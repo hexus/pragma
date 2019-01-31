@@ -1,8 +1,8 @@
 {
   "name": "pragma",
   "version": "0.1.0",
-  "description": "Pathfinder Character Sheet",
-  "main": "src/index.js",
+  "description": "Declarative form builder",
+  "main": "src/pragma.js",
   "scripts": {
     "build": "webpack",
     "watch": "webpack -w"
@@ -13,9 +13,8 @@
   },
   "keywords": [
     "form builder",
-    "pathfinder",
-    "character",
-    "sheet"
+    "declarative",
+    "ui"
   ],
   "author": "Chris Andrew <chris@hexus.io>",
   "license": "ISC",

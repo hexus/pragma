@@ -26,42 +26,43 @@
 		// Globally mixin the DOM event helper
 		riot.mixin(domEvent);
 
-		// Retrieve tag options
-		let fields, functions, state, form;
-
-		this.form  = null;
+		// Define properties
+		this.form  = new FormProcessor([]);
 		this.state = null;
 
 		// Define event handlers
 		this.add = function (event) {
 			let { name } = event.detail;
 
-			form.addItem(this.state, name);
+			this.form.addItem(this.state, name);
 		};
 
 		this.edit = function (event) {
 			let { name, value } = event.detail;
 
-			form.setValue(this.state, name, value);
+			this.form.setValue(this.state, name, value);
 		};
 
 		this.remove = function (event) {
 			let { name } = event.detail;
 
-			form.removeValue(this.state, name);
+			this.form.removeValue(this.state, name);
 		};
 
 		this.sync = function () {
-			fields    = this.opts.fields || this.root.fields || {};
-			functions = this.opts.functions || this.root.functions || {};
-			state     = this.opts.state || this.root.state || {};
+			let fields    = this.opts.fields || this.root.fields || {};
+			let functions = this.opts.functions || this.root.functions || {};
+			this.state    = this.opts.state || this.root.state || {};
 
-			form = new FormProcessor(fields, functions);
+			this.form.addFunctions(functions);
+			this.form.setFields(fields);
+			this.form.update(this.state);
 
-			this.form  = form;
-			this.state = state;
+			this.update();
+		};
 
-			form.update(this.state);
+		this.root.sync = () => {
+			this.sync();
 		};
 
 		this.sync();

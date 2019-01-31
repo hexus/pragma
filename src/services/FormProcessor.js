@@ -34,6 +34,8 @@ const DOWN = 1;
  *
  * Expands field lists a dictionary and tree. Processes field expressions from
  * state data.
+ *
+ * @class FormProcessor
  */
 export default class FormProcessor
 {
@@ -41,14 +43,27 @@ export default class FormProcessor
 	 * Create a new property processor.
 	 *
 	 * @constructor
-	 * @param {Field[]}                     fields         - Form fields.
- 	 * @param {Object.<string, Function>}   [functions]    - Functions to make available for field expressions.
-	 * @param {Object.<string, Object>}     [inputOptions] - Default input options keyed by input type.
+	 * @param {Field[]}                     [fields=[]]       - Initial form fields.
+	 * @param {Object.<string, Function>}   [functions={}]    - Functions to make available for field expressions.
+	 * @param {Object.<string, Object>}     [inputOptions={}] - Default input options keyed by input type.
 	 */
-	constructor(fields, functions, inputOptions)
+	constructor(fields = [], functions = {}, inputOptions = {})
 	{
 		/**
-		 * Default values for each field type.
+		 * Typecasting functions for each field type.
+		 *
+		 * TODO: Strong casting functions
+		 *
+		 * @type {Object.<string, Function>}
+		 */
+		this.casts = {
+			'string':  (f, v) => v == null ? '' : '' + v,
+			'number':  (f, v) => toNumber(util.clamp(v, get(f, 'options.min'), get(f, 'options.max'))),
+			'boolean': (f, v) => !!v
+		};
+		
+		/**
+		 * Default property values for each field type.
 		 *
 		 * @type {Object}
 		 */
@@ -120,63 +135,7 @@ export default class FormProcessor
 		 *
 		 * @type {Object.<string, Function>}
 		 */
-		this.functions = merge({
-			concat: (...args) => args.join(''),
-			keys:  Object.keys,
-			multiply,
-			sum,
-			sumBy,
-			map,
-			reduce
-		}, functions);
-		
-		/**
-		 * Typecasting functions.
-		 *
-		 * TODO: Strong casting functions
-		 *
-		 * @type {Object.<string, Function>}
-		 */
-		this.casts = {
-			'string':  (f, v) => v == null ? '' : '' + v,
-			'number':  (f, v) => toNumber(util.clamp(v, get(f, 'options.min'), get(f, 'options.max'))),
-			'boolean': (f, v) => !!v
-		};
-		
-		/**
-		 * The set of form fields.
-		 *
-		 * @type {Field[]}
-		 */
-		this.fields = this.createFields(fields);
-		
-		/**
-		 * Value cache for each field.
-		 *
-		 * @type {Object.<string, *>}
-		 */
-		this.valueCache = {};
-		
-		/**
-		 * Fields keyed by path.
-		 *
-		 * @type {FieldDictionary}
-		 */
-		this.dictionary = this.buildDictionary(this.fields);
-		
-		/**
-		 * Fields composed into a tree.
-		 *
-		 * @type {Field}
-		 */
-		this.tree = this.buildTree(this.dictionary);
-		
-		/**
-		 * Field update dependencies keyed by path.
-		 *
-		 * @type {Object.<string, string[]>}
-		 */
-		this.fieldDependencies = {};
+		this.functions = {};
 		
 		/**
 		 * Expression parser.
@@ -189,8 +148,47 @@ export default class FormProcessor
 			}
 		});
 		
-		// Provide custom functions to the expression parser
-		this.parser.functions = merge(this.parser.functions, this.functions);
+		// Set the functions
+		this.addFunctions(merge({
+			concat: (...args) => args.join(''),
+			keys:  Object.keys,
+			multiply,
+			sum,
+			sumBy,
+			map,
+			reduce
+		}, functions));
+		
+		/**
+		 * The set of form fields.
+		 *
+		 * @type {Field[]}
+		 */
+		this.fields = [];
+		
+		/**
+		 * Fields keyed by path.
+		 *
+		 * @type {FieldDictionary}
+		 */
+		this.dictionary = {};
+		
+		/**
+		 * The root node of the field tree.
+		 *
+		 * @type {Field}
+		 */
+		this.tree = {};
+		
+		// Set the form fields
+		this.setFields(fields);
+		
+		/**
+		 * Value cache for each field.
+		 *
+		 * @type {Object.<string, *>}
+		 */
+		this.valueCache = {};
 		
 		/**
 		 * Field expression cache keyed by path.
@@ -198,12 +196,58 @@ export default class FormProcessor
 		 * @type {Object.<string, Expression>}
 		 */
 		this.expressionCache = {};
+		
+		/**
+		 * Field update dependencies keyed by path.
+		 *
+		 * @type {Object.<string, string[]>}
+		 */
+		this.fieldDependencies = {};
 	}
 	
 	/**
-	 * Prepare the paths of a raw field definition.
+	 * Add to the form's functions.
 	 *
-	 * Gives field definitions all they need to become a field object.
+	 * @param {Object.<string, Function>} functions - Functions to add, keyed by name.
+	 */
+	addFunctions(functions)
+	{
+		// Add the functions to the form
+		this.functions = merge(this.functions, functions);
+		
+		// Add the functions to the expression parser
+		this.parser.functions = merge(this.parser.functions, this.functions);
+		
+		// Clear the expression cache
+		this.expressionCache = {};
+	}
+	
+	/**
+	 * Set the form's fields.
+	 *
+	 * TODO: Creates, updates and removes fields accordingly.
+	 *
+	 * @param {Field[]} fields
+	 */
+	setFields(fields)
+	{
+		// Prepare the fields
+		this.fields = this.createFields(fields);
+		
+		// Key the fields by path
+		this.dictionary = this.buildDictionary(this.fields);
+		
+		// Compose the fields into a tree
+		this.tree = this.buildTree(this.dictionary);
+		
+		// Clear all caches
+		this.valueCache = {};
+		this.expressionCache = {};
+		this.fieldDependencies = {};
+	}
+	
+	/**
+	 * Create fields from a set of field descriptions.
 	 *
 	 * TODO: Field class, FieldDescription typedef.
 	 *
@@ -1210,7 +1254,7 @@ export default class FormProcessor
 			existingField         = this.getField(path);
 			existingField.extends = joinPath(template.path, key);
 			
-			console.log('inheritTemplate() existingField', path, existingField);
+			//console.log('inheritTemplate() existingField', path, existingField);
 		}
 		
 		// Build new template fields
@@ -1547,7 +1591,7 @@ export default class FormProcessor
  * @property {string}         [parent]         - The path of the field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
  * @property {string}         [pathFragment]   - The leaf of the field's path. TODO: Rename to key
  * @property {string}         [type]           - The type of the field. Determines the type of value to read and store. Defaults to `'number'`.
- * @property {string}         [input]          - The input type to use for this field, if any. // TODO: Rename? Might not be an actual input... (i.e. section)
+ * @property {string}         [input]          - The input type to use for this field, if any. // TODO: Rename? Might not be an actual input... (i.e. section). `element` might be a good name.
  * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
  * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the field's key. TODO: Rename to label?
  * @property {string}         [description]    - The field's description.
