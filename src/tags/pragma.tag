@@ -50,25 +50,29 @@
 		};
 
 		this.sync = function () {
-			let fields                 = this.opts.fields || this.root.fields || {};
-			let functions              = this.opts.functions || this.root.functions || {};
-			let defaultFieldProperties = this.opts.defaultFieldProperties || this.root.defaultFieldProperties || {};
-			this.state                 = this.opts.state || this.root.state || {};
+			let fields    = this.opts.fields || this.root.fields || {};
+			let functions = this.opts.functions || this.root.functions || {};
+			let defaults  = this.opts.defaults || this.root.defaults || {};
+			this.state    = this.opts.state || this.root.state || {};
 
-			this.form.setDefaultFieldProperties(defaultFieldProperties);
+			this.form.setDefaultFieldProperties(defaults);
 			this.form.addFunctions(functions);
 			this.form.setFields(fields);
 			this.form.update(this.state);
-
-			this.update();
 		};
 
 		this.root.sync = () => {
 			this.sync();
 		};
 
-		this.sync();
-		//this.on('mount', this.sync);
-		//this.on('update', this.sync);
+		this.root.update = () => {
+			this.update();
+		};
+
+		//this.sync();
+		this.on('mount', this.sync);
+		this.on('update', this.sync);
+
+		window.pragma = this.form;
 	</script>
 </pragma>

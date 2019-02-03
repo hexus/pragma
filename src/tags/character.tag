@@ -4,7 +4,7 @@
 	<!-- TODO: Classes -->
 	<abilities abilities="{ character.abilities }" strict="{ opts.strict }"></abilities>
 	<defense defense="{ character.defense }" strict="{ opts.strict }"></defense>
-	<offense offense="{ character.offense }" strict="{ opts.strict}"></offense>
+	<offense offense="{ character.offense }" strict="{ opts.strict }"></offense>
 	<!-- TODO: Skills -->
 
 	<script>

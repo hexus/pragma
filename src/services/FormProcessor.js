@@ -230,8 +230,8 @@ export default class FormProcessor
 		// Prepare the fields
 		this.fields = this.prepareFields(fields);
 		
-		// Key the fields by path
-		this.dictionary = this.buildDictionary(this.fields);
+		//this.dictionary = this.buildDictionary(this.fields);
+		this.dictionary = this.updateDictionary(this.fields);
 		
 		// Compose the fields into a tree
 		this.tree = this.buildTree(this.dictionary);
@@ -245,11 +245,13 @@ export default class FormProcessor
 	/**
 	 * Prepare fields from a set of field descriptions.
 	 *
+	 * Ascertain's the parent path and path fragment (key) of each field.
+	 *
 	 * TODO: Field class, FieldDescription typedef.
 	 *
 	 * @protected
 	 * @param {Field[]} fields - The field description.
-	 * @returns {Field[]} The given fields with derived names and default values
+	 * @returns {Field[]} The given fields prepared with pathFragment and parent properties.
 	 */
 	prepareFields(fields)
 	{
@@ -740,6 +742,30 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Set a form field.
+	 *
+	 * @param {Field} field
+	 */
+	setField(field) {
+		let parent = this.getFieldParent(field);
+		
+		if (!parent) {
+			console.warn(`Could not set field ${field.path} - its parent does not exist`);
+			return;
+		}
+		
+		if (!parent.children) {
+			parent.children = [];
+		}
+		
+		if (!parent.children.includes(field)) {
+			parent.children.push(field);
+		}
+		
+		this.dictionary[field.path] = field;
+	}
+	
+	/**
 	 * Get the current value of a field.
 	 *
 	 * Falls back to default values as appropriate.
@@ -921,7 +947,7 @@ export default class FormProcessor
 		this.applyDefaultFieldProperties([field]);
 		
 		// Update the state's value
-		this.updateDataValue(field, data);
+		this.updateData(field, data);
 		
 		// Update the field's value (and update all fields dependent on this one)
 		this.updateFieldValue(field, data, direction <= 0);
@@ -935,7 +961,7 @@ export default class FormProcessor
 	 * @param {Object} data  - The data to update.
 	 * @return {Object} The updated data.
 	 */
-	updateDataValue(field, data)
+	updateData(field, data)
 	{
 		if (!field || field.omit || field.virtual) {
 			return data;
@@ -1108,6 +1134,8 @@ export default class FormProcessor
 		// Add the non-existent fixed keys to the keys that need creating
 		newKeys = newKeys.concat(difference(fixedKeys, existingFieldKeys, newKeys));
 		
+		//console.log(field.path, newKeys, existingKeys, oldKeys, fixedKeys, existingFieldKeys);
+		
 		// Remove old fields
 		for (i = 0; i < oldKeys.length; i++) {
 			key  = oldKeys[i];
@@ -1121,7 +1149,7 @@ export default class FormProcessor
 			key  = existingKeys[i];
 			path = joinPath(field.path, key);
 			
-			//console.log('existingField', field.path, path);
+			//console.log('updateTemplateFields() existingField', field.path, path);
 			
 			// Ensure the existing field has the correct template
 			existingField          = this.getField(path);
@@ -1136,7 +1164,7 @@ export default class FormProcessor
 			key  = newKeys[i];
 			path = joinPath(field.path, key);
 			
-			//console.log('template newKey', path, value[key]);
+			//console.log('updateTemplateFields() newField', path, value[key]);
 			
 			newField = {
 				path:         path,
@@ -1162,14 +1190,15 @@ export default class FormProcessor
 			field.children = field.children.concat(newFields);
 		}
 		
-		for (i = 0; i < newFields.length; i++) {
-			dictionary[newFields[i].path] = newFields[i];
-		}
+		this.updateDictionary(newFields);
 	}
 	
 	/**
 	 * Diff the keys of the first field's children with those of the second
 	 * field's children.
+	 *
+	 * Finds keys of the first that aren't of the second, keys that are of both,
+	 * and keys of the second that aren't of the first.
 	 *
 	 * @protected
 	 * @param {Field} firstField
@@ -1261,9 +1290,8 @@ export default class FormProcessor
 			path = joinPath(field.path, key);
 			
 			existingField         = this.getField(path);
-			existingField.extends = joinPath(template.path, key);
-			
 			//console.log('inheritTemplate() existingField', path, existingField);
+			existingField.extends = joinPath(template.path, key);
 		}
 		
 		// Build new template fields
@@ -1319,12 +1347,9 @@ export default class FormProcessor
 			field.children = sortBy(field.children, (child) => {
 				return templateChildKeys[child.pathFragment];
 			});
-			
 		}
 		
-		for (i = 0; i < newFields.length; i++) {
-			this.dictionary[newFields[i].path] = newFields[i];
-		}
+		this.updateDictionary(newFields);
 		
 		return field;
 	}
@@ -1388,7 +1413,7 @@ export default class FormProcessor
 	 * Doesn't remove data or update parent field values.
 	 *
 	 * @protected
-	 * @param {Field}  field - The field to remove.
+	 * @param {Field} field - The field to remove.
 	 */
 	removeField(field)
 	{
@@ -1439,15 +1464,36 @@ export default class FormProcessor
 		}
 		
 		set(data, parentPath, parentValue);
+	}
+	
+	/**
+	 * Update the dictionary with the given fields.
+	 *
+	 * @param {Field[]} fields
+	 * @returns {FieldDictionary}
+	 */
+	updateDictionary(fields)
+	{
+		if (!Array.isArray(fields)) {
+			return this.dictionary;
+		}
 		
-		//this.updateFieldValue(parent, data);
+		for (let i = 0; i < fields.length; i++) {
+			if (!fields[i] || !fields[i].path) {
+				continue;
+			}
+			
+			this.dictionary[fields[i].path] = fields[i];
+		}
+		
+		return this.dictionary;
 	}
 	
 	/**
 	 * Build a dictionary from the given fields.
 	 *
 	 * @param {Field[]} fields
-	 * @returns {FieldDictionary}
+	 * @return {FieldDictionary}
 	 */
 	buildDictionary(fields)
 	{
@@ -1464,17 +1510,6 @@ export default class FormProcessor
 	buildTree(dictionary)
 	{
 		return buildTree(dictionary);
-	}
-	
-	/**
-	 * Flatten a tree to a dictionary.
-	 *
-	 * @param {Field} tree
-	 * @returns {FieldDictionary}
-	 */
-	flattenToDictionary(tree)
-	{
-		// TODO: Implement
 	}
 	
 	/**

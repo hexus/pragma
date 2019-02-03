@@ -1,5 +1,5 @@
 /**
- * Build a property tree from a dictionary of properties.
+ * Build a property tree from a dictionary of fields.
  *
  * @param {FieldDictionary} dictionary
  * @returns {Field}
@@ -23,33 +23,33 @@ export default function (dictionary) {
 		dictionary[''] = tree;
 	}
 	
-	let path, property, parent;
+	let path, field, parent;
 	
 	// Link up properties to their parents, placing any properties without
 	// parents into the children of our tree
 	for (path in dictionary) {
-		property = dictionary[path];
+		field = dictionary[path];
 		
 		// Skip the root node silently
-		if (property === tree) {
+		if (field === tree) {
 			continue;
 		}
 		
-		if (!property || property.path == null || path !== property.path) {
+		if (!field || field.path == null || path !== field.path) {
 			// You're weird and don't belong in our tree, bye Felicia
 			// TODO: "path" could be valid here, set it to property.path if so
-			console.warn(`Skipped property without path`, property);
+			console.warn(`Skipped property without path`, field);
 			continue;
 		}
 		
-		if (property.parent == null) {
+		if (field.parent == null) {
 			// You don't have an explicitly defined parent, bye Felicia
 			// TODO: Add to root?
 			console.warn(`Skipped property '${path}'; it has no parent`);
 			continue;
 		}
 		
-		parent = dictionary[property.parent];
+		parent = dictionary[field.parent];
 		
 		if (!parent) {
 			// Sorry, you're an orphan, you don't get into the tree
@@ -60,7 +60,9 @@ export default function (dictionary) {
 		
 		parent.children = parent.children || [];
 		
-		parent.children.push(property);
+		if (!parent.children.includes(field)) {
+			parent.children.push(field);
+		}
 	}
 	
 	return tree;
