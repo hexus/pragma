@@ -56,8 +56,12 @@
 
 			this.form.setDefaults(defaults);
 			this.form.addFunctions(functions);
+			console.time('setFields');
 			this.form.setFields(fields);
+			console.timeEnd('setFields');
+			console.time('update');
 			this.form.update(this.state);
+			console.timeEnd('update');
 		};
 
 		this.root.sync = () => {
