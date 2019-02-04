@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
@@ -17,7 +18,8 @@ module.exports = {
 	},
 	resolve: {
 		modules: [
-			path.resolve(__dirname, 'src'), path.resolve(__dirname, 'node_modules')
+			path.resolve(__dirname, 'src'),
+			path.resolve(__dirname, 'node_modules')
 		],
 	},
 	module: {
@@ -45,5 +47,10 @@ module.exports = {
 				}
 			}
 		]
-	}
+	},
+	plugins: [
+		new webpack.ProvidePlugin({
+			'riot': 'riot'
+		})
+	]
 };

@@ -10,7 +10,6 @@
 	</div>
 
 	<script>
-		// Import default tags, mixins, and the Form class
 		import './tree.tag';
 		import './input/string.tag';
 		import './input/number.tag';
