@@ -35,6 +35,8 @@ const DOWN = 1;
  * Expands field lists a dictionary and tree. Processes field expressions from
  * state data.
  *
+ * TODO: Rename to Form?
+ *
  * @class FormProcessor
  */
 export default class FormProcessor
@@ -67,9 +69,9 @@ export default class FormProcessor
 		 *
 		 * @type {Object}
 		 */
-		this.defaultFieldProperties = {};
+		this.defaults = {};
 		
-		this.setDefaultFieldProperties({
+		this.setDefaults({
 			'*': {
 				type: 'number',
 				visible: true
@@ -199,358 +201,6 @@ export default class FormProcessor
 		 * @type {Object.<string, string[]>}
 		 */
 		this.fieldDependencies = {};
-	}
-	
-	/**
-	 * Add to the form's functions.
-	 *
-	 * @param {Object.<string, Function>} functions - Functions to add, keyed by name.
-	 */
-	addFunctions(functions)
-	{
-		// Add the functions to the form
-		this.functions = merge(this.functions, functions);
-		
-		// Add the functions to the expression parser
-		this.parser.functions = merge(this.parser.functions, this.functions);
-		
-		// Clear the expression cache
-		this.expressionCache = {};
-	}
-	
-	/**
-	 * Set the form's fields.
-	 *
-	 * TODO: Creates, updates and removes fields accordingly.
-	 *
-	 * @param {Field[]} fields
-	 */
-	setFields(fields)
-	{
-		// Prepare the fields
-		this.fields = this.prepareFields(fields);
-		
-		//this.dictionary = this.buildDictionary(this.fields);
-		this.dictionary = this.updateDictionary(this.fields);
-		
-		// Compose the fields into a tree
-		this.tree = this.buildTree(this.dictionary);
-		
-		// Clear all caches
-		this.valueCache = {};
-		this.expressionCache = {};
-		this.fieldDependencies = {};
-	}
-	
-	/**
-	 * Prepare fields from a set of field descriptions.
-	 *
-	 * Ascertain's the parent path and path fragment (key) of each field.
-	 *
-	 * TODO: Field class, FieldDescription typedef.
-	 *
-	 * @protected
-	 * @param {Field[]} fields - The field description.
-	 * @returns {Field[]} The given fields prepared with pathFragment and parent properties.
-	 */
-	prepareFields(fields)
-	{
-		if (!fields || !fields.length) {
-			return fields;
-		}
-		
-		let i, field, pathFragment, parentPath;
-		
-		for (i = 0; i < fields.length; i++) {
-			field = fields[i];
-			
-			// Ascertain a parent path and path fragment
-			[parentPath, pathFragment] = splitPath(field.path);
-			
-			field.pathFragment = defaultTo(field.pathFragment, pathFragment);
-			field.parent = defaultTo(field.parent, parentPath);
-		}
-		
-		return fields;
-	}
-	
-	/**
-	 * Set the default field properties.
-	 *
-	 * @param {Object.<string, Object>} fieldProperties
-	 */
-	setDefaultFieldProperties(fieldProperties)
-	{
-		this.defaultFieldProperties = merge(
-			this.defaultFieldProperties,
-			fieldProperties
-		);
-	}
-	
-	/**
-	 * Apply the form's default properties to the given fields.
-	 *
-	 * Fills in default values, derives default names.
-	 *
-	 * @protected
-	 * @param {Field[]} fields - The fields to apply default values to.
-	 * @returns {Field[]}
-	 */
-	applyDefaultFieldProperties(fields)
-	{
-		if (!fields || !fields.length) {
-			return fields;
-		}
-		
-		let i, field;
-		
-		for (i = 0; i < fields.length; i++) {
-			field = fields[i];
-			
-			// Derive a name
-			if (field.name === undefined) {
-				field.name = this.deriveName(field);
-			}
-			
-			// Apply global defaults
-			field = defaults(field, this.defaultFieldProperties['*']);
-			
-			// Apply type-specific defaults
-			if (this.defaultFieldProperties[field.type]) {
-				field = defaults(field, this.defaultFieldProperties[field.type]);
-			}
-			
-			// Apply default input options
-			if (this.inputOptions[field.input]) {
-				field.options = field.options || {};
-				
-				field.options = defaults(field.options, this.inputOptions[field.input]);
-			}
-			
-			// Disable the field implicitly if it has an expression
-			if (!field.hasOwnProperty('disabled')) {
-				field.disabled = !!field.expression;
-			}
-		}
-		
-		return fields;
-	}
-	
-	/**
-	 * Derive a property's name from its path.
-	 *
-	 * @protected
-	 * @param {Field} field
-	 * @return {string} The derived name
-	 */
-	deriveName(field)
-	{
-		let path = field.path;
-		let lastDotIndex = path.lastIndexOf('.');
-		
-		return util.sentenceCase(path.substring(lastDotIndex + 1));
-	}
-	
-	/**
-	 * Derive a field's value from some data.
-	 *
-	 * @protected
-	 * @param {string} path - The path of the field to derive a value for.
-	 * @param {Object} data - The data to derive values from.
-	 * @return {*} The derived value.
-	 */
-	deriveValue(path, data)
-	{
-		// Return from the value cache if a value is set
-		if (this.valueCache.hasOwnProperty(path)) {
-			return this.valueCache[path];
-		}
-		
-		let field = this.getField(path);
-		let value = this.getFieldValue(field, data);
-		
-		// Return the raw value if there's no such field
-		if (!field) {
-			return value;
-		}
-
-		// Cast the value
-		value = this.castValue(field, value);
-		
-		// Evaluate the field's expression
-		value = this.evaluateFieldExpression(field, data, value);
-		
-		// Fall back to defaults
-		//value = defaultTo(value, defaultTo(field.default, null));
-		value = this.getFieldValue(field, data, value);
-		
-		// Update the value cache
-		this.valueCache[path] = value;
-		
-		return value;
-	}
-	
-	/**
-	 * Build a field's expression.
-	 *
-	 * @param {Field} field - The field to build an expression for.
-	 * @return {Expression} The built expression.
-	 */
-	buildFieldExpression(field)
-	{
-		if (field.expression == null || typeof field.expression !== 'string') {
-			return null;
-		}
-		
-		// Use the cached expression if one is available
-		if (this.expressionCache[field.path]) {
-			return this.expressionCache[field.path];
-		}
-		
-		// Build the initial expression
-		let expression;
-		
-		try {
-			expression = this.parser.parse(field.expression);
-		} catch (error) {
-			console.error(`Error parsing expression for field '${field.path}': ${error.message}`);
-			
-			return null;
-		}
-		
-		// Substitute contextual variables
-		let substitutions = {
-			$parent: field.parent
-		};
-		
-		for (let s in substitutions) {
-			try {
-				expression = expression.substitute(s, substitutions[s]);
-			} catch (error) {
-				console.error(`Error substituting expression variable '${s}' for field '${field.path}: ${error.message}`);
-				
-				return null;
-			}
-		}
-		
-		this.expressionCache[field.path] = expression;
-		
-		return expression;
-	}
-	
-	/**
-	 * Evaluate a field's value from its expression.
-	 *
-	 * Causes the evaluation of any field dependencies as a result.
-	 *
-	 * TODO: Evaluate (and cache) expressions for other field properties! :D
-	 *
-	 * @param {Field}  field   - The field to compute the value of.
-	 * @param {Object} data    - The data to derive values from.
-	 * @param {*}      [value] - The current value of the field.
-	 * @return {*} The computed value of the field's expression.
-	 */
-	evaluateFieldExpression(field, data, value)
-	{
-		value = this.getFieldValue(field, data, value);
-		
-		// Parse the expression
-		let expression = this.buildFieldExpression(field);
-		
-		if (!expression) {
-			return value;
-		}
-		
-		// TODO: Extract deriving variables and building contextual functions
-		//       let variables = buildExpressionContext(field, data, expression, value)?
-		//       Contextual functions should still update the same "variables" reference
-		
-		// Derive values for the variables in the expression
-		let variables = expression.variables({ withMembers: true });
-		
-		let values = {
-			$this: field,
-			$value: value
-		};
-		
-		for (let v = 0; v < variables.length; v++) {
-			let variable = variables[v];
-			
-			if (has(values, variable))
-				continue;
-			
-			set(values, variable, this.deriveValue(variable, data));
-		}
-		
-		// Build contextual functions
-		values = merge(
-			values,
-			{
-				field: (path) => {
-					variables.push(path);
-					
-					return this.getField(path);
-				},
-				value: (path) => {
-					// Add the path to the list of expression variables
-					variables.push(path);
-					
-					// Derive the value for the expression
-					return this.deriveValue(path, data);
-				}
-			}
-		);
-		
-		// Evaluate the expression
-		try {
-			value = expression.evaluate(values);
-		} catch (error) {
-			console.log('evaluateFieldExpression', field, data, value);
-			
-			console.error(`Error evaluating expression for field '${field.path}': ${error.message}`);
-		}
-		
-		//console.log('evaluateFieldExpression', field.path, expression.toString(), variables, values, value);
-		//console.log('evaluateFieldExpression expression', expression);
-		
-		// Update the map of field update dependencies
-		// TODO: Exclude contextual variables
-		// TODO: Move this to an earlier processing step that evaluates the
-		//       expression with spy functions
-		for (let v = 0; v < variables.length; v++) {
-			let variable = variables[v];
-			
-			this.fieldDependencies[variable] = this.fieldDependencies[variable] || [];
-			
-			if (this.fieldDependencies[variable].indexOf(field.path) < 0) {
-				this.fieldDependencies[variable].push(field.path);
-			}
-		}
-		
-		return value;
-	}
-	
-	/**
-	 * Cast a value based on the property it belongs to.
-	 *
-	 * @public
-	 * @param {Field} field
-	 * @param {*} value
-	 */
-	castValue(field, value)
-	{
-		if (!field)
-			return value;
-		
-		if (!this.casts[field.type])
-			return value;
-
-		// if (Array.isArray(value))
-		// 	return value.map(this.casts[field.type]);
-		
-		value = this.casts[field.type](field, value);
-		
-		return value;
 	}
 	
 	/**
@@ -742,11 +392,285 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Set a form field.
+	 * Get the current value of a field.
+	 *
+	 * Falls back to default values as appropriate.
+	 *
+	 * @public
+	 * @param {string} path - The path to the field.
+	 * @return {*} The value of the field
+	 */
+	getValue(path)
+	{
+		return this.getFieldValue(this.getField(path));
+	}
+	
+	/**
+	 * Cast a value based on the property it belongs to.
+	 *
+	 * @public
+	 * @param {Field} field
+	 * @param {*} value
+	 */
+	castValue(field, value)
+	{
+		if (!field)
+			return value;
+		
+		if (!this.casts[field.type])
+			return value;
+		
+		// if (Array.isArray(value))
+		// 	return value.map(this.casts[field.type]);
+		
+		value = this.casts[field.type](field, value);
+		
+		return value;
+	}
+	
+	/**
+	 * Derive a field's value from some data.
+	 *
+	 * @protected
+	 * @param {string} path - The path of the field to derive a value for.
+	 * @param {Object} data - The data to derive values from.
+	 * @return {*} The derived value.
+	 */
+	deriveValue(path, data)
+	{
+		// Return from the value cache if a value is set
+		if (this.valueCache.hasOwnProperty(path)) {
+			return this.valueCache[path];
+		}
+		
+		let field = this.getField(path);
+		let value = this.getFieldValue(field, data);
+		
+		// Return the raw value if there's no such field
+		if (!field) {
+			return value;
+		}
+		
+		// Cast the value
+		value = this.castValue(field, value);
+		
+		// Evaluate the field's expression
+		value = this.evaluateFieldExpression(field, data, value);
+		
+		// Fall back to defaults
+		//value = defaultTo(value, defaultTo(field.default, null));
+		value = this.getFieldValue(field, data, value);
+		
+		// Update the value cache
+		this.valueCache[path] = value;
+		
+		return value;
+	}
+	
+	/**
+	 * Build a field's expression.
+	 *
+	 * @param {Field} field - The field to build an expression for.
+	 * @return {Expression} The built expression.
+	 */
+	buildFieldExpression(field)
+	{
+		if (field.expression == null || typeof field.expression !== 'string') {
+			return null;
+		}
+		
+		// Use the cached expression if one is available
+		if (this.expressionCache[field.path]) {
+			return this.expressionCache[field.path];
+		}
+		
+		// Build the initial expression
+		let expression;
+		
+		try {
+			expression = this.parser.parse(field.expression);
+		} catch (error) {
+			console.error(`Error parsing expression for field '${field.path}': ${error.message}`);
+			
+			return null;
+		}
+		
+		// Substitute contextual variables
+		let substitutions = {
+			$parent: field.parent
+		};
+		
+		for (let s in substitutions) {
+			try {
+				expression = expression.substitute(s, substitutions[s]);
+			} catch (error) {
+				console.error(`Error substituting expression variable '${s}' for field '${field.path}: ${error.message}`);
+				
+				return null;
+			}
+		}
+		
+		this.expressionCache[field.path] = expression;
+		
+		return expression;
+	}
+	
+	/**
+	 * Evaluate a field's value from its expression.
+	 *
+	 * Causes the evaluation of any field dependencies as a result.
+	 *
+	 * TODO: Evaluate (and cache) expressions for other field properties! :D
+	 *
+	 * @param {Field}  field   - The field to compute the value of.
+	 * @param {Object} data    - The data to derive values from.
+	 * @param {*}      [value] - The current value of the field.
+	 * @return {*} The computed value of the field's expression.
+	 */
+	evaluateFieldExpression(field, data, value)
+	{
+		value = this.getFieldValue(field, data, value);
+		
+		// Parse the expression
+		let expression = this.buildFieldExpression(field);
+		
+		if (!expression) {
+			return value;
+		}
+		
+		// TODO: Extract deriving variables and building contextual functions
+		//       let variables = buildExpressionContext(field, data, expression, value)?
+		//       Contextual functions should still update the same "variables" reference
+		
+		// Derive values for the variables in the expression
+		let variables = expression.variables({ withMembers: true });
+		
+		let values = {
+			$this: field,
+			$value: value
+		};
+		
+		for (let v = 0; v < variables.length; v++) {
+			let variable = variables[v];
+			
+			if (has(values, variable))
+				continue;
+			
+			set(values, variable, this.deriveValue(variable, data));
+		}
+		
+		// Build contextual functions
+		values = merge(
+			values,
+			{
+				field: (path) => {
+					variables.push(path);
+					
+					return this.getField(path);
+				},
+				value: (path) => {
+					// Add the path to the list of expression variables
+					variables.push(path);
+					
+					// Derive the value for the expression
+					return this.deriveValue(path, data);
+				}
+			}
+		);
+		
+		// Evaluate the expression
+		try {
+			value = expression.evaluate(values);
+		} catch (error) {
+			console.log('evaluateFieldExpression', field, data, value);
+			
+			console.error(`Error evaluating expression for field '${field.path}': ${error.message}`);
+		}
+		
+		//console.log('evaluateFieldExpression', field.path, expression.toString(), variables, values, value);
+		//console.log('evaluateFieldExpression expression', expression);
+		
+		// Update the map of field update dependencies
+		// TODO: Exclude contextual variables
+		// TODO: Move this to an earlier processing step that evaluates the
+		//       expression with spy functions
+		for (let v = 0; v < variables.length; v++) {
+			let variable = variables[v];
+			
+			this.fieldDependencies[variable] = this.fieldDependencies[variable] || [];
+			
+			if (this.fieldDependencies[variable].indexOf(field.path) < 0) {
+				this.fieldDependencies[variable].push(field.path);
+			}
+		}
+		
+		return value;
+	}
+	
+	/**
+	 * Prepare fields from a set of field descriptions.
+	 *
+	 * Ascertain's the parent path and path fragment (key) of each field.
+	 *
+	 * TODO: Field class, FieldDescription typedef.
+	 *
+	 * @protected
+	 * @param {Field[]} fields - The field description.
+	 * @returns {Field[]} The given fields prepared with pathFragment and parent properties.
+	 */
+	prepareFields(fields)
+	{
+		if (!fields || !fields.length) {
+			return fields;
+		}
+		
+		let i, field, pathFragment, parentPath;
+		
+		for (i = 0; i < fields.length; i++) {
+			field = fields[i];
+			
+			// Ascertain a parent path and path fragment
+			[parentPath, pathFragment] = splitPath(field.path);
+			
+			field.pathFragment = defaultTo(field.pathFragment, pathFragment);
+			field.parent = defaultTo(field.parent, parentPath);
+		}
+		
+		return fields;
+	}
+	
+	/**
+	 * Set the form's fields.
+	 *
+	 * TODO: Creates, updates and removes fields accordingly.
+	 *
+	 * @public
+	 * @param {Field[]} fields
+	 */
+	setFields(fields)
+	{
+		// Prepare the fields
+		this.fields = this.prepareFields(fields);
+		
+		// TODO: Build dictionary from given fields, compare with current fields
+		//this.dictionary = this.buildDictionary(this.fields);
+		this.dictionary = this.updateDictionary(this.fields);
+		
+		// Compose the fields into a tree
+		this.tree = this.buildTree(this.dictionary);
+		
+		// Clear all caches
+		this.valueCache = {};
+		this.expressionCache = {};
+		this.fieldDependencies = {};
+	}
+	
+	/**
+	 * Add a form field.
 	 *
 	 * @param {Field} field
 	 */
-	setField(field) {
+	addField(field) {
 		let parent = this.getFieldParent(field);
 		
 		if (!parent) {
@@ -763,20 +687,6 @@ export default class FormProcessor
 		}
 		
 		this.dictionary[field.path] = field;
-	}
-	
-	/**
-	 * Get the current value of a field.
-	 *
-	 * Falls back to default values as appropriate.
-	 *
-	 * @public
-	 * @param {string} path - The path to the field.
-	 * @return {*} The value of the field
-	 */
-	getValue(path)
-	{
-		return this.getFieldValue(this.getField(path));
 	}
 	
 	/**
@@ -857,6 +767,100 @@ export default class FormProcessor
 		for (i = 0; i < ancestors.length; i++) {
 			delete this.valueCache[ancestors[i].path];
 		}
+	}
+	
+	/**
+	 * Derive a property's name from its path.
+	 *
+	 * @protected
+	 * @param {Field} field
+	 * @return {string} The derived name
+	 */
+	deriveName(field)
+	{
+		let path = field.path;
+		let lastDotIndex = path.lastIndexOf('.');
+		
+		return util.sentenceCase(path.substring(lastDotIndex + 1));
+	}
+	
+	/**
+	 * Set the default field properties for each type.
+	 *
+	 * @param {Object.<string, Object>} fieldProperties - The default field properties, keyed by field type.
+	 */
+	setDefaults(fieldProperties)
+	{
+		this.defaults = merge(
+			this.defaults,
+			fieldProperties
+		);
+	}
+	
+	/**
+	 * Apply the form's default properties to the given fields.
+	 *
+	 * Fills in default values, derives default names.
+	 *
+	 * @protected
+	 * @param {Field[]} fields - The fields to apply default values to.
+	 * @returns {Field[]}
+	 */
+	applyDefaults(fields)
+	{
+		if (!fields || !fields.length) {
+			return fields;
+		}
+		
+		let i, field;
+		
+		for (i = 0; i < fields.length; i++) {
+			field = fields[i];
+			
+			// Derive a name
+			if (field.name === undefined) {
+				field.name = this.deriveName(field);
+			}
+			
+			// Apply global defaults
+			field = defaults(field, this.defaults['*']);
+			
+			// Apply type-specific defaults
+			if (this.defaults[field.type]) {
+				field = defaults(field, this.defaults[field.type]);
+			}
+			
+			// Apply default input options
+			if (this.inputOptions[field.input]) {
+				field.options = field.options || {};
+				
+				field.options = defaults(field.options, this.inputOptions[field.input]);
+			}
+			
+			// Disable the field implicitly if it has an expression
+			if (!field.hasOwnProperty('disabled')) {
+				field.disabled = !!field.expression;
+			}
+		}
+		
+		return fields;
+	}
+	
+	/**
+	 * Add to the form's functions.
+	 *
+	 * @param {Object.<string, Function>} functions - Functions to add, keyed by name.
+	 */
+	addFunctions(functions)
+	{
+		// Add the functions to the form
+		this.functions = merge(this.functions, functions);
+		
+		// Add the functions to the expression parser
+		this.parser.functions = merge(this.parser.functions, this.functions);
+		
+		// Clear the expression cache
+		this.expressionCache = {};
 	}
 	
 	/**
@@ -944,10 +948,10 @@ export default class FormProcessor
 		}
 		
 		// Apply default values
-		this.applyDefaultFieldProperties([field]);
+		this.applyDefaults([field]);
 		
 		// Update the state's value
-		this.updateData(field, data);
+		this.updateDataValue(field, data);
 		
 		// Update the field's value (and update all fields dependent on this one)
 		this.updateFieldValue(field, data, direction <= 0);
@@ -961,7 +965,7 @@ export default class FormProcessor
 	 * @param {Object} data  - The data to update.
 	 * @return {Object} The updated data.
 	 */
-	updateData(field, data)
+	updateDataValue(field, data)
 	{
 		if (!field || field.omit || field.virtual) {
 			return data;
@@ -1368,6 +1372,10 @@ export default class FormProcessor
 	
 	/**
 	 * Remove data at the given path and update parent fields.
+	 *
+	 * TODO: The naming and existence of this method doesn't quite make sense.
+	 *       You'd expect it to remove the field(s) too.
+	 *       Refactor!
 	 *
 	 * @protected
 	 * @param {string}  path - The path to remove.

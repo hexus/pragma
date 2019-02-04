@@ -55,7 +55,7 @@
 			let defaults  = this.opts.defaults || this.root.defaults || {};
 			this.state    = this.opts.state || this.root.state || {};
 
-			this.form.setDefaultFieldProperties(defaults);
+			this.form.setDefaults(defaults);
 			this.form.addFunctions(functions);
 			this.form.setFields(fields);
 			this.form.update(this.state);
