@@ -1,29 +1,31 @@
 import exprEval        from 'expr-eval';
 import clone           from 'lodash/clone';
 import merge           from 'lodash/merge';
-import defaults        from 'lodash/defaultsDeep';
-import map             from 'lodash/map';
-import reduce          from 'lodash/reduce';
-import has             from 'lodash/has';
-import get             from 'lodash/get';
-import set             from 'lodash/set';
-import pull            from 'lodash/pull';
-import defaultTo       from 'lodash/defaultTo';
-import difference      from 'lodash/difference';
-import intersection    from 'lodash/intersection';
-import isPlainObject   from 'lodash/isPlainObject';
-import toNumber        from 'lodash/toNumber';
-import zipObject       from 'lodash/zipObject';
-import sortBy          from 'lodash/sortBy';
-import { util }        from '../mixins/util';
-import sum             from '../functions/sum';
-import sumBy           from 'lodash/sumBy';
-import multiply        from '../functions/multiply';
-import buildDictionary from '../functions/buildDictionary';
-import buildTree       from '../functions/buildTree';
-import traverseTree    from '../functions/traverseTree';
-import splitPath       from '../functions/splitPath';
-import joinPath        from '../functions/joinPath';
+import defaults         from 'lodash/defaultsDeep';
+import map              from 'lodash/map';
+import reduce           from 'lodash/reduce';
+import has              from 'lodash/has';
+import get              from 'lodash/get';
+import set              from 'lodash/set';
+import pull             from 'lodash/pull';
+import defaultTo        from 'lodash/defaultTo';
+import difference       from 'lodash/difference';
+import intersection     from 'lodash/intersection';
+import isPlainObject    from 'lodash/isPlainObject';
+import toNumber         from 'lodash/toNumber';
+import zipObject        from 'lodash/zipObject';
+import sortBy           from 'lodash/sortBy';
+import { util }         from '../mixins/util';
+import sum              from '../functions/sum';
+import sumBy            from 'lodash/sumBy';
+import multiply         from '../functions/multiply';
+import buildDictionary  from '../functions/buildDictionary';
+import buildTree        from '../functions/buildTree';
+import traverseTree     from '../functions/traverseTree';
+import splitPath        from '../functions/splitPath';
+import joinPath         from '../functions/joinPath';
+import flatten          from 'flat';
+import { detailedDiff } from 'deep-object-diff';
 
 const UP = -1;
 const BOTH = 0;
@@ -872,13 +874,55 @@ export default class FormProcessor
 	update(data)
 	{
 		// Update the value of every field
+		this.updatePath('', data);
+		
 		// TODO: Diff any *paths* that changed and update those
 		//       i.e. implement diffFieldDataPaths()
-		this.updatePath('', data, DOWN);
 		
-		// traverseTree(this.tree, null, (field, data) => {
-		// 	console.log(field.path);
-		// }, data);
+		console.time('buildData');
+		let formData = this.buildData(this.tree);
+		console.timeEnd('buildData');
+		console.log(formData);
+		
+		console.time('diff');
+		let diff = detailedDiff(formData, data);
+		console.timeEnd('diff');
+		
+		console.log(diff);
+		
+		console.time('flatten');
+		let addedPaths = flatten(diff.added);
+		let updatedPaths = flatten(diff.updated);
+		let deletedPaths = flatten(diff.deleted);
+		console.timeEnd('flatten');
+		
+		console.log(addedPaths, updatedPaths, deletedPaths);
+		
+		//let path;
+		
+		// for (path in addedPaths) {
+		// 	this.updatePath(path, data, BOTH);
+		// }
+		
+		// for (path in updatedPaths) {
+		// 	this.updatePath(path, data, BOTH);
+		// }
+		//
+		// for (path in deletedPaths) {
+		// 	this.updatePath(path, data, BOTH);
+		// }
+		
+		console.time('traverseTree');
+		traverseTree(
+			this.tree,
+			(field) => { // Pre-order
+			
+			},
+			(field) => { // Post-order
+				console.log(field.path);
+			}
+		);
+		console.timeEnd('traverseTree');
 	}
 	
 	/**
@@ -933,6 +977,8 @@ export default class FormProcessor
 		}
 		
 		//console.log('updateField()', field.path);
+		
+		console.count('updateField()');
 		
 		this.clearValueCache(field.path);
 		
@@ -1009,7 +1055,7 @@ export default class FormProcessor
 	{
 		// Recursively update parent field values
 		if (updateParents) {
-			this.updateFieldParents(field, data);
+			this.updateFieldAncestors(field, data);
 		}
 		
 		// Update fields listed as dependencies
@@ -1017,13 +1063,13 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Update the parent fields of the given field.
+	 * Update the ancestors of the given field.
 	 *
 	 * @protected
 	 * @param {Field}  field - The field to update parents of.
 	 * @param {Object} data  - The data to update with.
 	 */
-	updateFieldParents(field, data)
+	updateFieldAncestors(field, data)
 	{
 		let i, parents = this.getFieldAncestors(field);
 		
@@ -1533,11 +1579,17 @@ export default class FormProcessor
 			return data;
 		}
 		
-		let childData;
+		let child, childData;
 		
 		// If the field has children, build the data of its children
 		if (field.children) {
 			for (let c = 0; c < field.children.length; c++) {
+				child = field.children[c];
+				
+				if (child.virtual || child.omit) {
+					continue;
+				}
+				
 				childData = this.buildData(field.children[c], data);
 			}
 			
