@@ -203,6 +203,15 @@ export default class FormProcessor
 		 * @type {Object.<string, string[]>}
 		 */
 		this.fieldDependencies = {};
+		
+		/**
+		 * Map of updated fields.
+		 *
+		 * Used to prevent updating fields more than once.
+		 *
+		 * @type {Object.<string, boolean>}
+		 */
+		this.updatedFields = {};
 	}
 	
 	/**
@@ -663,7 +672,7 @@ export default class FormProcessor
 		
 		// Clear all caches
 		this.valueCache = {};
-		this.expressionCache = {};
+		//this.expressionCache = {};
 		this.fieldDependencies = {};
 	}
 	
@@ -862,7 +871,7 @@ export default class FormProcessor
 		this.parser.functions = merge(this.parser.functions, this.functions);
 		
 		// Clear the expression cache
-		this.expressionCache = {};
+		//this.expressionCache = {};
 	}
 	
 	/**
@@ -873,11 +882,8 @@ export default class FormProcessor
 	 */
 	update(data)
 	{
-		// Update the value of every field
-		this.updatePath('', data);
-		
-		// TODO: Diff any *paths* that changed and update those
-		//       i.e. implement diffFieldDataPaths()
+		// Clear updated fields map
+		this.updatedFields = {};
 		
 		console.time('buildData');
 		let formData = this.buildData(this.tree);
@@ -912,6 +918,9 @@ export default class FormProcessor
 		// 	this.updatePath(path, data, BOTH);
 		// }
 		
+		// Update the value of every field
+		this.updatePath('', data);
+		
 		console.time('traverseTree');
 		traverseTree(
 			this.tree,
@@ -919,7 +928,7 @@ export default class FormProcessor
 			
 			},
 			(field) => { // Post-order
-				console.log(field.path);
+				//console.log(field.path);
 			}
 		);
 		console.timeEnd('traverseTree');
@@ -977,8 +986,7 @@ export default class FormProcessor
 		}
 		
 		//console.log('updateField()', field.path);
-		
-		console.count('updateField()');
+		//console.count('updateField()');
 		
 		this.clearValueCache(field.path);
 		
@@ -993,6 +1001,11 @@ export default class FormProcessor
 			}
 		}
 		
+		// Skip if this field has already been updated
+		if (this.updatedFields[field.path]) {
+			return;
+		}
+		
 		// Apply default values
 		this.applyDefaults([field]);
 		
@@ -1001,6 +1014,9 @@ export default class FormProcessor
 		
 		// Update the field's value (and update all fields dependent on this one)
 		this.updateFieldValue(field, data, direction <= 0);
+		
+		// Mark the field as updated
+		this.updatedFields[field.path] = true;
 	}
 	
 	/**
@@ -1047,15 +1063,15 @@ export default class FormProcessor
 	 * Update fields that are dependent upon the value of the given field.
 	 *
 	 * @protected
-	 * @param {Field}         field         - The field to update dependencies of.
-	 * @param {Object}        data          - The data to update from.
-	 * @param {boolean=false} updateParents - Whether to update the field's parents.
+	 * @param {Field}         field           - The field to update dependencies of.
+	 * @param {Object}        data            - The data to update from.
+	 * @param {boolean=false} updateAncestors - Whether to update the field's ancestors.
 	 */
-	updateFieldDependencies(field, data, updateParents)
+	updateFieldDependencies(field, data, updateAncestors)
 	{
 		// Recursively update parent field values
-		if (updateParents) {
-			this.updateFieldAncestors(field, data);
+		if (updateAncestors) {
+			this.updateFieldAncestorValues(field, data);
 		}
 		
 		// Update fields listed as dependencies
@@ -1069,7 +1085,7 @@ export default class FormProcessor
 	 * @param {Field}  field - The field to update parents of.
 	 * @param {Object} data  - The data to update with.
 	 */
-	updateFieldAncestors(field, data)
+	updateFieldAncestorValues(field, data)
 	{
 		let i, parents = this.getFieldAncestors(field);
 		
