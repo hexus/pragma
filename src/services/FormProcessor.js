@@ -681,7 +681,8 @@ export default class FormProcessor
 		// Prepare the fields
 		this.fields = this.prepareFields(fields);
 		
-		// TODO: Build dictionary from given fields, compare with current fields
+		// TODO: Build dictionary from given fields, compare with current fields,
+		//       update things accordingly
 		//this.dictionary = this.buildDictionary(this.fields);
 		this.dictionary = this.updateDictionary(this.fields);
 		
@@ -893,49 +894,27 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Mark fields to be updated by finding the deepest existent paths in the
-	 * diff of the given data.
+	 * Diff the given data with the current form data.
 	 *
 	 * @protected
-	 * @param {Object} data
+	 * @param {Object} data - The data to diff with the current form data.
+	 * @return {Object} The detailed diff of current form data and given data.
 	 */
-	markFieldsForUpdate(data)
+	diffFormData(data)
 	{
-		// TODO: Mark the deepest existent fields found in each path for updates
-		//       to replace full updates
-		console.time('buildData');
+		console.time('buildData(this.tree)');
 		let formData = this.buildData(this.tree);
-		console.timeEnd('buildData');
-		console.log(formData);
+		console.timeEnd('buildData(this.tree)');
 		
-		console.time('diff');
+		//console.log(formData);
+		
+		console.time('detailedDiff');
 		let diff = detailedDiff(formData, data);
-		console.timeEnd('diff');
+		console.timeEnd('detailedDiff');
 		
-		console.log(diff);
+		//console.log(diff);
 		
-		console.time('flatten');
-		let addedPaths = Object.keys(flatten(diff.added));
-		let updatedPaths = Object.keys(flatten(diff.updated));
-		let deletedPaths = Object.keys(flatten(diff.deleted));
-		console.timeEnd('flatten');
-		
-		console.log(addedPaths, updatedPaths, deletedPaths);
-		
-		
-		//let path;
-		
-		// for (path in addedPaths) {
-		// 	this.updatePath(path, data, BOTH);
-		// }
-		
-		// for (path in updatedPaths) {
-		// 	this.updatePath(path, data, BOTH);
-		// }
-		//
-		// for (path in deletedPaths) {
-		// 	this.updatePath(path, data, BOTH);
-		// }
+		return diff;
 	}
 	
 	/**
@@ -946,27 +925,34 @@ export default class FormProcessor
 	 */
 	update(data)
 	{
-		// console.time('markFieldsForUpdate');
-		// this.markFieldsForUpdate(data);
-		// console.timeEnd('markFieldsForUpdate');
-		
-		// TODO: Switch to tree traversal
-		// Clear updated fields map
-		//this.updatedFields = {};
-		
-		// Update the value of every field
-		//this.updatePath('', data);
+		//console.time('diffFormData');
+		//let diff = this.diffFormData(data);
+		//console.timeEnd('diffFormData');
 		
 		console.time('traverseTree');
 		traverseTree(
 			this.tree,
-			(field) => { // Pre-order
+			(field) => {
+				// Pre-order operation
 				this.updateFieldInheritance(field, data);
 				
+				// TODO: Skip fields that aren't in the diff using has()
+				// if (field.path &&
+				// 	(
+				// 		!has(diff.added, field.path) &&
+				// 		!has(diff.updated, field.path) &&
+				// 		!has(diff.deleted, field.path)
+				// 	)
+				// ) {
+				// 	return false;
+				// }
+				
+				// Skip omitted fields
 				return !field.omit;
 			},
-			(field) => { // Post-order
-				//console.log(field.path);
+			(field) => {
+				// Post-order operation
+				// Update the current field and its dependencies
 				this.applyDefaults([field]);
 				
 				this.updateDataValue(field, data);
@@ -1210,8 +1196,7 @@ export default class FormProcessor
 			return;
 		}
 		
-		let dictionary = this.dictionary,
-			i,
+		let i,
 			key,
 			path,
 			value,
@@ -1249,6 +1234,8 @@ export default class FormProcessor
 		for (i = 0; i < oldKeys.length; i++) {
 			key  = oldKeys[i];
 			path = joinPath(field.path, key);
+			
+			//console.log('updateTemplateFields() oldField', field.path, path);
 			
 			this.removeField(this.getField(path));
 		}
@@ -1527,30 +1514,34 @@ export default class FormProcessor
 	 *
 	 * @protected
 	 * @param {Field} field - The field to remove.
+	 * @return {Field} The removed field.
 	 */
 	removeField(field)
 	{
 		if (!field) {
-			return;
+			return field;
 		}
 		
+		// Remove the field and its children from the value cache, dictionary
+		// and dependency list
 		this.clearValueCache(field.path);
 		
-		// Remove the field's children
-		this.removeFields(field.children);
-		
-		// Remove the field from the dictionary and dependency list
-		delete this.dictionary[field.path];
-		delete this.expressionDependencies[field.path];
+		traverseTree(field, (field) => {
+			delete this.dictionary[field.path];
+			delete this.expressionDependencies[field.path];
+		});
 		
 		// Remove the field from its parent
 		let parent = this.getFieldParent(field);
 		pull(parent.children, field);
+		
+		return field;
 	}
 	
 	/**
 	 * Remove a field's path from the given data.
 	 *
+	 * @protected
 	 * @param {Field} field - The field whose path to remove from data.
 	 * @param {Object} data - The data to remove from.
 	 */

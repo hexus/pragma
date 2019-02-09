@@ -37,15 +37,15 @@ export default function (dictionary) {
 		
 		if (!field || field.path == null || path !== field.path) {
 			// You're weird and don't belong in our tree, bye Felicia
-			// TODO: "path" could be valid here, set it to property.path if so
-			console.warn(`Skipped property without path`, field);
+			// TODO: "path" could be valid here, set it to field.path if so
+			console.warn(`Skipped field without path`, field);
 			continue;
 		}
 		
 		if (field.parent == null) {
 			// You don't have an explicitly defined parent, bye Felicia
 			// TODO: Add to root?
-			console.warn(`Skipped property '${path}'; it has no parent`);
+			console.warn(`Skipped field '${path}'; it has no parent`);
 			continue;
 		}
 		
@@ -54,7 +54,7 @@ export default function (dictionary) {
 		if (!parent) {
 			// Sorry, you're an orphan, you don't get into the tree
 			// TODO: Be nice and create a parent for them?
-			console.warn(`Orphaned property '${path}'`);
+			console.warn(`Orphaned field '${path}'`);
 			continue;
 		}
 		
