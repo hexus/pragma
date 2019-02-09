@@ -202,7 +202,7 @@ export default class FormProcessor
 		 *
 		 * @type {Object.<string, string[]>}
 		 */
-		this.fieldDependencies = {};
+		this.expressionDependencies = {};
 		
 		/**
 		 * Map of updated fields.
@@ -272,6 +272,24 @@ export default class FormProcessor
 		}
 		
 		return ancestors;
+	}
+	
+	/**
+	 * Get the descendants of a field.
+	 *
+	 * @protected
+	 * @param {Field} field
+	 * @return {Field[]}
+	 */
+	getFieldDescendants(field)
+	{
+		let i, descendants = [];
+		
+		traverseTree(field, (descendant) => {
+			descendants.push(descendant);
+		});
+		
+		return descendants;
 	}
 	
 	/**
@@ -372,15 +390,15 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Get the fields dependent upon the given field.
+	 * Get the fields dependent upon the given field's expression.
 	 *
 	 * @protected
-	 * @param {Field} field
-	 * @return {Field[]} The dependent fields
+	 * @param {Field} field - The field whose expression to get dependent fields of.
+	 * @return {Field[]} The dependent fields of the given field's expression
 	 */
-	getFieldDependencies(field)
+	getFieldExpressionDependencies(field)
 	{
-		let dependencies = this.fieldDependencies[field.path];
+		let dependencies = this.expressionDependencies[field.path];
 		
 		// Skip if the field has no dependencies
 		if (!dependencies || !dependencies.length) {
@@ -608,10 +626,10 @@ export default class FormProcessor
 		for (let v = 0; v < variables.length; v++) {
 			let variable = variables[v];
 			
-			this.fieldDependencies[variable] = this.fieldDependencies[variable] || [];
+			this.expressionDependencies[variable] = this.expressionDependencies[variable] || [];
 			
-			if (this.fieldDependencies[variable].indexOf(field.path) < 0) {
-				this.fieldDependencies[variable].push(field.path);
+			if (this.expressionDependencies[variable].indexOf(field.path) < 0) {
+				this.expressionDependencies[variable].push(field.path);
 			}
 		}
 		
@@ -671,9 +689,9 @@ export default class FormProcessor
 		this.tree = this.buildTree(this.dictionary);
 		
 		// Clear all caches
-		this.valueCache = {};
+		this.valueCache             = {};
 		//this.expressionCache = {};
-		this.fieldDependencies = {};
+		this.expressionDependencies = {};
 	}
 	
 	/**
@@ -875,16 +893,16 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Update the form using the given data.
+	 * Mark fields to be updated by finding the deepest existent paths in the
+	 * diff of the given data.
 	 *
-	 * @public
-	 * @param {Object} [data] - The data to update with.
+	 * @protected
+	 * @param {Object} data
 	 */
-	update(data)
+	markFieldsForUpdate(data)
 	{
-		// Clear updated fields map
-		this.updatedFields = {};
-		
+		// TODO: Mark the deepest existent fields found in each path for updates
+		//       to replace full updates
 		console.time('buildData');
 		let formData = this.buildData(this.tree);
 		console.timeEnd('buildData');
@@ -897,12 +915,13 @@ export default class FormProcessor
 		console.log(diff);
 		
 		console.time('flatten');
-		let addedPaths = flatten(diff.added);
-		let updatedPaths = flatten(diff.updated);
-		let deletedPaths = flatten(diff.deleted);
+		let addedPaths = Object.keys(flatten(diff.added));
+		let updatedPaths = Object.keys(flatten(diff.updated));
+		let deletedPaths = Object.keys(flatten(diff.deleted));
 		console.timeEnd('flatten');
 		
 		console.log(addedPaths, updatedPaths, deletedPaths);
+		
 		
 		//let path;
 		
@@ -917,18 +936,42 @@ export default class FormProcessor
 		// for (path in deletedPaths) {
 		// 	this.updatePath(path, data, BOTH);
 		// }
+	}
+	
+	/**
+	 * Update the form using the given data.
+	 *
+	 * @public
+	 * @param {Object} [data] - The data to update with.
+	 */
+	update(data)
+	{
+		// console.time('markFieldsForUpdate');
+		// this.markFieldsForUpdate(data);
+		// console.timeEnd('markFieldsForUpdate');
+		
+		// TODO: Switch to tree traversal
+		// Clear updated fields map
+		//this.updatedFields = {};
 		
 		// Update the value of every field
-		this.updatePath('', data);
+		//this.updatePath('', data);
 		
 		console.time('traverseTree');
 		traverseTree(
 			this.tree,
 			(field) => { // Pre-order
-			
+				this.updateFieldInheritance(field, data);
+				
+				return !field.omit;
 			},
 			(field) => { // Post-order
 				//console.log(field.path);
+				this.applyDefaults([field]);
+				
+				this.updateDataValue(field, data);
+				
+				this.updateFieldValue(field, data);
 			}
 		);
 		console.timeEnd('traverseTree');
@@ -997,14 +1040,14 @@ export default class FormProcessor
 			this.updateFieldInheritance(field, data);
 			
 			if (!field.omit) {
-				this.updateFields(field.children, data);
+				//this.updateFields(field.children, data);
 			}
 		}
 		
 		// Skip if this field has already been updated
-		if (this.updatedFields[field.path]) {
-			return;
-		}
+		// if (this.updatedFields[field.path]) {
+		// 	return;
+		// }
 		
 		// Apply default values
 		this.applyDefaults([field]);
@@ -1016,7 +1059,7 @@ export default class FormProcessor
 		this.updateFieldValue(field, data, direction <= 0);
 		
 		// Mark the field as updated
-		this.updatedFields[field.path] = true;
+		//this.updatedFields[field.path] = true;
 	}
 	
 	/**
@@ -1075,7 +1118,7 @@ export default class FormProcessor
 		}
 		
 		// Update fields listed as dependencies
-		this.updateFields(this.getFieldDependencies(field), data);
+		this.updateFields(this.getFieldExpressionDependencies(field), data);
 	}
 	
 	/**
@@ -1436,7 +1479,7 @@ export default class FormProcessor
 	 * Remove data at the given path and update parent fields.
 	 *
 	 * TODO: The naming and existence of this method doesn't quite make sense.
-	 *       You'd expect it to remove the field(s) too.
+	 *       You'd expect it to remove the field(s) too, considering updatePath().
 	 *       Refactor!
 	 *
 	 * @protected
@@ -1498,7 +1541,7 @@ export default class FormProcessor
 		
 		// Remove the field from the dictionary and dependency list
 		delete this.dictionary[field.path];
-		delete this.fieldDependencies[field.path];
+		delete this.expressionDependencies[field.path];
 		
 		// Remove the field from its parent
 		let parent = this.getFieldParent(field);
@@ -1602,7 +1645,7 @@ export default class FormProcessor
 			for (let c = 0; c < field.children.length; c++) {
 				child = field.children[c];
 				
-				if (child.virtual || child.omit) {
+				if (child.omit) {
 					continue;
 				}
 				
