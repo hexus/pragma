@@ -929,23 +929,35 @@ export default class FormProcessor
 		//let diff = this.diffFormData(data);
 		//console.timeEnd('diffFormData');
 		
+		this.updatePath('', data);
+	}
+	
+	/**
+	 * Update the field at the given path.
+	 *
+	 * @param {string} path - The path of the field to update.
+	 * @param {Object} data - The data to update with.
+	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
+	 */
+	updatePath(path, data, direction = BOTH)
+	{
+		let field = this.getField(path);
+		
+		if (!field) {
+			return;
+		}
+		
+		this.clearValueCache(path);
+		
+		// Update the field and its children
 		console.time('traverseTree');
 		traverseTree(
-			this.tree,
+			field,
 			(field) => {
 				// Pre-order operation
 				this.updateFieldInheritance(field, data);
 				
-				// TODO: Skip fields that aren't in the diff using has()
-				// if (field.path &&
-				// 	(
-				// 		!has(diff.added, field.path) &&
-				// 		!has(diff.updated, field.path) &&
-				// 		!has(diff.deleted, field.path)
-				// 	)
-				// ) {
-				// 	return false;
-				// }
+				// TODO: Skip fields that have already been visited
 				
 				// Skip omitted fields
 				return !field.omit;
@@ -961,18 +973,8 @@ export default class FormProcessor
 			}
 		);
 		console.timeEnd('traverseTree');
-	}
-	
-	/**
-	 * Update the field at the given path.
-	 *
-	 * @param {string} path - The path of the field to update.
-	 * @param {Object} data - The data to update with.
-	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
-	 */
-	updatePath(path, data, direction = BOTH)
-	{
-		this.updateField(this.getField(path), data, direction);
+		
+		// TODO: Update parent fields and their dependencies
 	}
 	
 	/**
@@ -993,7 +995,7 @@ export default class FormProcessor
 		}
 		
 		for (let i = 0; i < fields.length; i++) {
-			this.updateField(fields[i], data, direction);
+			this.updatePath(fields[i].path, data, direction);
 		}
 	}
 	
@@ -1014,9 +1016,6 @@ export default class FormProcessor
 			return;
 		}
 		
-		//console.log('updateField()', field.path);
-		//console.count('updateField()');
-		
 		this.clearValueCache(field.path);
 		
 		// Update the field's children
@@ -1030,11 +1029,6 @@ export default class FormProcessor
 			}
 		}
 		
-		// Skip if this field has already been updated
-		// if (this.updatedFields[field.path]) {
-		// 	return;
-		// }
-		
 		// Apply default values
 		this.applyDefaults([field]);
 		
@@ -1043,9 +1037,6 @@ export default class FormProcessor
 		
 		// Update the field's value (and update all fields dependent on this one)
 		this.updateFieldValue(field, data, direction <= 0);
-		
-		// Mark the field as updated
-		//this.updatedFields[field.path] = true;
 	}
 	
 	/**
@@ -1104,7 +1095,7 @@ export default class FormProcessor
 		}
 		
 		// Update fields listed as dependencies
-		this.updateFields(this.getFieldExpressionDependencies(field), data);
+		//this.updateFields(this.getFieldExpressionDependencies(field), data);
 	}
 	
 	/**
@@ -1485,7 +1476,7 @@ export default class FormProcessor
 		this.removeData(field, data);
 		
 		// Update the parent field
-		this.updateField(this.getFieldParent(field), data);
+		this.updatePath(this.getFieldParent(field).path, data);
 	}
 	
 	/**
