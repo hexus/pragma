@@ -690,7 +690,7 @@ export default class FormProcessor
 		this.tree = this.buildTree(this.dictionary);
 		
 		// Clear all caches
-		this.valueCache             = {};
+		this.valueCache = {};
 		//this.expressionCache = {};
 		this.expressionDependencies = {};
 	}
@@ -902,15 +902,15 @@ export default class FormProcessor
 	 */
 	diffFormData(data)
 	{
-		console.time('buildData(this.tree)');
+		//console.time('buildData(this.tree)');
 		let formData = this.buildData(this.tree);
-		console.timeEnd('buildData(this.tree)');
+		//console.timeEnd('buildData(this.tree)');
 		
 		//console.log(formData);
 		
-		console.time('detailedDiff');
+		//console.time('detailedDiff');
 		let diff = detailedDiff(formData, data);
-		console.timeEnd('detailedDiff');
+		//console.timeEnd('detailedDiff');
 		
 		//console.log(diff);
 		
@@ -925,54 +925,74 @@ export default class FormProcessor
 	 */
 	update(data)
 	{
-		//console.time('diffFormData');
-		//let diff = this.diffFormData(data);
-		//console.timeEnd('diffFormData');
-		
 		this.updatePath('', data);
 	}
 	
 	/**
 	 * Update the field at the given path.
 	 *
-	 * @param {string} path - The path of the field to update.
-	 * @param {Object} data - The data to update with.
-	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
+	 * @param {string} path         - The path of the field to update.
+	 * @param {Object} data         - The data to update with.
+	 * @param {Object} [visited={}] - Map of fields already visited.
 	 */
-	updatePath(path, data, direction = BOTH)
+	updatePath(path, data, visited = {})
 	{
 		let field = this.getField(path);
 		
-		if (!field) {
+		if (!field || visited[field.path]) {
 			return;
 		}
 		
 		this.clearValueCache(path);
 		
+		//console.time('diffFormData');
+		//let diff = this.diffFormData(data);
+		//console.timeEnd('diffFormData');
+		
 		// Update the field and its children
-		console.time('traverseTree');
+		//console.time('updatePath() ' + path);
 		traverseTree(
 			field,
 			(field) => {
 				// Pre-order operation
 				this.updateFieldInheritance(field, data);
 				
-				// TODO: Skip fields that have already been visited
-				
-				// Skip omitted fields
+				// Skip omitted fields and their children
 				return !field.omit;
 			},
 			(field) => {
 				// Post-order operation
 				// Update the current field and its dependencies
+				//console.log('updatePath() post', field.path);
+				
+				// Skip fields that have already been visited
+				if (visited[field.path]) {
+					//console.warn('skipped visited field', field.path);
+					return;
+				}
+				
+				// if (field.path &&
+				// 	(
+				// 		!has(diff.added, field.path) &&
+				// 		!has(diff.updated, field.path) &&
+				// 		!has(diff.deleted, field.path)
+				// 	)
+				// ) {
+				// 	return;
+				// }
+				
 				this.applyDefaults([field]);
 				
 				this.updateDataValue(field, data);
 				
 				this.updateFieldValue(field, data);
+				
+				this.updateFieldDependencies(field, data, visited);
+				
+				visited[field.path] = true;
 			}
 		);
-		console.timeEnd('traverseTree');
+		//console.timeEnd('updatePath() ' + path);
 		
 		// TODO: Update parent fields and their dependencies
 	}
@@ -986,16 +1006,15 @@ export default class FormProcessor
 	 * @protected
 	 * @param {Field[]} fields - The fields to update.
 	 * @param {Object}  data   - The data to update with.
-	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
 	 */
-	updateFields(fields, data, direction)
+	updateFields(fields, data)
 	{
 		if (!Array.isArray(fields) || !fields.length) {
 			return;
 		}
 		
 		for (let i = 0; i < fields.length; i++) {
-			this.updatePath(fields[i].path, data, direction);
+			this.updatePath(fields[i].path, data);
 		}
 	}
 	
@@ -1019,14 +1038,10 @@ export default class FormProcessor
 		this.clearValueCache(field.path);
 		
 		// Update the field's children
-		if (direction >= 0) {
-			// TODO: This would be a good spot for an event to fire to allow plugins
-			//       (like inheritance) to intercept child update behaviour
-			this.updateFieldInheritance(field, data);
-			
-			if (!field.omit) {
-				//this.updateFields(field.children, data);
-			}
+		this.updateFieldInheritance(field, data);
+		
+		if (!field.omit) {
+			//this.updateFields(field.children, data);
 		}
 		
 		// Apply default values
@@ -1036,7 +1051,7 @@ export default class FormProcessor
 		this.updateDataValue(field, data);
 		
 		// Update the field's value (and update all fields dependent on this one)
-		this.updateFieldValue(field, data, direction <= 0);
+		this.updateFieldValue(field, data);
 	}
 	
 	/**
@@ -1062,11 +1077,10 @@ export default class FormProcessor
 	 * Update a field using the given data.
 	 *
 	 * @protected
-	 * @param {Field}         field         - The field to update.
-	 * @param {Object}        data          - The data to update with.
-	 * @param {boolean=false} updateParents - Whether to update the field's parents.
+	 * @param {Field}  field        - The field to update.
+	 * @param {Object} data         - The data to update with.
 	 */
-	updateFieldValue(field, data, updateParents = false)
+	updateFieldValue(field, data)
 	{
 		if (!field) {
 			return;
@@ -1074,28 +1088,27 @@ export default class FormProcessor
 		
 		// Update the field value
 		field.value = get(data, field.path);
-		
-		// Update all fields dependent on this one
-		this.updateFieldDependencies(field, data, updateParents);
 	}
 	
 	/**
 	 * Update fields that are dependent upon the value of the given field.
 	 *
 	 * @protected
-	 * @param {Field}         field           - The field to update dependencies of.
-	 * @param {Object}        data            - The data to update from.
-	 * @param {boolean=false} updateAncestors - Whether to update the field's ancestors.
+	 * @param {Field}  field        - The field to update dependencies of.
+	 * @param {Object} data         - The data to update from.
+	 * @param {Object} [visited={}] - Map of fields already visited.
 	 */
-	updateFieldDependencies(field, data, updateAncestors)
+	updateFieldDependencies(field, data, visited = {})
 	{
-		// Recursively update parent field values
-		if (updateAncestors) {
-			this.updateFieldAncestorValues(field, data);
-		}
+		// Update parent field values
+		this.updateFieldAncestorValues(field, data);
 		
-		// Update fields listed as dependencies
-		//this.updateFields(this.getFieldExpressionDependencies(field), data);
+		// Update the field's expression dependencies
+		let dependencies = this.getFieldExpressionDependencies(field);
+		
+		for (let i = 0; i < dependencies.length; i++) {
+			this.updatePath(dependencies[i].path, data, visited);
+		}
 	}
 	
 	/**

@@ -1,7 +1,9 @@
+import isFunction from 'lodash/isFunction';
+
 /**
  * Traverse a tree.
  *
- * TODO: Visitor object? Could have multiple pre/post callbacks
+ * TODO: Visitor object? Could have multiple pre/post callbacks.
  *
  * Traversal of children can be halted by returning false from the pre-order
  * operation function.
@@ -17,7 +19,7 @@ function traverseTree(node, pre = null, post = null) {
 	
 	let result;
 	
-	if (typeof pre === 'function') {
+	if (isFunction(pre)) {
 		result = pre(node);
 		
 		if (result === false) {
@@ -31,12 +33,8 @@ function traverseTree(node, pre = null, post = null) {
 		traverseTree(children[i], pre, post);
 	}
 	
-	if (typeof post === 'function') {
-		result = post(node);
-		
-		if (result === false) {
-			return;
-		}
+	if (isFunction(post)) {
+		post(node);
 	}
 }
 
