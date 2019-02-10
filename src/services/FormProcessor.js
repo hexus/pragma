@@ -959,9 +959,9 @@ export default class FormProcessor
 					return;
 				}
 				
-				this.updateField(field, data);
-				
 				visited[field.path] = true;
+				
+				this.updateField(field, data, visited);
 			}
 		);
 		
@@ -975,9 +975,9 @@ export default class FormProcessor
 				continue;
 			}
 			
-			this.updateField(ancestors[i], data, visited);
-			
 			visited[ancestors[i].path] = true;
+			
+			this.updateField(ancestors[i], data, visited);
 		}
 		//console.timeEnd('updatePath() ' + path);
 	}
