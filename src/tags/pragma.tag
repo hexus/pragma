@@ -28,6 +28,11 @@
 		// Define properties
 		this.form  = new FormProcessor([]);
 		this.state = null;
+		this.fields = null;
+
+		if (window && this.opts.debug) {
+			window.pragma = this.form;
+		}
 
 		// Define event handlers
 		this.add = function (event) {
@@ -39,7 +44,9 @@
 		this.edit = function (event) {
 			let { name, value } = event.detail;
 
-			this.form.setValue(this.state, name, value);
+			value = this.form.setValue(this.state, name, value);
+
+			event.detail.value = value;
 		};
 
 		this.remove = function (event) {
@@ -52,16 +59,24 @@
 			let fields    = this.opts.fields || this.root.fields || {};
 			let functions = this.opts.functions || this.root.functions || {};
 			let defaults  = this.opts.defaults || this.root.defaults || {};
-			this.state    = this.opts.state || this.root.state || {};
+			let state     = this.opts.state || this.root.state || {};
 
 			this.form.setDefaults(defaults);
 			this.form.addFunctions(functions);
-			console.time('setFields');
-			this.form.setFields(fields);
-			console.timeEnd('setFields');
-			console.time('update');
-			this.form.update(this.state);
-			console.timeEnd('update');
+
+			if (fields !== this.fields) {
+				console.time('setFields');
+				this.fields = fields;
+				this.form.setFields(fields);
+				console.timeEnd('setFields');
+			}
+
+			if (state !== this.state) {
+				console.time('update');
+				this.state = state;
+				this.form.update(this.state);
+				console.timeEnd('update');
+			}
 		};
 
 		this.root.sync = () => {
@@ -72,10 +87,7 @@
 			this.update();
 		};
 
-		//this.sync();
 		this.on('mount', this.sync);
 		this.on('update', this.sync);
-
-		window.pragma = this.form;
 	</script>
 </pragma>

@@ -945,56 +945,41 @@ export default class FormProcessor
 		
 		this.clearValueCache(path);
 		
-		//console.time('diffFormData');
-		//let diff = this.diffFormData(data);
-		//console.timeEnd('diffFormData');
-		
 		// Update the field and its children
 		//console.time('updatePath() ' + path);
 		traverseTree(
 			field,
 			(field) => {
-				// Pre-order operation
-				this.updateFieldInheritance(field, data);
-				
-				// Skip omitted fields and their children
-				return !field.omit;
+				return this.preUpdateField(field, data);
 			},
 			(field) => {
-				// Post-order operation
-				// Update the current field and its dependencies
-				//console.log('updatePath() post', field.path);
-				
 				// Skip fields that have already been visited
 				if (visited[field.path]) {
 					//console.warn('skipped visited field', field.path);
 					return;
 				}
 				
-				// if (field.path &&
-				// 	(
-				// 		!has(diff.added, field.path) &&
-				// 		!has(diff.updated, field.path) &&
-				// 		!has(diff.deleted, field.path)
-				// 	)
-				// ) {
-				// 	return;
-				// }
-				
-				this.applyDefaults([field]);
-				
-				this.updateDataValue(field, data);
-				
-				this.updateFieldValue(field, data);
-				
-				this.updateFieldDependencies(field, data, visited);
+				this.updateField(field, data);
 				
 				visited[field.path] = true;
 			}
 		);
-		//console.timeEnd('updatePath() ' + path);
 		
-		// TODO: Update parent fields and their dependencies
+		// Update parent fields and their dependencies
+		let i;
+		let ancestors = this.getFieldAncestors(field);
+		
+		for (i = 0; i < ancestors.length; i++) {
+			if (visited[ancestors[i].path]) {
+				//console.log('skipped visited ancestor', field.path, ancestors[i].path, visited);
+				continue;
+			}
+			
+			this.updateField(ancestors[i], data, visited);
+			
+			visited[ancestors[i].path] = true;
+		}
+		//console.timeEnd('updatePath() ' + path);
 	}
 	
 	/**
@@ -1019,30 +1004,34 @@ export default class FormProcessor
 	}
 	
 	/**
+	 * Pre-order update the given field with the given data.
+	 *
+	 * @protected
+	 * @param {Field}  field - The field to update.
+	 * @param {Object} data  - The data to update with.
+	 * @returns {boolean}
+	 */
+	preUpdateField(field, data)
+	{
+		this.updateFieldInheritance(field, data);
+		
+		return !field.omit;
+	}
+	
+	/**
 	 * Update the given field with the given data.
 	 *
 	 * Recursively descends into child fields and updates dependent fields,
 	 * including parents.
 	 *
 	 * @protected
-	 * @param {Field}   field  - The fields to update.
-	 * @param {Object}  data   - The data to update with.
-	 * @param {number} [direction=BOTH] - Update direction (UP: -1, BOTH: 0, DOWN: 1)
+	 * @param {Field}   field        - The field to update.
+	 * @param {Object}  data         - The data to update with.
+	 * @param {Object}  [visited={}] - Map of fields already visited.
 	 */
-	updateField(field, data, direction = BOTH)
+	updateField(field, data, visited = {})
 	{
-		if (!field) {
-			return;
-		}
-		
-		this.clearValueCache(field.path);
-		
-		// Update the field's children
-		this.updateFieldInheritance(field, data);
-		
-		if (!field.omit) {
-			//this.updateFields(field.children, data);
-		}
+		//console.log('updateField()', field.path);
 		
 		// Apply default values
 		this.applyDefaults([field]);
@@ -1052,6 +1041,9 @@ export default class FormProcessor
 		
 		// Update the field's value (and update all fields dependent on this one)
 		this.updateFieldValue(field, data);
+		
+		// Update the fields that are dependent upon the value of this field
+		this.updateFieldDependencies(field, data, visited);
 	}
 	
 	/**
@@ -1077,14 +1069,16 @@ export default class FormProcessor
 	 * Update a field using the given data.
 	 *
 	 * @protected
-	 * @param {Field}  field        - The field to update.
-	 * @param {Object} data         - The data to update with.
+	 * @param {Field}  field - The field to update.
+	 * @param {Object} data  - The data to update with.
 	 */
 	updateFieldValue(field, data)
 	{
 		if (!field) {
 			return;
 		}
+		
+		//console.log('updateFieldValue()', field.path);
 		
 		// Update the field value
 		field.value = get(data, field.path);
@@ -1100,9 +1094,6 @@ export default class FormProcessor
 	 */
 	updateFieldDependencies(field, data, visited = {})
 	{
-		// Update parent field values
-		this.updateFieldAncestorValues(field, data);
-		
 		// Update the field's expression dependencies
 		let dependencies = this.getFieldExpressionDependencies(field);
 		
@@ -1471,7 +1462,7 @@ export default class FormProcessor
 	 *
 	 * TODO: The naming and existence of this method doesn't quite make sense.
 	 *       You'd expect it to remove the field(s) too, considering updatePath().
-	 *       Refactor!
+	 *       Refactor?
 	 *
 	 * @protected
 	 * @param {string}  path - The path to remove.
@@ -1497,16 +1488,21 @@ export default class FormProcessor
 	 *
 	 * @protected
 	 * @param {Field[]} fields - The fields to remove.
+	 * @return {Field[]} The removed fields.
 	 */
 	removeFields(fields)
 	{
 		if (!Array.isArray(fields) || !fields.length) {
-			return;
+			return [];
 		}
 		
+		let removed = [];
+		
 		for (let i = 0; i < fields.length; i++) {
-			this.removeField(fields[i]);
+			removed.push(this.removeField(fields[i]));
 		}
+		
+		return removed;
 	}
 	
 	/**

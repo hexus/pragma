@@ -118,9 +118,9 @@ const fields = [
 		}
 	},
 	{
-		path: 'templates.class.levels',
-		type: 'number',
-		name: 'Levels',
+		path:    'templates.class.levels',
+		type:    'number',
+		name:    'Levels',
 		options: {
 			min: 1
 		},
@@ -133,7 +133,7 @@ const fields = [
 		description: "The character's classes"
 	},
 	{
-		path: 'classes.level',
+		path:       'classes.level',
 		expression: 'sumBy($parent.list, "levels")'
 	},
 	{
@@ -143,11 +143,11 @@ const fields = [
 			editable: true // TODO: Rename to mutable.. or something else more appropriate
 		},
 		template: 'templates.class',
-		fixed: {
+		fixed:    {
 			0: true // Always keep the first class
 		}
 	},
-
+	
 	// Abilities
 	{
 		path: 'templates.ability',
@@ -167,7 +167,8 @@ const fields = [
 		expression: 'abilityModifier($parent.score)'
 	},
 	{
-		path: 'templates.ability.base'
+		path:    'templates.ability.base',
+		default: 10
 	},
 	{
 		path: 'templates.ability.racialBonus'
@@ -186,12 +187,12 @@ const fields = [
 		virtual: true
 	},
 	{
-		path:    'abilities',
-		parent:  'sections.abilities',
-		type:    'table',
+		path:     'abilities',
+		parent:   'sections.abilities',
+		type:     'table',
 		template: 'templates.ability',
-		fixed:   ['str', 'dex', 'con', 'int', 'wis', 'cha'],
-		options: {
+		fixed:    ['str', 'dex', 'con', 'int', 'wis', 'cha'],
+		options:  {
 			showLabel: true,
 			headings:  [
 				'Ability',
@@ -565,7 +566,7 @@ const fields = [
 				'cha': 'Charisma'
 			}
 		},
-		default: 'str',
+		default:  'str',
 		disabled: true
 	},
 	{
@@ -626,7 +627,7 @@ const fields = [
 		},
 		template: 'templates.skill',
 		merge:    true,
-		fixed: [
+		fixed:    [
 			'acrobatics', 'appraise', 'bluff', 'climb', 'craft', 'diplomacy',
 			'disableDevice', 'disguise', 'escapeArtist', 'fly', 'handleAnimal',
 			'heal', 'intimidate', 'knowledgeArcana', 'knowledgeDungeoneering',

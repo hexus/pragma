@@ -40,10 +40,6 @@
 		this.on('mount', this.sync);
 		this.on('update', this.sync);
 
-		this.root.sync = () => {
-			this.sync();
-		};
-
 		this.root.update = () => {
 			this.update();
 		};
