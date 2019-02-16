@@ -3,9 +3,10 @@
     [
       "@babel/preset-env",
       {
+        "modules": false,
         "targets": {
-          "node": "6.10",
-          "esmodules": true
+          "chrome": "72",
+          "ie": "11"
         }
       }
     ]

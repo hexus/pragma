@@ -4,7 +4,7 @@ const MinifyPlugin = require('babel-minify-webpack-plugin');
 
 
 module.exports = {
-	mode: 'none',
+	mode: 'development',
 	entry: {
 		index: './src/index.js',
 		pragma: './src/pragma.js',
@@ -33,7 +33,7 @@ module.exports = {
 					loader: 'riot-tag-loader',
 					options: {
 						hot: false,
-						//type: 'es6'
+						type: 'es6'
 						// riot-compiler options riot.js.org/guide/compiler/
 					}
 				}]
@@ -41,23 +41,30 @@ module.exports = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				use: {
+				use: [{
 					loader: 'babel-loader',
 					options: {
-						presets: ['@babel/preset-env']
+						presets: ['@babel/preset-env'],
+						sourceMaps: true
 					}
-				}
+				}]
 			}
 		]
 	},
 	optimization: {
-		minimize: true,
 		minimizer: [
-			new MinifyPlugin(
-				{
-					mangle: { topLevel: false }
-				}
-			)
+			new MinifyPlugin()
 		]
-	}
+	},
+	plugins: [
+		new webpack.ProgressPlugin((percentage, message, ...args) => {
+			console.info(
+				Math.round(percentage * 1000) / 1000,
+				message
+			);
+		}),
+		new webpack.ProvidePlugin({
+			'riot': 'riot'
+		})
+	]
 };

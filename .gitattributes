@@ -2,6 +2,7 @@
 
 LICENSE   text eol=lf
 .git*     text eol=lf
+.babelrc  text eol=lf
 .jshintrc text eol=lf
 *.html    text eol=lf
 *.js      text eol=lf
