@@ -1,8 +1,10 @@
 const webpack = require('webpack');
 const path = require('path');
+const MinifyPlugin = require('babel-minify-webpack-plugin');
+
 
 module.exports = {
-	mode: 'development',
+	mode: 'none',
 	entry: {
 		index: './src/index.js',
 		pragma: './src/pragma.js',
@@ -31,7 +33,7 @@ module.exports = {
 					loader: 'riot-tag-loader',
 					options: {
 						hot: false,
-						type: 'es6'
+						//type: 'es6'
 						// riot-compiler options riot.js.org/guide/compiler/
 					}
 				}]
@@ -48,9 +50,14 @@ module.exports = {
 			}
 		]
 	},
-	plugins: [
-		new webpack.ProvidePlugin({
-			'riot': 'riot'
-		})
-	]
+	optimization: {
+		minimize: true,
+		minimizer: [
+			new MinifyPlugin(
+				{
+					mangle: { topLevel: false }
+				}
+			)
+		]
+	}
 };

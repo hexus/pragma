@@ -1,7 +1,7 @@
 <pragma>
 	<tree children="{ form.tree.children }" onadd="{ add }" onedit="{ edit }" onremove="{ remove }"></tree>
 
-	<div if="{ opts.hasOwnProperty('debug') }"
+	<div if="{ opts.debug !== undefined }"
 		 style="position: fixed; top: 0; right: 0; height: 100%; width: 300px; background: rgba(255, 255, 255, 0.5); overflow: auto;">
 		<!-- Debug the data -->
 		<!-- TODO: Pragma debug tag that decorates this tag with debugging functionality -->
