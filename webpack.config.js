@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const path = require('path');
 const MinifyPlugin = require('babel-minify-webpack-plugin');
 
-
 module.exports = {
 	mode: 'development',
 	entry: {
@@ -44,8 +43,9 @@ module.exports = {
 				use: [{
 					loader: 'babel-loader',
 					options: {
-						presets: ['@babel/preset-env'],
-						sourceMaps: true
+						presets: [
+							'@babel/preset-env'
+						]
 					}
 				}]
 			}

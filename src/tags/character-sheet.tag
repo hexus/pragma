@@ -8,9 +8,6 @@
 
 	<script>
 		import './pragma.tag';
-		// import './input/mdc/mdc-number.tag';
-		// import './input/mdc/mdc-string.tag';
-		// import './input/mdc/mdc-selection.tag';
 
 		import fields from '../data/fields';
 		import abilityModifier from '../model/functions/abilityModifier';
@@ -20,18 +17,6 @@
 		this.functions = {
 			abilityModifier
 		};
-
-		// this.defaults = {
-		// 	'number': {
-		// 		input: 'mdc-number'
-		// 	},
-		// 	'string': {
-		// 		input: 'mdc-string'
-		// 	},
-		// 	'selection': {
-		// 		input: 'mdc-selection'
-		// 	}
-		// };
 
 		this.sync = function () {
 			this.state = this.opts.state || this.root.state || {};
