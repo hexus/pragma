@@ -65,13 +65,15 @@
 			this.form.addFunctions(functions);
 
 			if (fields !== this.fields) {
+				console.log('setFields', fields);
 				console.time('setFields');
 				this.fields = fields;
 				this.form.setFields(fields);
 				console.timeEnd('setFields');
 			}
 
-			if (state !== this.state) {
+			if (state && state !== this.state) {
+				console.log('update', state);
 				console.time('update');
 				this.state = state;
 				this.form.update(this.state);
@@ -87,6 +89,7 @@
 			this.update();
 		};
 
+		this.sync();
 		this.on('mount', this.sync);
 		this.on('update', this.sync);
 	</script>

@@ -6,8 +6,9 @@ module.exports = {
 	mode: 'development',
 	entry: {
 		index: ['@babel/polyfill', './src/index.js'],
+		shopping: './src/shopping.js',
 		pragma: './src/pragma.js',
-		old: './src/old.js'
+		old: './src/old.js',
 	},
 	output: {
 		path: path.join(__dirname, 'build'),
