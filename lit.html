@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Web components experiment</title>
+	</head>
+	<body>
+		<script type="module">
+			import {LitElement, html} from "https://unpkg.com/@polymer/lit-element/lit-element.js?module";
+
+			class TestElement extends LitElement
+			{
+				render()
+				{
+					return html`
+						<h1>Heading</h1>
+						<p><slot></slot></p>
+					`;
+				}
+			}
+
+			customElements.define('test-element', TestElement);
+		</script>
+
+		<test-element>
+			Hello there
+		</test-element>
+	</body>
+</html>
