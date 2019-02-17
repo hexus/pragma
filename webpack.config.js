@@ -6,7 +6,7 @@ const MinifyPlugin = require('babel-minify-webpack-plugin');
 module.exports = {
 	mode: 'development',
 	entry: {
-		index: './src/index.js',
+		index: ['@babel/polyfill', './src/index.js'],
 		pragma: './src/pragma.js',
 		old: './src/old.js'
 	},
@@ -59,7 +59,7 @@ module.exports = {
 	plugins: [
 		new webpack.ProgressPlugin((percentage, message, ...args) => {
 			console.info(
-				Math.round(percentage * 1000) / 1000,
+				(Math.round(percentage * 1000) / 10) + '%',
 				message
 			);
 		}),
