@@ -1672,14 +1672,15 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Add new child data for the field at the given path using its template.
+	 * Add new a new data item for the field at the given path.
 	 *
 	 * @public
-	 * @param {Object}        data  - The data to change.
-	 * @param {string}        path  - The path of the field to add new child data to.
-	 * @param {string|number} [key] - Optional key to use for the new child data.
+	 * @param {Object}        data    - The data to change.
+	 * @param {string}        path    - The path of the field to add new data item to.
+	 * @param {string|number} [key]   - Optional key to use for the new data item.
+	 * @param {*}             [value] - Optional value to use for the new data item.
 	 */
-	addItem(data, path, key)
+	addItem(data, path, key, value)
 	{
 		let field = this.getField(path);
 
@@ -1688,7 +1689,7 @@ export default class FormProcessor
 		}
 		
 		// Build the new child data
-		let newData = this.buildTemplateData(field);
+		let newData = merge(this.buildTemplateData(field), value || {});
 		
 		// Get the target for the data
 		let target = get(data, path, []);

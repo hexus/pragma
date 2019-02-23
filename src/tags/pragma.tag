@@ -16,6 +16,7 @@
 		import './input/boolean.tag';
 		import './input/selection.tag';
 		import './input/section.tag';
+		import './input/picker.tag';
 		import './input/group.tag';
 		import './input/list.tag';
 		import './input/pragma-table.tag';
@@ -36,9 +37,9 @@
 
 		// Define event handlers
 		this.add = function (event) {
-			let { name } = event.detail;
+			let { name, key, value } = event.detail;
 
-			this.form.addItem(this.state, name);
+			this.form.addItem(this.state, name, key, value);
 		};
 
 		this.edit = function (event) {

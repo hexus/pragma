@@ -690,6 +690,28 @@ const fields = [
 			ability: 'cha'
 		}
 	},
+	{
+		path: 'spells',
+		type: 'section'
+	},
+	{
+		path: 'spells.search',
+		type: 'selection',
+		input: 'picker'
+	},
+	{
+		path: 'templates.spell',
+		type: 'group'
+	},
+	{
+		path: 'templates.spell.name',
+		type: 'string'
+	},
+	{
+		path: 'spells.list',
+		type: 'list',
+		template: 'templates.spell'
+	}
 ];
 
 export default fields;
