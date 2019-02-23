@@ -697,7 +697,25 @@ const fields = [
 	{
 		path: 'spells.search',
 		type: 'selection',
-		input: 'picker'
+		input: 'picker',
+		options: {
+			target: 'spells.list', // Add selections to spell list
+			source: '',            // Source URL for data
+			data: {                // Inline data
+				'One': {
+					id: 1,
+					name: 'One'
+				},
+				'Two': {
+					id: 2,
+					name: 'Two'
+				},
+				'Three': {
+					id: 3,
+					name: 'Three'
+				}
+			}
+		}
 	},
 	{
 		path: 'templates.spell',
