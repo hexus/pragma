@@ -1,7 +1,7 @@
-//import raw from './spells-raw.json';
+import raw from './spells-raw.json';
 // @see {@link https://api.sheety.co/07f58b33-42c4-475f-b6a0-bc4ce72adba3}
 
-const raw = [];
+//const raw = [];
 const emptyValues = [null, 'NULL', 0];
 const spells = {};
 
