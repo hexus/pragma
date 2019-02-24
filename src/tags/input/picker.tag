@@ -5,38 +5,44 @@
 		<option each="{ item, key in data() }" value="{ key }"></option>
 	</datalist>
 
-	<button type="button" onclick="{ add }">
+	<button type="button" onclick="{ add }" disabled="{ !value }">
 		Add
 	</button>
 
 	<script>
 		import get from 'lodash/get';
 		import defaultTo from 'lodash/defaultTo';
-		import edit from '../../mixins/edit';
 		import domEvent from '../../mixins/domEvent';
 
-		this.mixin(edit);
 		this.mixin(domEvent);
 
 		console.log(this);
 
-		// TODO: Implement sourcing data via ajax
-
-		this.data = {};
-
 		this.value = null;
+
+		this.source = function () {
+			return get(this.opts.property, 'options.source');
+		};
 
 		this.data = function () {
 			return get(this.opts.property, 'options.data', {});
 		};
 
-		this.input = function (event) {
-			if (!this.data()[event.target.value]) {
+		this.updateValue = function (key) {
+			if (!this.data()[key]) {
 				this.value = null;
 				return;
 			}
 
-			this.value = this.data()[event.target.value];
+			this.value = this.data()[key];
+		};
+
+		this.input = function (event) {
+			if (this.source()) {
+				// TODO: fetch() data then updateValue()
+			} else {
+				this.updateValue(event.target.value);
+			}
 		};
 
 		this.add = function () {
