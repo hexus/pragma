@@ -1,4 +1,4 @@
-import spells from './spells';
+//import spells from './spells';
 
 /**
  * A set of fields that describe a Pathfinder Character Sheet.
@@ -701,9 +701,12 @@ const fields = [
 		type: 'selection',
 		input: 'picker',
 		options: {
-			target: 'spells.list', // Add selections to spell list
-			source: '',            // Source URL for data
-			data: spells
+			target: 'spells.list',          // Add selections to spell list
+			source: '/src/data/spells.csv', // Source URL for data
+			static: true,                   // Load the data source once
+			type:   'csv',
+			key:    'name'                  // Spell name value key
+			//data: spells
 		}
 	},
 	{
