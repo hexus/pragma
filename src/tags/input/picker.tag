@@ -2,7 +2,9 @@
 	<input ref="input" list="picker-{_riot_id}-list" oninput="{ input }">
 
 	<datalist id="picker-{_riot_id}-list">
-		<option each="{ item, key in data() }" value="{ getItemValue(item, key) }"></option>
+		<option each="{ item, key in data() }" value="{ getItemValue(item, key) }">
+			{ getItemDetail(item, key) }
+		</option>
 	</datalist>
 
 	<button type="button" onclick="{ add }" disabled="{ !value }">
@@ -92,6 +94,12 @@
 			let valueKey = get(this.opts.property, 'options.key');
 
 			return valueKey ? get(item, valueKey) : key;
+		};
+
+		this.getItemDetail = function (item, key) {
+			let detailKey = get(this.opts.property, 'options.detail');
+
+			return detailKey ? get(item, detailKey) : null;
 		};
 
 		this.input = function (event) {
