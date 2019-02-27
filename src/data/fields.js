@@ -696,7 +696,7 @@ const fields = [
 	},
 	{
 		// TODO: Collection type used for lists *and* selects/pickers?
-		//       Generic child data loading for fields?
+		//       Generic loading for child data and/or options?
 		path: 'spells.search',
 		type: 'selection',
 		input: 'picker',

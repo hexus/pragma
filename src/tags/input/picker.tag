@@ -1,11 +1,9 @@
 <picker>
-	<input ref="input" list="picker-{_riot_id}-list" oninput="{ input }">
-
-	<datalist id="picker-{_riot_id}-list">
-		<option each="{ item, key in data() }" value="{ getItemValue(item, key) }">
-			{ getItemDetail(item, key) }
-		</option>
-	</datalist>
+	<select ref="input" oninput="{ input }">
+		<!--<option each="{ item, key in data() }" value="{ getItemValue(item, key) }">-->
+			<!--{ getItemDetail(item, key) }-->
+		<!--</option>-->
+	</select>
 
 	<button type="button" onclick="{ add }" disabled="{ !value }">
 		Add
@@ -16,15 +14,27 @@
 		import set from 'lodash/set';
 		import defaultTo from 'lodash/defaultTo';
 		import domEvent from '../../mixins/domEvent';
+		import Choices from 'choices.js';
+		//import 'choices.js/public/assets/styles/choices.css'; // TODO: Make this work
 		import Papa from 'papaparse';
 
 		this.mixin(domEvent);
 
-		console.log(this);
-
 		let tag = this;
 
+		/**
+		 * Currently selected value.
+		 *
+		 * @type {*}
+		 */
 		this.value = null;
+
+		/**
+		 * Choices input element.
+		 *
+		 * @type {Object}
+		 */
+		this.choices = null;
 
 		this.source = function () {
 			return get(this.opts.property, 'options.source');
@@ -53,7 +63,7 @@
 		function updateData(data) {
 			return new Promise((resolve) => {
 				resolve(
-					set(tag.opts.property, 'options.data', data)
+					tag.choices.setChoices(data, 'id', 'name')
 				);
 			});
 		}
@@ -136,8 +146,14 @@
 			this.refs.input.value = null;
 		};
 
-		// Load data upfront if configured
 		this.on('mount', function () {
+			// Set up the select
+			this.choices = new Choices(this.refs.input, {
+				renderChoiceLimit: 50,
+				searchResultLimit: 50
+			});
+
+			// Load data upfront if configured
 			this.static() && this.loadData().then(() => this.update());
 		});
 	</script>
