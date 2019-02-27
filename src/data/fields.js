@@ -1,5 +1,3 @@
-import spells from './spells';
-
 /**
  * A set of fields that describe a Pathfinder Character Sheet.
  *
@@ -697,13 +695,18 @@ const fields = [
 		type: 'section'
 	},
 	{
+		// TODO: Collection type used for lists *and* selects/pickers?
+		//       Generic child data loading for fields?
 		path: 'spells.search',
 		type: 'selection',
 		input: 'picker',
 		options: {
-			target: 'spells.list', // Add selections to spell list
-			source: '',            // Source URL for data
-			data: spells
+			target: 'spells.list',          // Add selections to spell list
+			source: '/src/data/spells.csv', // Source URL for data
+			static: true,                   // Load the data source once
+			type:   'csv',
+			key:    'name',                 // Value key
+			detail: 'short_description'     // Detail key
 		}
 	},
 	{
@@ -712,6 +715,10 @@ const fields = [
 	},
 	{
 		path: 'templates.spell.name',
+		type: 'string'
+	},
+	{
+		path: 'templates.spell.short_description',
 		type: 'string'
 	},
 	{
