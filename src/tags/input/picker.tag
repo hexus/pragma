@@ -1,5 +1,9 @@
 <picker>
-	<select ref="input"></select>
+	<select ref="input">
+		<option if="{ placeholder() }" placeholder value="">
+			{ placeholder() }
+		</option>
+	</select>
 
 	<button if="target()" type="button" onclick="{ add }" disabled="{ !value }">
 		Add
@@ -48,6 +52,16 @@
 
 		this.target = function () {
 			return get(this.opts.property, 'options.target');
+		};
+
+		this.placeholder = function () {
+			let placeholder = get(this.opts.property, 'options.placeholder');
+
+			if (!placeholder) {
+				return false;
+			}
+
+			return typeof placeholder === 'string' ? placeholder: 'Select an option';
 		};
 
 		function parseOptions(data) {
@@ -165,9 +179,12 @@
 				value: this.value
 			});
 
-			// Clear the value
-			this.updateValue(null);
-			this.choices.setValue(null);
+			// Clear the value if this has a target
+			// TODO: "property.options.clear" instead of target check?
+			if (this.target()) {
+				this.updateValue(null);
+				this.choices.setChoiceByValue('');
+			}
 		};
 
 		this.on('mount', function () {
