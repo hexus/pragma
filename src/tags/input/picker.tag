@@ -21,6 +21,8 @@
 		/**
 		 * Currently selected value.
 		 *
+		 * TODO: Drop this and use opts.property.value instead
+		 *
 		 * @type {*}
 		 */
 		this.value = null;
@@ -68,8 +70,8 @@
 				// Update the Choices instance options
 				tag.choices.setChoices(
 					data,
-					tag.getItemValueKey(),
-					tag.getItemLabelKey()
+					tag.getOptionValuePath(),
+					tag.getOptionLabelKey()
 				);
 
 				resolve(data);
@@ -93,21 +95,17 @@
 		};
 
 		this.updateValue = function (value) {
-			console.log(this.choices);
-
 			// Linear search for the given value
 			let i;
 			let options = this.options();
 			let keys = Object.keys(options);
-			let item;
-
-			console.log(options);
+			let option;
 
 			for (i = 0; i < keys.length; i++) {
-				item = options[keys[i]];
+				option = options[keys[i]];
 
-				if (this.getItemValue(item, keys[i]) === value) {
-					this.value = item;
+				if (this.getOptionValue(option, keys[i]) === value) {
+					this.value = option;
 
 					return;
 				}
@@ -116,37 +114,38 @@
 			this.value = null;
 		};
 
-		this.getItemValueKey = function () {
+		this.getOptionValuePath = function () {
 			return get(this.opts.property, 'options.key');
 		};
 
-		this.getItemLabelKey = function () {
+		this.getOptionLabelKey = function () {
 			return get(this.opts.property, 'options.label');
 		};
 
-		this.getItemValue = function (item, key) {
-			// Use the configured value key, falling back to the item key
-			let valueKey = this.getItemValueKey();
+		/**
+		 * Get the value of the given option.
+		 *
+		 * @param {*}             option - The option.
+		 * @param {string|number} [key]  - The key of the option.
+		 * @returns {string|number}
+		 */
+		this.getOptionValue = function (option, key) {
+			// Use the configured value key, falling back to the option key
+			let valueKey = this.getOptionValuePath();
 
-			return valueKey ? get(item, valueKey) : key;
+			return valueKey ? get(option, valueKey) : key;
 		};
 
-		this.getItemLabel = function (item, key) {
-			let labelKey = this.getItemLabelKey();
+		/**
+		 * Get the label of the given option.
+		 *
+		 * @param {*} option - The option.
+		 * @returns {string}
+		 */
+		this.getOptionLabel = function (option) {
+			let labelKey = this.getOptionLabelKey();
 
-			return labelKey ? get(item, labelKey) : null;
-		};
-
-		this.input = function (event) {
-			if (!this.static() && this.source()) {
-				// Load data on input if it isn't static
-				this.loadOptions().then(() => {
-					this.updateValue(event.target.value);
-				});
-			} else {
-				// Update immediately if data is static
-				this.updateValue(event.target.value);
-			}
+			return labelKey ? get(option, labelKey) : null;
 		};
 
 		this.add = function () {
@@ -167,27 +166,47 @@
 			});
 
 			// Clear the value
-			this.value = null;
-			this.refs.input.value = null;
+			this.updateValue(null);
+			this.choices.setValue(null);
 		};
 
 		this.on('mount', function () {
+			let input = this.refs.input;
+
 			// Set up the select
-			this.choices = new Choices(this.refs.input, {
+			this.choices = new Choices(input, {
 				renderChoiceLimit: 50,
 				searchResultLimit: 50
 			});
 
-			this.refs.input.addEventListener('addItem', function (event) {
+			input.addEventListener('addItem', function (event) {
+				// TODO: Support multiple selections
+
 				// Update the selected value
+				// TODO: Remove this
 				tag.updateValue(event.detail.value);
 
-				// Update the tag
-				tag.update();
+				// Trigger the edit event
+				tag.triggerDom('edit', {
+					name:  tag.opts.property.path,
+					value: event.detail.value
+				});
 			});
 
 			// Load data upfront if configured
 			this.static() && this.loadOptions().then(() => this.update());
+		});
+
+		this.on('update', function () {
+			let option = this.opts.property.value;
+
+			// TODO: Support multiple selections
+			this.choices.setValue([
+				{
+					label: this.getOptionLabel(option),
+					value: this.getOptionValue(option)
+				}
+			]);
 		});
 	</script>
 </picker>

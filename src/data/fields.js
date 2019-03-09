@@ -700,6 +700,7 @@ const fields = [
 		path: 'spells.search',
 		type: 'selection',
 		input: 'picker',
+		//virtual: true
 		options: {
 			target: 'spells.list',          // Add selections to spell list
 			source: '/src/data/spells.csv', // Source URL for data
