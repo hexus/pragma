@@ -1,11 +1,7 @@
 <picker>
-	<select ref="input" oninput="{ input }">
-		<!--<option each="{ item, key in data() }" value="{ getItemValue(item, key) }">-->
-			<!--{ getItemDetail(item, key) }-->
-		<!--</option>-->
-	</select>
+	<select ref="input"></select>
 
-	<button type="button" onclick="{ add }" disabled="{ !value }">
+	<button if="target()" type="button" onclick="{ add }" disabled="{ !value }">
 		Add
 	</button>
 
@@ -40,15 +36,19 @@
 			return get(this.opts.property, 'options.source');
 		};
 
-		this.data = function () {
-			return get(this.opts.property, 'options.data', {});
+		this.options = function () {
+			return get(this.opts.property, 'options.options', {});
 		};
 
 		this.static = function () {
 			return get(this.opts.property, 'options.static', false);
 		};
 
-		function parseData(data) {
+		this.target = function () {
+			return get(this.opts.property, 'options.target');
+		};
+
+		function parseOptions(data) {
 			return new Promise((resolve) => {
 				resolve(
 					Papa.parse(data, {
@@ -60,34 +60,51 @@
 			});
 		}
 
-		function updateData(data) {
+		function updateOptions(data) {
 			return new Promise((resolve) => {
-				resolve(
-					tag.choices.setChoices(data, 'id', 'name')
+				// Update the field's options
+				set(tag.opts.property, 'options.options', data);
+
+				// Update the Choices instance options
+				tag.choices.setChoices(
+					data,
+					tag.getItemValueKey(),
+					tag.getItemLabelKey()
 				);
+
+				resolve(data);
 			});
 		}
 
-		this.loadData = function () {
-			return fetch(this.source())
-				.then(response => response.text())
-				.then(parseData)
-				.then(updateData)
-				.catch((error) => {
-					console.error(`Error loading data for field '${this.opts.property.path}'`, error);
-				});
+		this.loadOptions = function () {
+			if (this.source()) {
+				return fetch(this.source())
+					.then(response => response.text())
+					.then(parseOptions)
+					.then(updateOptions)
+					.catch((error) => {
+						console.error(`Error loading data for field '${this.opts.property.path}'`, error);
+					});
+			}
+
+			// TODO: Promisify this
+			//return this.options();
+			throw new Error('Inline options are not yet supported');
 		};
 
 		this.updateValue = function (value) {
-			// Linear search for the given value, validating that it's in the data
-			// TODO: Use a good autocomplete library, native won't cut it
+			console.log(this.choices);
+
+			// Linear search for the given value
 			let i;
-			let data = this.data();
-			let keys = Object.keys(data);
+			let options = this.options();
+			let keys = Object.keys(options);
 			let item;
 
+			console.log(options);
+
 			for (i = 0; i < keys.length; i++) {
-				item = data[keys[i]];
+				item = options[keys[i]];
 
 				if (this.getItemValue(item, keys[i]) === value) {
 					this.value = item;
@@ -99,23 +116,31 @@
 			this.value = null;
 		};
 
+		this.getItemValueKey = function () {
+			return get(this.opts.property, 'options.key');
+		};
+
+		this.getItemLabelKey = function () {
+			return get(this.opts.property, 'options.label');
+		};
+
 		this.getItemValue = function (item, key) {
 			// Use the configured value key, falling back to the item key
-			let valueKey = get(this.opts.property, 'options.key');
+			let valueKey = this.getItemValueKey();
 
 			return valueKey ? get(item, valueKey) : key;
 		};
 
-		this.getItemDetail = function (item, key) {
-			let detailKey = get(this.opts.property, 'options.detail');
+		this.getItemLabel = function (item, key) {
+			let labelKey = this.getItemLabelKey();
 
-			return detailKey ? get(item, detailKey) : null;
+			return labelKey ? get(item, labelKey) : null;
 		};
 
 		this.input = function (event) {
 			if (!this.static() && this.source()) {
 				// Load data on input if it isn't static
-				this.loadData().then(() => {
+				this.loadOptions().then(() => {
 					this.updateValue(event.target.value);
 				});
 			} else {
@@ -125,8 +150,8 @@
 		};
 
 		this.add = function () {
-			// Only fire an event for a valid selection
-			if (!this.value) {
+			// Only fire an event for a valid selection and target
+			if (!this.value || !this.target()) {
 				return;
 			}
 
@@ -153,8 +178,16 @@
 				searchResultLimit: 50
 			});
 
+			this.refs.input.addEventListener('addItem', function (event) {
+				// Update the selected value
+				tag.updateValue(event.detail.value);
+
+				// Update the tag
+				tag.update();
+			});
+
 			// Load data upfront if configured
-			this.static() && this.loadData().then(() => this.update());
+			this.static() && this.loadOptions().then(() => this.update());
 		});
 	</script>
 </picker>
