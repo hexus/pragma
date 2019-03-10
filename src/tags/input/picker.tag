@@ -5,7 +5,7 @@
 		</option>
 	</select>
 
-	<button if="target()" type="button" onclick="{ add }" disabled="{ !value }">
+	<button if="target()" type="button" onclick="{ add }" disabled="{ !value() }">
 		Add
 	</button>
 
@@ -21,15 +21,6 @@
 		this.mixin(domEvent);
 
 		let tag = this;
-
-		/**
-		 * Currently selected value.
-		 *
-		 * TODO: Drop this and use opts.property.value instead
-		 *
-		 * @type {*}
-		 */
-		this.value = null;
 
 		/**
 		 * Choices input element.
@@ -62,6 +53,15 @@
 			}
 
 			return typeof placeholder === 'string' ? placeholder: 'Select an option';
+		};
+
+		/**
+		 * Get the current value.
+		 *
+		 * @return {*}
+		 */
+		this.value = function () {
+			return this.opts.property.value;
 		};
 
 		function parseOptions(data) {
@@ -108,7 +108,13 @@
 			throw new Error('Inline options are not yet supported');
 		};
 
-		this.updateValue = function (value) {
+		/**
+		 * Get the full option for the given option value.
+		 *
+		 * @param {string|number} value
+		 * @return {*}
+		 */
+		this.getValueOption = function (value) {
 			// Linear search for the given value
 			let i;
 			let options = this.options();
@@ -119,13 +125,11 @@
 				option = options[keys[i]];
 
 				if (this.getOptionValue(option, keys[i]) === value) {
-					this.value = option;
-
-					return;
+					return option;
 				}
 			}
 
-			this.value = null;
+			return null;
 		};
 
 		this.getOptionValuePath = function () {
@@ -169,22 +173,19 @@
 			}
 
 			// Fire the event
-			let target = defaultTo(
-				get(this.opts.property, 'options.target'),
-				this.opts.property.path
-			);
-
 			this.triggerDom('add', {
-				name:  target,
-				value: this.value
+				name:  this.target(),
+				value: this.value()
 			});
 
-			// Clear the value if this has a target
-			// TODO: "property.options.clear" instead of target check?
-			if (this.target()) {
-				this.updateValue(null);
-				this.choices.setChoiceByValue('');
-			}
+			// TODO: "property.options.clear" check?
+
+			// Clear the value
+			//this.choices.setChoiceByValue('');
+			this.triggerDom('edit', {
+				name: this.opts.property.path,
+				value: ''
+			});
 		};
 
 		this.on('mount', function () {
@@ -199,14 +200,10 @@
 			input.addEventListener('addItem', function (event) {
 				// TODO: Support multiple selections
 
-				// Update the selected value
-				// TODO: Remove this
-				tag.updateValue(event.detail.value);
-
 				// Trigger the edit event
 				tag.triggerDom('edit', {
 					name:  tag.opts.property.path,
-					value: event.detail.value
+					value: tag.getValueOption(event.detail.value)
 				});
 			});
 
@@ -215,9 +212,17 @@
 		});
 
 		this.on('update', function () {
-			let option = this.opts.property.value;
+			let option = this.value();
+
+			if (!option) {
+				this.choices.setChoiceByValue('');
+				return;
+			}
+
+			console.log('picker update', option);
 
 			// TODO: Support multiple selections
+			// TODO: Fixed infinite loop
 			this.choices.setValue([
 				{
 					label: this.getOptionLabel(option),
