@@ -222,12 +222,7 @@
 			console.log('picker update', option);
 
 			// TODO: Support multiple selections
-			this.choices.setValue([
-				{
-					label: this.getOptionLabel(option),
-					value: this.getOptionValue(option)
-				}
-			]);
+			this.choices.setChoiceByValue(this.getOptionValue(option));
 		});
 	</script>
 </picker>
