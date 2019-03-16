@@ -39,11 +39,19 @@
 		this.add = function (event) {
 			let { name, key, value } = event.detail;
 
+			if (!name) {
+				return;
+			}
+
 			this.form.addItem(this.state, name, key, value);
 		};
 
 		this.edit = function (event) {
 			let { name, value } = event.detail;
+
+			if (!name) {
+				return;
+			}
 
 			value = this.form.setValue(this.state, name, value);
 
@@ -52,6 +60,10 @@
 
 		this.remove = function (event) {
 			let { name } = event.detail;
+
+			if (!name) {
+				return;
+			}
 
 			this.form.removeValue(this.state, name);
 		};

@@ -66,6 +66,7 @@
 
 		function parseOptions(data) {
 			return new Promise((resolve) => {
+				// TODO: JSON support, pass-through for inline (no type set)
 				resolve(
 					Papa.parse(data, {
 						delimiter:     ',',
@@ -82,6 +83,7 @@
 				set(tag.opts.property, 'options.options', data);
 
 				// Update the Choices instance options
+				// TODO: Perhaps this should move down to the 'update' event listener?
 				tag.choices.setChoices(
 					data,
 					tag.getOptionValuePath(),
@@ -208,7 +210,9 @@
 			});
 
 			// Load data upfront if configured
-			this.static() && this.loadOptions().then(() => this.update());
+			if (this.static()) {
+				this.loadOptions().then(() => this.update());
+			}
 		});
 
 		this.on('update', function () {
