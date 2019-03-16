@@ -197,7 +197,7 @@
 				searchResultLimit: 50
 			});
 
-			input.addEventListener('addItem', function (event) {
+			input.addEventListener('change', function (event) {
 				// TODO: Support multiple selections
 
 				// Trigger the edit event
@@ -222,7 +222,6 @@
 			console.log('picker update', option);
 
 			// TODO: Support multiple selections
-			// TODO: Fixed infinite loop
 			this.choices.setValue([
 				{
 					label: this.getOptionLabel(option),
