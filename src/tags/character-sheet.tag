@@ -1,5 +1,5 @@
 <character-sheet>
-	<pragma debug
+	<pragma debug="{ opts.debug }"
 			functions="{ functions }"
 			defaults="{ defaults }"
 			fields="{ fields }"

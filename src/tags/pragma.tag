@@ -31,7 +31,7 @@
 		this.state = null;
 		this.fields = null;
 
-		if (window && this.opts.debug) {
+		if (window && this.opts.debug != null) {
 			window.pragma = this.form;
 		}
 

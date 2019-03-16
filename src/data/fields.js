@@ -317,9 +317,33 @@ const fields = [
 	{
 		path: 'defense.spellResistance'
 	},
-	// {
-	// 	path: 'templates.save'
-	// },
+	{
+		path: 'templates.save',
+		type: 'group',
+		//name: null
+	},
+	{
+		path:       'templates.save.total',
+		expression: '$parent.base + $parent.abilityModifier + ' +
+						'$parent.magicModifier + $parent.miscModifier + ' +
+						'$parent.tempModifier'
+	},
+	{
+		path: 'templates.save.base'
+	},
+	{
+		path:       'templates.save.abilityModifier',
+		expression: 'abilities.con.modifier'
+	},
+	{
+		path: 'templates.save.magicModifier'
+	},
+	{
+		path: 'templates.save.miscModifier'
+	},
+	{
+		path: 'templates.save.tempModifier'
+	},
 	{
 		path:    'sections.saves',
 		parent:  'defense',
@@ -328,10 +352,12 @@ const fields = [
 		virtual: true
 	},
 	{
-		path:    'defense.saves',
-		parent:  'sections.saves',
-		type:    'table',
-		options: {
+		path:     'defense.saves',
+		parent:   'sections.saves',
+		type:     'table',
+		template: 'templates.save',
+		fixed:    ['fortitude', 'reflex', 'will'], // TODO: Expressions don't work without this
+		options:  {
 			showLabel: true,
 			headings:  [
 				'Save',
@@ -345,82 +371,25 @@ const fields = [
 		}
 	},
 	{
-		path: 'defense.saves.fortitude',
-		type: 'group'
-	},
-	{
-		path:       'defense.saves.fortitude.total',
-		expression: '$parent.base + $parent.abilityModifier + ' +
-						'$parent.magicModifier + $parent.miscModifier + ' +
-						'$parent.tempModifier'
-	},
-	{
-		path: 'defense.saves.fortitude.base'
+		path: 'defense.saves.fortitude'
 	},
 	{
 		path:       'defense.saves.fortitude.abilityModifier',
 		expression: 'abilities.con.modifier'
 	},
 	{
-		path: 'defense.saves.fortitude.magicModifier'
-	},
-	{
-		path: 'defense.saves.fortitude.miscModifier'
-	},
-	{
-		path: 'defense.saves.fortitude.tempModifier'
-	},
-	{
-		path: 'defense.saves.reflex',
-		type: 'group'
-	},
-	{
-		path:       'defense.saves.reflex.total',
-		expression: '$parent.base + $parent.abilityModifier + ' +
-						'$parent.magicModifier + $parent.miscModifier + ' +
-						'$parent.tempModifier'
-	},
-	{
-		path: 'defense.saves.reflex.base'
+		path: 'defense.saves.reflex'
 	},
 	{
 		path:       'defense.saves.reflex.abilityModifier',
 		expression: 'abilities.dex.modifier'
 	},
 	{
-		path: 'defense.saves.reflex.magicModifier'
-	},
-	{
-		path: 'defense.saves.reflex.miscModifier'
-	},
-	{
-		path: 'defense.saves.reflex.tempModifier'
-	},
-	{
-		path: 'defense.saves.will',
-		type: 'group'
-	},
-	{
-		path:       'defense.saves.will.total',
-		expression: '$parent.base + $parent.abilityModifier + ' +
-						'$parent.magicModifier + $parent.miscModifier + ' +
-						'$parent.tempModifier'
-	},
-	{
-		path: 'defense.saves.will.base'
+		path: 'defense.saves.will'
 	},
 	{
 		path:       'defense.saves.will.abilityModifier',
 		expression: 'abilities.wis.modifier'
-	},
-	{
-		path: 'defense.saves.will.magicModifier'
-	},
-	{
-		path: 'defense.saves.will.miscModifier'
-	},
-	{
-		path: 'defense.saves.will.tempModifier'
 	},
 	{
 		path: 'defense.combatManeuverDefense',
@@ -697,17 +666,17 @@ const fields = [
 	{
 		// TODO: Collection type used for lists *and* selects/pickers?
 		//       Generic loading for child data and/or options?
-		path: 'spells.search',
-		type: 'selection',
-		input: 'picker',
+		path:    'spells.search',
+		type:    'selection',
+		input:   'picker',
 		//virtual: true
 		options: {
-			target: 'spells.list',            // Add selections to spell list
-			source: '/src/data/spells.csv',   // Source URL for data
-			static: true,                     // Load the data source once
-			type:   'csv',                    // TODO: Support different source data types
-			key:    'id',                     // Item value key
-			label:  'name',                   // Item label key
+			target:      'spells.list',            // Add selections to spell list
+			source:      '/src/data/spells.csv',   // Source URL for data
+			static:      true,                     // Load the data source once
+			type:        'csv',                    // TODO: Support different source data types
+			key:         'id',                     // Item value key
+			label:       'name',                   // Item label key
 			placeholder: 'Search for a spell' // Placeholder text
 		}
 	},
@@ -724,8 +693,8 @@ const fields = [
 		type: 'string'
 	},
 	{
-		path: 'spells.list',
-		type: 'list',
+		path:     'spells.list',
+		type:     'list',
 		template: 'templates.spell'
 	}
 ];
