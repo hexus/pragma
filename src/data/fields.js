@@ -681,6 +681,7 @@ const fields = [
 		}
 	},
 	{
+		// TODO: Custom component for spells
 		path: 'templates.spell',
 		type: 'group'
 	},
@@ -689,10 +690,43 @@ const fields = [
 		type: 'string'
 	},
 	{
+		path: 'templates.spell.school',
+		type: 'string'
+	},
+	{
+		path: 'templates.spell.subschool',
+		type: 'string'
+	},
+	{
+		path: 'templates.spell.range',
+		type: 'string'
+	},
+	{
+		path: 'templates.spell.area',
+		type: 'string'
+	},
+	{
+		path: 'templates.spell.effect',
+		type: 'string'
+	},
+	{
+		path: 'templates.spell.targets',
+		type: 'string'
+	},
+	{
+		path: 'templates.spell.saving_throw',
+		type: 'string'
+	},
+	{
 		path: 'templates.spell.short_description',
 		type: 'string'
 	},
 	{
+		path: 'templates.spell.'
+	},
+	{
+		// TODO: Custom component for spell list
+		//       Groups spells by level, etc
 		path:     'spells.list',
 		type:     'list',
 		template: 'templates.spell'

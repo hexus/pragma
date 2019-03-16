@@ -92,6 +92,7 @@
 			}
 		};
 
+		// Expose element methods
 		this.root.sync = () => {
 			this.sync();
 		};

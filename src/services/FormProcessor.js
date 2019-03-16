@@ -658,6 +658,9 @@ export default class FormProcessor
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
 			
+			if (!field.path)
+				continue;
+			
 			// Ascertain a parent path and path fragment
 			[parentPath, pathFragment] = splitPath(field.path);
 			
