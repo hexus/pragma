@@ -803,13 +803,13 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Derive a property's name from its path.
+	 * Derive a field's name from its path.
 	 *
 	 * @protected
 	 * @param {Field} field
 	 * @return {string} The derived name
 	 */
-	deriveName(field)
+	deriveFieldName(field)
 	{
 		let path = field.path;
 		let lastDotIndex = path.lastIndexOf('.');
@@ -852,7 +852,7 @@ export default class FormProcessor
 			
 			// Derive a name
 			if (field.name === undefined) {
-				field.name = this.deriveName(field);
+				field.name = this.deriveFieldName(field);
 			}
 			
 			// Apply global defaults
@@ -1355,7 +1355,7 @@ export default class FormProcessor
 			field = merge(field, templateClone, clone(field));
 			
 			if (field.name == null) {
-				field.name = this.deriveName(field);
+				field.name = this.deriveFieldName(field);
 			}
 			
 			field.extended = template.path;
