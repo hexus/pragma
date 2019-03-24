@@ -818,7 +818,7 @@ export default class FormProcessor
 	}
 	
 	/**
-	 * Set the default field properties for each type.
+	 * Set the default field properties for each field type.
 	 *
 	 * @param {Object.<string, Object>} fieldProperties - The default field properties, keyed by field type.
 	 */
