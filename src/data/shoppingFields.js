@@ -16,7 +16,9 @@ export default [
 		path: 'total',
 		name: 'Total cost',
 		options: {
-			showLabel: true
+			showLabel: true,
+			min: 0,
+			max: 200
 		}
 	},
 	{
