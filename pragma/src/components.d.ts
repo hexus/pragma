@@ -24,6 +24,12 @@ export namespace Components {
     */
     'middle': string;
   }
+  interface PragmaNumber {
+    /**
+    * Property data.
+    */
+    'property': any;
+  }
 }
 
 declare global {
@@ -34,8 +40,15 @@ declare global {
     prototype: HTMLMyComponentElement;
     new (): HTMLMyComponentElement;
   };
+
+  interface HTMLPragmaNumberElement extends Components.PragmaNumber, HTMLStencilElement {}
+  const HTMLPragmaNumberElement: {
+    prototype: HTMLPragmaNumberElement;
+    new (): HTMLPragmaNumberElement;
+  };
   interface HTMLElementTagNameMap {
     'my-component': HTMLMyComponentElement;
+    'pragma-number': HTMLPragmaNumberElement;
   }
 }
 
@@ -54,9 +67,16 @@ declare namespace LocalJSX {
     */
     'middle'?: string;
   }
+  interface PragmaNumber {
+    /**
+    * Property data.
+    */
+    'property'?: any;
+  }
 
   interface IntrinsicElements {
     'my-component': MyComponent;
+    'pragma-number': PragmaNumber;
   }
 }
 
@@ -67,6 +87,7 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'my-component': LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+      'pragma-number': LocalJSX.PragmaNumber & JSXBase.HTMLAttributes<HTMLPragmaNumberElement>;
     }
   }
 }
