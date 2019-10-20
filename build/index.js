@@ -6445,7 +6445,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _tre
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('tree', '<virtual each=\"{child in opts.children}\" key=\"path\"> <tree-child if=\"{visible(child)}\" is=\"{child.input}\" data-is=\"{child.input}\" property=\"{child}\"> <tree if=\"{opts.property.children}\" children=\"{opts.property.children}\"></tree> </tree-child> </virtual>', '', '', function(opts) {\n/**\n * Determine whether a field should be displayed.\n *\n * @param {Field} field\n * @returns {boolean}\n */\nthis.visible = function (field) {\n  return field && field.visible;\n}; // TODO: Would be amazing to retain and mount custom element tags without data-is\n});\n\n    \n  \n\n//# sourceURL=webpack://%5Bname%5D/./src/tags/tree.tag?");
+eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('tree', '<virtual each=\"{child in opts.children}\" key=\"path\"> <tree-child if=\"{visible(child)}\" data-is=\"{child.input}\" property=\"{child}\"> <tree if=\"{opts.property.children}\" children=\"{opts.property.children}\"></tree> </tree-child> </virtual>', '', '', function(opts) {\n/**\n * Determine whether a field should be displayed.\n *\n * @param {Field} field\n * @returns {boolean}\n */\nthis.visible = function (field) {\n  return field && field.visible;\n}; // TODO: Would be amazing to retain and mount custom element tags without data-is\n});\n\n    \n  \n\n//# sourceURL=webpack://%5Bname%5D/./src/tags/tree.tag?");
 
 /***/ }),
 

@@ -10,7 +10,7 @@ describe('parseJson', () => {
   });
 
   // Testing for the SyntaxError throw doesn't work for some reason
-  // it('throws an error if invalid JSON is given', () => {
-  //   expect(parseJson('string')).toThrowError();
-  // });
+  it('throws an error if invalid JSON is given', () => {
+    expect(() => parseJson('string')).toThrow(SyntaxError);
+  });
 });
