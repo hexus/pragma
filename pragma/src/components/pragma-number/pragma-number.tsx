@@ -1,4 +1,5 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
+import { parseJson } from '../../utils/utils';
 
 @Component({
   tag: 'pragma-number',
@@ -16,19 +17,12 @@ export class Number {
 
   @Watch('property')
   parseProperty(newValue) {
-    if (typeof newValue === 'string')
-      newValue = JSON.parse(newValue);
-
-    this.property = newValue;
+    this.property = parseJson(newValue);
   };
-
-  getPath() {
-    return this.property ? this.property.path : '';
-  }
 
   render() {
     console.log(this.property);
 
-    return <input type="number" name={this.getPath()}/>;
+    return <input type="number" name={this.property.path}/>;
   }
 }

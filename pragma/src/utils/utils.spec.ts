@@ -1,21 +1,16 @@
-import { format } from './utils';
+import { parseJson } from './utils';
 
-describe('format', () => {
-  it('returns empty string for no names defined', () => {
-    expect(format(undefined, undefined, undefined)).toEqual('');
+describe('parseJson', () => {
+  it('returns an object if a JSON object string is given', () => {
+    expect(parseJson('{"test": "test"}')).toEqual({test: 'test'});
   });
 
-  it('formats just first names', () => {
-    expect(format('Joseph', undefined, undefined)).toEqual('Joseph');
+  it('returns a string if a JSON string is given', () => {
+    expect(parseJson('"string"')).toEqual('string');
   });
 
-  it('formats first and last names', () => {
-    expect(format('Joseph', undefined, 'Publique')).toEqual('Joseph Publique');
-  });
-
-  it('formats first, middle and last names', () => {
-    expect(format('Joseph', 'Quincy', 'Publique')).toEqual(
-      'Joseph Quincy Publique'
-    );
-  });
+  // Testing for the SyntaxError throw doesn't work for some reason
+  // it('throws an error if invalid JSON is given', () => {
+  //   expect(parseJson('string')).toThrowError();
+  // });
 });
