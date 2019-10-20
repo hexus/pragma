@@ -1042,7 +1042,7 @@ export default class FormProcessor
 		// Update the state's value
 		this.updateDataValue(field, data);
 		
-		// Update the field's value (and update all fields dependent on this one)
+		// Update the field's value
 		this.updateFieldValue(field, data);
 		
 		// Update the fields that are dependent upon the value of this field

@@ -57,12 +57,12 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new webpack.ProgressPlugin((percentage, message, ...args) => {
-			console.info(
-				(Math.round(percentage * 1000) / 10) + '%',
-				message
-			);
-		}),
+		// new webpack.ProgressPlugin((percentage, message, ...args) => {
+		// 	console.info(
+		// 		(Math.round(percentage * 1000) / 10) + '%',
+		// 		message
+		// 	);
+		// }),
 		new webpack.ProvidePlugin({
 			'riot': 'riot'
 		})
