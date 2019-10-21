@@ -12,9 +12,37 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 export namespace Components {
   interface PragmaNumber {
     /**
-    * Property data.
+    * Whether the field is disabled.
     */
-    'property': any;
+    'disabled': boolean;
+    /**
+    * Pragma field data as a single object.  Setting this property will overwrite corresponding attributes.
+    */
+    'fieldAttribute': object|string;
+    /**
+    * The field's label.
+    */
+    'label': string;
+    /**
+    * The maximum value constraint.
+    */
+    'max': number;
+    /**
+    * The minimum value constraint.
+    */
+    'min': number;
+    /**
+    * The field's path.
+    */
+    'path': string;
+    /**
+    * The value step.
+    */
+    'step': number;
+    /**
+    * The field's value.
+    */
+    'value': number;
   }
 }
 
@@ -34,9 +62,37 @@ declare global {
 declare namespace LocalJSX {
   interface PragmaNumber {
     /**
-    * Property data.
+    * Whether the field is disabled.
     */
-    'property'?: any;
+    'disabled'?: boolean;
+    /**
+    * Pragma field data as a single object.  Setting this property will overwrite corresponding attributes.
+    */
+    'fieldAttribute'?: object|string;
+    /**
+    * The field's label.
+    */
+    'label'?: string;
+    /**
+    * The maximum value constraint.
+    */
+    'max'?: number;
+    /**
+    * The minimum value constraint.
+    */
+    'min'?: number;
+    /**
+    * The field's path.
+    */
+    'path'?: string;
+    /**
+    * The value step.
+    */
+    'step'?: number;
+    /**
+    * The field's value.
+    */
+    'value'?: number;
   }
 
   interface IntrinsicElements {
