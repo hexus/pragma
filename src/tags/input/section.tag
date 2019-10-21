@@ -1,5 +1,5 @@
 <section>
-	<fieldset name="{ opts.property.path }" title="{ opts.property.description }" style="min-width: 0;">
+	<fieldset name="{ opts.property.path }" title="{ opts.property.description }">
 		<legend>{ opts.property.name }</legend>
 		<yield/>
 	</fieldset>

@@ -5,14 +5,19 @@
  *
  * @param {string|object} field - The field definition to parse.
  * @return {object} The parsed JSON object.
- * @throws {Error}
+ * @throws {Error} If the given value is not a string or an object. Accepts null.
  */
-export function parseFieldDefinition(field: string|object)
+export function parseFieldDefinition(field?: string|object)
 {
+  if (field == null)
+    return {};
+
   field = parseJson(field);
 
   if (!Array.isArray(field) && typeof field !== 'object')
     throw Error('Field definition must be a JSON object string or an object literal');
+
+  // TODO: Check for Field type, when it's defined
 
   return field;
 }

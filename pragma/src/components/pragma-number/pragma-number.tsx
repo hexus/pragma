@@ -1,5 +1,16 @@
-import { Component, Prop, State, Watch, h } from '@stencil/core';
+import { Component, Prop, Watch, h } from '@stencil/core';
 import { parseFieldDefinition } from '../../utils/utils';
+
+const defaultFieldDefinition = {
+  path: null,
+  name: null,
+  min: null,
+  max: null,
+  step: null,
+  value: null,
+  options: {},
+  disabled: false
+};
 
 /**
  * A number field component.
@@ -10,22 +21,11 @@ import { parseFieldDefinition } from '../../utils/utils';
 })
 export class Number {
   /**
-   * Pragma field data as a single object.
+   * Internal Pragma field definition object.
    *
-   * Setting this property will overwrite corresponding attributes.
+   * TODO: Field definition type.
    */
-  @Prop({attribute: 'field'}) fieldAttribute: object|string;
-
-  @State() field: object|any = {
-    path: null,
-    name: null,
-    min: null,
-    max: null,
-    step: null,
-    value: null,
-    options: {},
-    disabled: false
-  };
+  @Prop() field: object|string|any = defaultFieldDefinition;
 
   /**
    * The field's path.
@@ -66,21 +66,22 @@ export class Number {
    * Handle the component loading.
    */
   componentWillLoad() {
-    this.parseFieldDefinition(this.fieldAttribute);
+    this.parseFieldDefinition(this.field, defaultFieldDefinition);
   }
 
   /**
    * Parse the field attribute when it changes.
    *
-   * @param {string|object} newValue
+   * @param {object|string} newValue
+   * @param {object|string} oldValue
    */
   @Watch('fieldAttribute')
-  parseFieldDefinition(newValue) {
+  parseFieldDefinition(newValue, oldValue) {
     let parsedField = parseFieldDefinition(newValue);
 
-    this.field = Object.assign(this.field, parsedField);
+    this.field = Object.assign(oldValue, parsedField);
 
-    console.log(newValue, parsedField, this.field);
+    console.log(oldValue, newValue, parsedField, this.field);
 
     this.path = this.field.path;
     this.label = this.field.name;

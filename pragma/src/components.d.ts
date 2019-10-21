@@ -16,9 +16,9 @@ export namespace Components {
     */
     'disabled': boolean;
     /**
-    * Pragma field data as a single object.  Setting this property will overwrite corresponding attributes.
+    * Internal Pragma field definition object.  TODO: Field definition type.
     */
-    'fieldAttribute': object|string;
+    'field': object|string|any;
     /**
     * The field's label.
     */
@@ -44,6 +44,15 @@ export namespace Components {
     */
     'value': number;
   }
+  interface PragmaSection {
+    'field': any;
+  }
+  interface PragmaTree {
+    /**
+    * The children of the root node of the tree.
+    */
+    'fields': Array<any>;
+  }
 }
 
 declare global {
@@ -54,8 +63,22 @@ declare global {
     prototype: HTMLPragmaNumberElement;
     new (): HTMLPragmaNumberElement;
   };
+
+  interface HTMLPragmaSectionElement extends Components.PragmaSection, HTMLStencilElement {}
+  const HTMLPragmaSectionElement: {
+    prototype: HTMLPragmaSectionElement;
+    new (): HTMLPragmaSectionElement;
+  };
+
+  interface HTMLPragmaTreeElement extends Components.PragmaTree, HTMLStencilElement {}
+  const HTMLPragmaTreeElement: {
+    prototype: HTMLPragmaTreeElement;
+    new (): HTMLPragmaTreeElement;
+  };
   interface HTMLElementTagNameMap {
     'pragma-number': HTMLPragmaNumberElement;
+    'pragma-section': HTMLPragmaSectionElement;
+    'pragma-tree': HTMLPragmaTreeElement;
   }
 }
 
@@ -66,9 +89,9 @@ declare namespace LocalJSX {
     */
     'disabled'?: boolean;
     /**
-    * Pragma field data as a single object.  Setting this property will overwrite corresponding attributes.
+    * Internal Pragma field definition object.  TODO: Field definition type.
     */
-    'fieldAttribute'?: object|string;
+    'field'?: object|string|any;
     /**
     * The field's label.
     */
@@ -94,9 +117,20 @@ declare namespace LocalJSX {
     */
     'value'?: number;
   }
+  interface PragmaSection {
+    'field'?: any;
+  }
+  interface PragmaTree {
+    /**
+    * The children of the root node of the tree.
+    */
+    'fields'?: Array<any>;
+  }
 
   interface IntrinsicElements {
     'pragma-number': PragmaNumber;
+    'pragma-section': PragmaSection;
+    'pragma-tree': PragmaTree;
   }
 }
 
@@ -107,6 +141,8 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'pragma-number': LocalJSX.PragmaNumber & JSXBase.HTMLAttributes<HTMLPragmaNumberElement>;
+      'pragma-section': LocalJSX.PragmaSection & JSXBase.HTMLAttributes<HTMLPragmaSectionElement>;
+      'pragma-tree': LocalJSX.PragmaTree & JSXBase.HTMLAttributes<HTMLPragmaTreeElement>;
     }
   }
 }

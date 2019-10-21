@@ -3003,7 +3003,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var loda
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('section', '<fieldset name=\"{opts.property.path}\" title=\"{opts.property.description}\" style=\"min-width: 0;\"> <legend>{opts.property.name}</legend> <yield></yield> </fieldset>', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://%5Bname%5D/./src/tags/input/section.tag?");
+eval("\n    var riot = __webpack_require__(/*! riot */ \"./node_modules/riot/riot.js\")\n    riot.tag2('section', '<fieldset name=\"{opts.property.path}\" title=\"{opts.property.description}\"> <legend>{opts.property.name}</legend> <yield></yield> </fieldset>', '', '', function(opts) {\n});\n\n    \n  \n\n//# sourceURL=webpack://%5Bname%5D/./src/tags/input/section.tag?");
 
 /***/ }),
 
