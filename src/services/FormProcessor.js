@@ -1753,17 +1753,17 @@ export default class FormProcessor
  * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
  * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the field's key. TODO: Rename to label?
  * @property {string}         [description]    - The field's description.
- * @property {boolean}        [omit=false]     - Whether to prevent storing the property's value in data AND prevent updating any children. Defaults to `false`.
- * @property {boolean}        [virtual=false]  - Whether to prevent storing the property's value in data. Defaults to `false`.
- * @property {string|boolean} [visible=true]   - Whether the property is visible. Defaults to `true`. String values are interpreted as expressions.
- * @property {string|boolean} [disabled=false] - Whether the property is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. String values are interpreted as expressions. TODO: Input options?
+ * @property {boolean}        [omit=false]     - Whether to prevent storing the field's value in data AND prevent updating any of its children. Defaults to `false`.
+ * @property {boolean}        [virtual=false]  - Whether to prevent storing the field's value in data. Defaults to `false`.
+ * @property {string|boolean} [visible=true]   - Whether the field is visible. Defaults to `true`. String values are interpreted as expressions.
+ * @property {string|boolean} [disabled=false] - Whether the field is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. String values are interpreted as expressions. TODO: Input options?
  * @property {*}              [value]          - The field's value.
- * @property {*}              [default]        - The field's default value. Defaults appropriately for the set `type`.
+ * @property {*}              [default]        - The field's default value. Defaults appropriately for the field's `type`.
  * @property {boolean}        [merge]          - Whether to merge the field's non-scalar value with its default value.
  * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
- * @property {string}         [validator]      - The field's validation function. Defaults as appropriate to the `type`.
- * @property {string}         [extends]        - The path of a field to inherit.
- * @property {string}         [extended]       - The path of a field that been inherited.
+ * @property {string}         [validator]      - The field's value validation function. Defaults appropriately for the field's `type`.
+ * @property {string}         [extends]        - The path of a field to inherit from.
+ * @property {string}         [extended]       - The path of a field that been has inherited from.
  * @property {string}         [mirror]         - The path of a field to mirror. TODO: Implement
  * @property {Field[]}        [children]       - Child fields.
  * @property {string}         [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
