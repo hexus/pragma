@@ -7,7 +7,9 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-
+import {
+  Field,
+} from './types';
 
 export namespace Components {
   interface PragmaNumber {
@@ -16,9 +18,9 @@ export namespace Components {
     */
     'disabled': boolean;
     /**
-    * Internal Pragma field definition object.  TODO: Field definition type.
+    * Pragma field definition.  TODO: Field definition type.
     */
-    'field': object|string|any;
+    'field': Field | string | any;
     /**
     * The field's label.
     */
@@ -47,6 +49,28 @@ export namespace Components {
   interface PragmaSection {
     'field': any;
   }
+  interface PragmaString {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled': boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field': Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label': string;
+    /**
+    * The field's path.
+    */
+    'path': string;
+    /**
+    * The field's value.
+    */
+    'value': string;
+  }
   interface PragmaTree {
     /**
     * The children of the root node of the tree.
@@ -70,6 +94,12 @@ declare global {
     new (): HTMLPragmaSectionElement;
   };
 
+  interface HTMLPragmaStringElement extends Components.PragmaString, HTMLStencilElement {}
+  const HTMLPragmaStringElement: {
+    prototype: HTMLPragmaStringElement;
+    new (): HTMLPragmaStringElement;
+  };
+
   interface HTMLPragmaTreeElement extends Components.PragmaTree, HTMLStencilElement {}
   const HTMLPragmaTreeElement: {
     prototype: HTMLPragmaTreeElement;
@@ -78,6 +108,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'pragma-number': HTMLPragmaNumberElement;
     'pragma-section': HTMLPragmaSectionElement;
+    'pragma-string': HTMLPragmaStringElement;
     'pragma-tree': HTMLPragmaTreeElement;
   }
 }
@@ -89,9 +120,9 @@ declare namespace LocalJSX {
     */
     'disabled'?: boolean;
     /**
-    * Internal Pragma field definition object.  TODO: Field definition type.
+    * Pragma field definition.  TODO: Field definition type.
     */
-    'field'?: object|string|any;
+    'field'?: Field | string | any;
     /**
     * The field's label.
     */
@@ -120,6 +151,28 @@ declare namespace LocalJSX {
   interface PragmaSection {
     'field'?: any;
   }
+  interface PragmaString {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled'?: boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field'?: Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label'?: string;
+    /**
+    * The field's path.
+    */
+    'path'?: string;
+    /**
+    * The field's value.
+    */
+    'value'?: string;
+  }
   interface PragmaTree {
     /**
     * The children of the root node of the tree.
@@ -130,6 +183,7 @@ declare namespace LocalJSX {
   interface IntrinsicElements {
     'pragma-number': PragmaNumber;
     'pragma-section': PragmaSection;
+    'pragma-string': PragmaString;
     'pragma-tree': PragmaTree;
   }
 }
@@ -142,6 +196,7 @@ declare module "@stencil/core" {
     interface IntrinsicElements {
       'pragma-number': LocalJSX.PragmaNumber & JSXBase.HTMLAttributes<HTMLPragmaNumberElement>;
       'pragma-section': LocalJSX.PragmaSection & JSXBase.HTMLAttributes<HTMLPragmaSectionElement>;
+      'pragma-string': LocalJSX.PragmaString & JSXBase.HTMLAttributes<HTMLPragmaStringElement>;
       'pragma-tree': LocalJSX.PragmaTree & JSXBase.HTMLAttributes<HTMLPragmaTreeElement>;
     }
   }

@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', function () {
 					label: 'Test number',
 					value: 72,
 					visible: true
+				},
+				{
+					tag: 'pragma-string',
+					path: 'test.string',
+					label: 'Test string',
+					value: 'Shade',
+					visible: true
 				}
 			]
 		}

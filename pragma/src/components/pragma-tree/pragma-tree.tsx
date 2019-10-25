@@ -16,6 +16,7 @@ export class Tree {
   @Prop() fields: Array<any>;
 
   render() {
+    // TODO: Functional component that renders an array of fields
     return (
         this.fields.map((child) => {
           console.log(child.path, child);

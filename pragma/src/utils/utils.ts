@@ -7,7 +7,7 @@
  * @return {object} The parsed JSON object.
  * @throws {Error} If the given value is not a string or an object. Accepts null.
  */
-export function parseFieldDefinition(field?: string|object)
+export function parseField(field?: string|object)
 {
   if (field == null)
     return {};

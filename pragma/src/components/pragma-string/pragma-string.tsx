@@ -1,5 +1,5 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
-import { parseField } from '../../utils/utils';
+import { parseField } from "../../utils/utils";
 import { Field } from "../../types";
 
 const defaultField = {
@@ -11,18 +11,13 @@ const defaultField = {
   disabled: false
 };
 
-/**
- * A number field component.
- */
 @Component({
-  tag: 'pragma-number',
+  tag: 'pragma-string',
   shadow: true
 })
-export class Number {
+export class String {
   /**
    * Pragma field definition.
-   *
-   * TODO: Field definition type.
    */
   @Prop() field: Field | string | any = defaultField;
 
@@ -37,24 +32,9 @@ export class Number {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
-   * The minimum value constraint.
-   */
-  @Prop({ mutable: true, reflect: true }) min: number;
-
-  /**
-   * The maximum value constraint.
-   */
-  @Prop({ mutable: true, reflect: true }) max: number;
-
-  /**
-   * The value step.
-   */
-  @Prop({ mutable: true, reflect: true }) step: number = 1;
-
-  /**
    * The field's value.
    */
-  @Prop({ mutable: true, reflect: true }) value: number = 0;
+  @Prop({ mutable: true, reflect: true }) value: string = '';
 
   /**
    * Whether the field is disabled.
@@ -80,35 +60,19 @@ export class Number {
 
     this.field = Object.assign(oldValue, parsedField);
 
-    console.log('pragma-number', oldValue, newValue, parsedField, this.field);
+    console.log('pragma-string', oldValue, newValue, parsedField, this.field);
 
     this.path = this.field.path;
     this.label = this.field.name;
-    this.min = this.field.options.min;
-    this.max = this.field.options.max;
-    this.step = this.field.options.step;
     this.value = this.field.value;
     this.disabled = this.field.disabled;
   };
 
   render() {
-    console.log(
-      this.field,
-      this.path,
-      this.label,
-      this.min,
-      this.max,
-      this.step,
-      this.disabled
-    );
-
     return <input
-      type="number"
+      type="text"
       name={this.path}
       title={this.label}
-      min={this.min}
-      max={this.max}
-      step={this.step}
       value={this.value}
       disabled={this.disabled}
     />;
