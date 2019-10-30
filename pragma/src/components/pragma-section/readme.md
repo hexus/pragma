@@ -12,6 +12,13 @@
 | `field`  | `field`   |             | `any` | `{}`    |
 
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | Section content. |
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

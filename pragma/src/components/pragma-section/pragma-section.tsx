@@ -1,5 +1,8 @@
 import { Component, Prop, h } from '@stencil/core';
 
+/**
+ * @slot - Section content.
+ */
 @Component({
   tag: 'pragma-section'
 })

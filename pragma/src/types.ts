@@ -158,3 +158,14 @@ export type Field = {
   fixed?: { [key: string]: string } | Array<string>;
 };
 
+/**
+ * Default field definition.
+ */
+export const defaultField = {
+  path: null,
+  name: null,
+  value: null,
+  options: {},
+  visible: true,
+  disabled: false
+};

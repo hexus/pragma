@@ -1,25 +1,24 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
-import { parseField } from "../../utils/utils";
-import { Field } from "../../types";
+import { parseField } from '../../utils/utils';
+import { Field, defaultField } from "../../types";
 
 /**
- * Default field definition.
+ * Pragma group component.
+ *
+ * Groups fields together with an inline label.
+ *
+ * @slot - Group content.
  */
-const defaultField = {
-  path: null,
-  name: null,
-  value: null,
-  options: {},
-  visible: true,
-  disabled: false
-};
-
-
 @Component({
-  tag: 'pragma-string',
-  shadow: true
+  tag: 'pragma-group',
+  shadow: true,
+  styles: `
+    .group-container {
+      margin: 8px 0;
+    }
+  `
 })
-export class String {
+export class Group {
   /**
    * Pragma field definition.
    */
@@ -36,14 +35,9 @@ export class String {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
-   * The field's value.
+   * Whether to hide the field's label.
    */
-  @Prop({ mutable: true, reflect: true }) value: string = '';
-
-  /**
-   * Whether the field is disabled.
-   */
-  @Prop({ mutable: true, reflect: true }) disabled: boolean = false;
+  @Prop({ mutable: true, reflect: true }) hideLabel: boolean = false;
 
   /**
    * Handle the component loading.
@@ -65,21 +59,22 @@ export class String {
       Object.assign(parseField(oldValue), parseField(newValue))
     );
 
-    console.log('pragma-string', oldValue, newValue, this.field);
-
     this.path = this.field.path;
     this.label = this.field.name;
-    this.value = this.field.value;
-    this.disabled = this.field.disabled;
+    this.hideLabel = !!this.field.options.hideLabel;
   };
 
   render() {
-    return <input
-      type="text"
-      name={this.path}
-      title={this.label}
-      value={this.value}
-      disabled={this.disabled}
-    />;
+    return (
+      <div class="group-container">
+        {!this.hideLabel
+          ? <span>{this.label}</span>
+          : null
+        }
+        <span>
+          <slot/>
+        </span>
+      </div>
+    );
   }
 }

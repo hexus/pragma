@@ -7,14 +7,12 @@ import { Field, defaultField } from "../../types";
  * A number field component.
  */
 @Component({
-  tag: 'pragma-number',
+  tag: 'pragma-boolean',
   shadow: true
 })
-export class Number {
+export class Boolean {
   /**
    * Pragma field definition.
-   *
-   * TODO: Field definition type.
    */
   @Prop() field: Field | string | any = defaultField;
 
@@ -29,24 +27,9 @@ export class Number {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
-   * The minimum value constraint.
-   */
-  @Prop({ mutable: true, reflect: true }) min: number;
-
-  /**
-   * The maximum value constraint.
-   */
-  @Prop({ mutable: true, reflect: true }) max: number;
-
-  /**
-   * The value step.
-   */
-  @Prop({ mutable: true, reflect: true }) step: number = 1;
-
-  /**
    * The field's value.
    */
-  @Prop({ mutable: true, reflect: true }) value: number = 0;
+  @Prop({ mutable: true, reflect: true }) value: boolean = false;
 
   /**
    * Whether the field is disabled.
@@ -69,17 +52,12 @@ export class Number {
   @Watch('field')
   parseFieldDefinition(newValue, oldValue) {
     this.field = Object.assign(
-      parseField(this.field),
-      Object.assign(parseField(oldValue), parseField(newValue))
+      oldValue,
+      parseField(newValue)
     );
-
-    console.log('pragma-number', oldValue, newValue, this.field);
 
     this.path = this.field.path;
     this.label = this.field.name;
-    this.min = this.field.options.min;
-    this.max = this.field.options.max;
-    this.step = this.field.options.step;
     this.value = this.field.value;
     this.disabled = this.field.disabled;
   };
@@ -89,21 +67,15 @@ export class Number {
       this.field,
       this.path,
       this.label,
-      this.min,
-      this.max,
-      this.step,
       this.value,
       this.disabled
     );
 
     return <input
-      type="number"
+      type="checkbox"
       name={this.path}
       title={this.label}
-      min={this.min}
-      max={this.max}
-      step={this.step}
-      value={this.value}
+      checked={this.value}
       disabled={this.disabled}
     />;
   }

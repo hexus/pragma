@@ -7,9 +7,9 @@
 
 ## Properties
 
-| Property | Attribute | Description                                | Type    | Default     |
-| -------- | --------- | ------------------------------------------ | ------- | ----------- |
-| `fields` | --        | The children of the root node of the tree. | `any[]` | `undefined` |
+| Property | Attribute | Description                                | Type    | Default |
+| -------- | --------- | ------------------------------------------ | ------- | ------- |
+| `fields` | --        | The children of the root node of the tree. | `any[]` | `[]`    |
 
 
 ## Dependencies
