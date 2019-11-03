@@ -1,14 +1,31 @@
 /**
+ * Parse and merge a set of field definitions.
+ *
+ * Accepts JSON object strings or JavaScript objects.
+ *
+ * If the first argument is an object, its reference is maintained.
+ *
+ * @param {Array<string|object>} fields - The fields to parse and merge.
+ * @return {object} The parsed Field
+ */
+export function parseAndMergeFields(...fields: Array<string | object>) {
+  fields = fields.map(parseField) as Array<object>;
+
+  let field = fields.shift();
+
+  return Object.assign(field, fields.reduce(Object.assign));
+}
+
+/**
  * Parse a field definition from a JSON object string or a JavaScript object.
  *
  * Throws an error if the given value is not a string or an object.
  *
  * @param {string|object} field - The field definition to parse.
- * @return {object} The parsed JSON object.
+ * @return {object} The parsed field.
  * @throws {Error} If the given value is not a string or an object. Accepts null.
  */
-export function parseField(field?: string|object)
-{
+export function parseField(field?: string | object) {
   if (field == null)
     return {};
 
@@ -30,7 +47,7 @@ export function parseField(field?: string|object)
  * @param {*} value
  * @return {*}
  */
-export function parseJson(value: any): any {
+export function parseJson(value: any) {
   if (typeof value === 'string')
     value = JSON.parse(value);
 

@@ -27,10 +27,7 @@ export class Tree {
           const ChildTag = child.tag;
 
           return <ChildTag key={child.path} field={child}>
-            {child.children
-              ? <pragma-tree fields={child.children}/>
-              : null
-            }
+            <pragma-tree fields={child.children}/>
           </ChildTag>;
         }) : null
     );

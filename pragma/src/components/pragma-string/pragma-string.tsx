@@ -1,5 +1,5 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
-import { parseField } from "../../utils/utils";
+import { parseAndMergeFields } from "../../utils/utils";
 import { Field } from "../../types";
 
 /**
@@ -60,10 +60,7 @@ export class String {
    */
   @Watch('field')
   parseFieldDefinition(newValue, oldValue) {
-    this.field = Object.assign(
-      parseField(this.field),
-      Object.assign(parseField(oldValue), parseField(newValue))
-    );
+    this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
     console.log('pragma-string', oldValue, newValue, this.field);
 
