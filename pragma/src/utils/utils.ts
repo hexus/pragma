@@ -13,7 +13,9 @@ export function parseAndMergeFields(...fields: Array<string | object>) {
 
   let field = fields.shift();
 
-  return Object.assign(field, fields.reduce(Object.assign));
+  return Object.assign(field, fields.reduce(
+    (prev, current) => Object.assign(prev, current))
+  );
 }
 
 /**
