@@ -123,37 +123,37 @@ declare global {
 
 
   interface HTMLPragmaBooleanElement extends Components.PragmaBoolean, HTMLStencilElement {}
-  const HTMLPragmaBooleanElement: {
+  var HTMLPragmaBooleanElement: {
     prototype: HTMLPragmaBooleanElement;
     new (): HTMLPragmaBooleanElement;
   };
 
   interface HTMLPragmaGroupElement extends Components.PragmaGroup, HTMLStencilElement {}
-  const HTMLPragmaGroupElement: {
+  var HTMLPragmaGroupElement: {
     prototype: HTMLPragmaGroupElement;
     new (): HTMLPragmaGroupElement;
   };
 
   interface HTMLPragmaNumberElement extends Components.PragmaNumber, HTMLStencilElement {}
-  const HTMLPragmaNumberElement: {
+  var HTMLPragmaNumberElement: {
     prototype: HTMLPragmaNumberElement;
     new (): HTMLPragmaNumberElement;
   };
 
   interface HTMLPragmaSectionElement extends Components.PragmaSection, HTMLStencilElement {}
-  const HTMLPragmaSectionElement: {
+  var HTMLPragmaSectionElement: {
     prototype: HTMLPragmaSectionElement;
     new (): HTMLPragmaSectionElement;
   };
 
   interface HTMLPragmaStringElement extends Components.PragmaString, HTMLStencilElement {}
-  const HTMLPragmaStringElement: {
+  var HTMLPragmaStringElement: {
     prototype: HTMLPragmaStringElement;
     new (): HTMLPragmaStringElement;
   };
 
   interface HTMLPragmaTreeElement extends Components.PragmaTree, HTMLStencilElement {}
-  const HTMLPragmaTreeElement: {
+  var HTMLPragmaTreeElement: {
     prototype: HTMLPragmaTreeElement;
     new (): HTMLPragmaTreeElement;
   };
