@@ -2,7 +2,6 @@ import { Component, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from '../../utils/utils';
 import { Field, defaultField } from "../../types";
 
-
 /**
  * A number field component.
  */

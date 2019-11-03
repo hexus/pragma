@@ -30,6 +30,20 @@ document.addEventListener('DOMContentLoaded', function () {
 					label: 'Test string',
 					value: 'Shade',
 					visible: true
+				},
+				{
+					tag: 'pragma-select',
+					path: 'test.select',
+					label: 'Test select',
+					options: {
+						options: {
+							one: 'One',
+							two: 'Two',
+							three: 'Three'
+						}
+					},
+					value: 'two',
+					visible: true
 				}
 			]
 		}

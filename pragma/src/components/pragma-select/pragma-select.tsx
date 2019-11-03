@@ -2,11 +2,14 @@ import { Component, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from "../../utils/utils";
 import { Field, defaultField } from "../../types";
 
+/**
+ * A select field component.
+ */
 @Component({
-  tag: 'pragma-string',
+  tag: 'pragma-select',
   shadow: true
 })
-export class String {
+export class Select {
   /**
    * Pragma field definition.
    */
@@ -23,14 +26,30 @@ export class String {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
+   * The selectable options.
+   */
+  @Prop({ mutable: true }) options: object = {};
+
+  /**
    * The field's value.
    */
-  @Prop({ mutable: true, reflect: true }) value: string = '';
+  @Prop({ mutable: true, reflect: true }) value;
 
   /**
    * Whether the field is disabled.
    */
   @Prop({ mutable: true, reflect: true }) disabled: boolean = false;
+
+  /**
+   * Handle the underlying input changing value.
+   *
+   * @param {Event} event
+   */
+  inputChanged(event) {
+    const target = event.target as HTMLSelectElement;
+
+    this.value = target.value;
+  }
 
   /**
    * Handle the component loading.
@@ -49,21 +68,34 @@ export class String {
   parseFieldDefinition(newValue, oldValue) {
     this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
-    console.log('pragma-string', oldValue, newValue, this.field);
+    console.log('pragma-select', oldValue, newValue, this.field);
 
     this.path = this.field.path;
     this.label = this.field.name;
+    this.options = this.field.options.options || {};
     this.value = this.field.value;
     this.disabled = this.field.disabled;
   };
 
   render() {
-    return <input
-      type="text"
+    return <select
       name={this.path}
       title={this.label}
-      value={this.value}
       disabled={this.disabled}
-    />;
+      onInput={this.inputChanged.bind(this)}
+    >
+      {
+        Object.keys(this.options).map((value) => {
+          let label = this.options[value];
+
+          return <option
+            value={value}
+            selected={this.value === value}
+          >
+            {label}
+          </option>;
+        })
+      }
+    </select>
   }
 }

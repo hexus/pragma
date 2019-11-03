@@ -89,6 +89,32 @@ export namespace Components {
   interface PragmaSection {
     'field': any;
   }
+  interface PragmaSelect {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled': boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field': Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label': string;
+    /**
+    * The selectable options.
+    */
+    'options': object;
+    /**
+    * The field's path.
+    */
+    'path': string;
+    /**
+    * The field's value.
+    */
+    'value': any;
+  }
   interface PragmaString {
     /**
     * Whether the field is disabled.
@@ -146,6 +172,12 @@ declare global {
     new (): HTMLPragmaSectionElement;
   };
 
+  interface HTMLPragmaSelectElement extends Components.PragmaSelect, HTMLStencilElement {}
+  var HTMLPragmaSelectElement: {
+    prototype: HTMLPragmaSelectElement;
+    new (): HTMLPragmaSelectElement;
+  };
+
   interface HTMLPragmaStringElement extends Components.PragmaString, HTMLStencilElement {}
   var HTMLPragmaStringElement: {
     prototype: HTMLPragmaStringElement;
@@ -162,6 +194,7 @@ declare global {
     'pragma-group': HTMLPragmaGroupElement;
     'pragma-number': HTMLPragmaNumberElement;
     'pragma-section': HTMLPragmaSectionElement;
+    'pragma-select': HTMLPragmaSelectElement;
     'pragma-string': HTMLPragmaStringElement;
     'pragma-tree': HTMLPragmaTreeElement;
   }
@@ -245,6 +278,32 @@ declare namespace LocalJSX {
   interface PragmaSection {
     'field'?: any;
   }
+  interface PragmaSelect {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled'?: boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field'?: Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label'?: string;
+    /**
+    * The selectable options.
+    */
+    'options'?: object;
+    /**
+    * The field's path.
+    */
+    'path'?: string;
+    /**
+    * The field's value.
+    */
+    'value'?: any;
+  }
   interface PragmaString {
     /**
     * Whether the field is disabled.
@@ -279,6 +338,7 @@ declare namespace LocalJSX {
     'pragma-group': PragmaGroup;
     'pragma-number': PragmaNumber;
     'pragma-section': PragmaSection;
+    'pragma-select': PragmaSelect;
     'pragma-string': PragmaString;
     'pragma-tree': PragmaTree;
   }
@@ -294,6 +354,7 @@ declare module "@stencil/core" {
       'pragma-group': LocalJSX.PragmaGroup & JSXBase.HTMLAttributes<HTMLPragmaGroupElement>;
       'pragma-number': LocalJSX.PragmaNumber & JSXBase.HTMLAttributes<HTMLPragmaNumberElement>;
       'pragma-section': LocalJSX.PragmaSection & JSXBase.HTMLAttributes<HTMLPragmaSectionElement>;
+      'pragma-select': LocalJSX.PragmaSelect & JSXBase.HTMLAttributes<HTMLPragmaSelectElement>;
       'pragma-string': LocalJSX.PragmaString & JSXBase.HTMLAttributes<HTMLPragmaStringElement>;
       'pragma-tree': LocalJSX.PragmaTree & JSXBase.HTMLAttributes<HTMLPragmaTreeElement>;
     }
