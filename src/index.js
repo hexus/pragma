@@ -46,6 +46,36 @@ document.addEventListener('DOMContentLoaded', function () {
 					visible: true
 				}
 			]
+		},
+		{
+			tag: 'pragma-section',
+			path: 'lists',
+			label: 'Test lists',
+			description: 'This is a test section for lists',
+			visible: true,
+			children: [
+				{
+					tag: 'pragma-list',
+					path: 'lists.list',
+					label: 'List',
+					description: 'First test list',
+					options: {
+						showLabel: true
+					},
+					visible: true,
+					children: [
+						{
+							value: 'One'
+						},
+						{
+							value: 'Two'
+						},
+						{
+							value: 'Three'
+						}
+					]
+				}
+			]
 		}
 	];
 });

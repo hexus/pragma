@@ -52,6 +52,32 @@ export namespace Components {
     */
     'path': string;
   }
+  interface PragmaList {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled': boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field': Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label': string;
+    /**
+    * The field's options.
+    */
+    'options': object | any;
+    /**
+    * The field's path.
+    */
+    'path': string;
+    /**
+    * The field's value.
+    */
+    'value': any;
+  }
   interface PragmaNumber {
     /**
     * Whether the field is disabled.
@@ -160,6 +186,12 @@ declare global {
     new (): HTMLPragmaGroupElement;
   };
 
+  interface HTMLPragmaListElement extends Components.PragmaList, HTMLStencilElement {}
+  var HTMLPragmaListElement: {
+    prototype: HTMLPragmaListElement;
+    new (): HTMLPragmaListElement;
+  };
+
   interface HTMLPragmaNumberElement extends Components.PragmaNumber, HTMLStencilElement {}
   var HTMLPragmaNumberElement: {
     prototype: HTMLPragmaNumberElement;
@@ -192,6 +224,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'pragma-boolean': HTMLPragmaBooleanElement;
     'pragma-group': HTMLPragmaGroupElement;
+    'pragma-list': HTMLPragmaListElement;
     'pragma-number': HTMLPragmaNumberElement;
     'pragma-section': HTMLPragmaSectionElement;
     'pragma-select': HTMLPragmaSelectElement;
@@ -240,6 +273,32 @@ declare namespace LocalJSX {
     * The field's path.
     */
     'path'?: string;
+  }
+  interface PragmaList {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled'?: boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field'?: Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label'?: string;
+    /**
+    * The field's options.
+    */
+    'options'?: object | any;
+    /**
+    * The field's path.
+    */
+    'path'?: string;
+    /**
+    * The field's value.
+    */
+    'value'?: any;
   }
   interface PragmaNumber {
     /**
@@ -336,6 +395,7 @@ declare namespace LocalJSX {
   interface IntrinsicElements {
     'pragma-boolean': PragmaBoolean;
     'pragma-group': PragmaGroup;
+    'pragma-list': PragmaList;
     'pragma-number': PragmaNumber;
     'pragma-section': PragmaSection;
     'pragma-select': PragmaSelect;
@@ -352,6 +412,7 @@ declare module "@stencil/core" {
     interface IntrinsicElements {
       'pragma-boolean': LocalJSX.PragmaBoolean & JSXBase.HTMLAttributes<HTMLPragmaBooleanElement>;
       'pragma-group': LocalJSX.PragmaGroup & JSXBase.HTMLAttributes<HTMLPragmaGroupElement>;
+      'pragma-list': LocalJSX.PragmaList & JSXBase.HTMLAttributes<HTMLPragmaListElement>;
       'pragma-number': LocalJSX.PragmaNumber & JSXBase.HTMLAttributes<HTMLPragmaNumberElement>;
       'pragma-section': LocalJSX.PragmaSection & JSXBase.HTMLAttributes<HTMLPragmaSectionElement>;
       'pragma-select': LocalJSX.PragmaSelect & JSXBase.HTMLAttributes<HTMLPragmaSelectElement>;
