@@ -1,5 +1,5 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
-import { parseAndMergeFields } from "../../utils/utils";
+import { parseAndMergeFields, dump } from "../../utils/utils";
 import { Field, defaultField } from "../../types";
 
 /**

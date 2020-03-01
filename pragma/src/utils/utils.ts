@@ -5,8 +5,7 @@
  *
  * If the first argument is an object, its reference is maintained.
  *
- * TODO: This is still buggy because it changes `defaultField` at runtime.
- *       Use a proper merge function.
+ * TODO: Use a proper merge function.
  *
  * @param {Array<string|object>} fields - The fields to parse and merge.
  * @return {object} The parsed Field
@@ -16,8 +15,14 @@ export function parseAndMergeFields(...fields: Array<string | object>) {
 
   let field = fields.shift();
 
-  return Object.assign(field, fields.reduce(
-    (prev, current) => Object.assign(prev, current))
+  return Object.assign(
+    field,
+    fields.reduce((previous, current) => {
+      return Object.assign(
+        Object.assign({}, previous),
+        Object.assign({}, current)
+      );
+    })
   );
 }
 
