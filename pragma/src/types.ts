@@ -10,11 +10,11 @@ export type Field = {
   path: string,
 
   /**
-   * The leaf of the field's path.
+   * The field's name; the leaf of the field's path.
    *
    * TODO: Derived from the field's path.
    */
-  key?: string,
+  name?: string,
 
   /**
    * The path of the field's parent, if any.
@@ -163,7 +163,7 @@ export type Field = {
  */
 export const defaultField: Field = {
   path: null,
-  key: null,
+  name: null,
   value: null,
   options: {},
   visible: true,

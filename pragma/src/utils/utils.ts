@@ -5,6 +5,9 @@
  *
  * If the first argument is an object, its reference is maintained.
  *
+ * TODO: This is still buggy because it changes `defaultField` at runtime.
+ *       Use a proper merge function.
+ *
  * @param {Array<string|object>} fields - The fields to parse and merge.
  * @return {object} The parsed Field
  */
@@ -32,6 +35,7 @@ export function parseField(field?: string | object) {
     return {};
 
   field = parseJson(field);
+
 
   if (!Array.isArray(field) && typeof field !== 'object')
     throw Error('Field definition must be a JSON object string or an object literal');
