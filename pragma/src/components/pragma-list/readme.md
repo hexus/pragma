@@ -17,6 +17,20 @@
 | `value`    | `value`    | The field's value.             | `any`     | `undefined`    |
 
 
+## Dependencies
+
+### Depends on
+
+- [pragma-list-item](../pragma-list-item)
+
+### Graph
+```mermaid
+graph TD;
+  pragma-list --> pragma-list-item
+  pragma-list-item --> pragma-fields
+  style pragma-list fill:#f9f,stroke:#333,stroke-width:4px
+```
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

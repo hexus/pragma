@@ -55,3 +55,14 @@ export function parseJson(value: any) {
 
   return value;
 }
+
+/**
+ * Dump the given values to the console as formatted JSON.
+ *
+ * @param {*[]} values
+ */
+export function dump(...values: any) {
+  for (let i = 0; i < values.length; i++) {
+    console.log(JSON.stringify(values[i], null, 2));
+  }
+}

@@ -12,7 +12,7 @@ export class Section {
   render() {
     return <fieldset name={this.field.path} title={this.field.description}>
       <legend>{ this.field.label }</legend>
-      <slot/>
+      <pragma-fields fields={this.field.children}/>
     </fieldset>
   }
 }

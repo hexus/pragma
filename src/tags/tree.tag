@@ -1,6 +1,5 @@
 <tree>
 	<virtual each="{ child in opts.children }" key="path">
-		<!-- TODO: Make a pragma-tree element in Stencil -->
 		<tree-child if="{ visible(child) }" data-is="{ child.input }" property="{ child }">
 			<tree if="{ opts.property.children }" children="{ opts.property.children }"></tree>
 		</tree-child>

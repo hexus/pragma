@@ -22,6 +22,19 @@
 |      | Group content. |
 
 
+## Dependencies
+
+### Depends on
+
+- [pragma-fields](../pragma-fields)
+
+### Graph
+```mermaid
+graph TD;
+  pragma-group --> pragma-fields
+  style pragma-group fill:#f9f,stroke:#333,stroke-width:4px
+```
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

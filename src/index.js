@@ -63,15 +63,25 @@ document.addEventListener('DOMContentLoaded', function () {
 						showLabel: true
 					},
 					visible: true,
+					rendersChildren: true,
 					children: [
 						{
-							value: 'One'
+							tag: 'pragma-string',
+							path: 'lists.list.0',
+							value: 'One',
+							visible: true
 						},
 						{
-							value: 'Two'
+							tag: 'pragma-string',
+							path: 'lists.list.1',
+							value: 'Two',
+							visible: true
 						},
 						{
-							value: 'Three'
+							tag: 'pragma-string',
+							path: 'lists.list.2',
+							value: 'Three',
+							visible: true
 						}
 					]
 				}

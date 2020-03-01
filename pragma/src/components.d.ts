@@ -34,6 +34,12 @@ export namespace Components {
     */
     'value': boolean;
   }
+  interface PragmaFields {
+    /**
+    * The set of fields to render.
+    */
+    'fields': Array<Field>;
+  }
   interface PragmaGroup {
     /**
     * Pragma field definition.
@@ -77,6 +83,12 @@ export namespace Components {
     * The field's value.
     */
     'value': any;
+  }
+  interface PragmaListItem {
+    /**
+    * Pragma field definition.
+    */
+    'field': Field | string | any;
   }
   interface PragmaNumber {
     /**
@@ -163,12 +175,6 @@ export namespace Components {
     */
     'value': string;
   }
-  interface PragmaTree {
-    /**
-    * The children of the root node of the tree.
-    */
-    'fields': Array<any>;
-  }
 }
 
 declare global {
@@ -178,6 +184,12 @@ declare global {
   var HTMLPragmaBooleanElement: {
     prototype: HTMLPragmaBooleanElement;
     new (): HTMLPragmaBooleanElement;
+  };
+
+  interface HTMLPragmaFieldsElement extends Components.PragmaFields, HTMLStencilElement {}
+  var HTMLPragmaFieldsElement: {
+    prototype: HTMLPragmaFieldsElement;
+    new (): HTMLPragmaFieldsElement;
   };
 
   interface HTMLPragmaGroupElement extends Components.PragmaGroup, HTMLStencilElement {}
@@ -190,6 +202,12 @@ declare global {
   var HTMLPragmaListElement: {
     prototype: HTMLPragmaListElement;
     new (): HTMLPragmaListElement;
+  };
+
+  interface HTMLPragmaListItemElement extends Components.PragmaListItem, HTMLStencilElement {}
+  var HTMLPragmaListItemElement: {
+    prototype: HTMLPragmaListItemElement;
+    new (): HTMLPragmaListItemElement;
   };
 
   interface HTMLPragmaNumberElement extends Components.PragmaNumber, HTMLStencilElement {}
@@ -215,21 +233,16 @@ declare global {
     prototype: HTMLPragmaStringElement;
     new (): HTMLPragmaStringElement;
   };
-
-  interface HTMLPragmaTreeElement extends Components.PragmaTree, HTMLStencilElement {}
-  var HTMLPragmaTreeElement: {
-    prototype: HTMLPragmaTreeElement;
-    new (): HTMLPragmaTreeElement;
-  };
   interface HTMLElementTagNameMap {
     'pragma-boolean': HTMLPragmaBooleanElement;
+    'pragma-fields': HTMLPragmaFieldsElement;
     'pragma-group': HTMLPragmaGroupElement;
     'pragma-list': HTMLPragmaListElement;
+    'pragma-list-item': HTMLPragmaListItemElement;
     'pragma-number': HTMLPragmaNumberElement;
     'pragma-section': HTMLPragmaSectionElement;
     'pragma-select': HTMLPragmaSelectElement;
     'pragma-string': HTMLPragmaStringElement;
-    'pragma-tree': HTMLPragmaTreeElement;
   }
 }
 
@@ -255,6 +268,12 @@ declare namespace LocalJSX {
     * The field's value.
     */
     'value'?: boolean;
+  }
+  interface PragmaFields {
+    /**
+    * The set of fields to render.
+    */
+    'fields'?: Array<Field>;
   }
   interface PragmaGroup {
     /**
@@ -299,6 +318,12 @@ declare namespace LocalJSX {
     * The field's value.
     */
     'value'?: any;
+  }
+  interface PragmaListItem {
+    /**
+    * Pragma field definition.
+    */
+    'field'?: Field | string | any;
   }
   interface PragmaNumber {
     /**
@@ -385,22 +410,17 @@ declare namespace LocalJSX {
     */
     'value'?: string;
   }
-  interface PragmaTree {
-    /**
-    * The children of the root node of the tree.
-    */
-    'fields'?: Array<any>;
-  }
 
   interface IntrinsicElements {
     'pragma-boolean': PragmaBoolean;
+    'pragma-fields': PragmaFields;
     'pragma-group': PragmaGroup;
     'pragma-list': PragmaList;
+    'pragma-list-item': PragmaListItem;
     'pragma-number': PragmaNumber;
     'pragma-section': PragmaSection;
     'pragma-select': PragmaSelect;
     'pragma-string': PragmaString;
-    'pragma-tree': PragmaTree;
   }
 }
 
@@ -411,13 +431,14 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'pragma-boolean': LocalJSX.PragmaBoolean & JSXBase.HTMLAttributes<HTMLPragmaBooleanElement>;
+      'pragma-fields': LocalJSX.PragmaFields & JSXBase.HTMLAttributes<HTMLPragmaFieldsElement>;
       'pragma-group': LocalJSX.PragmaGroup & JSXBase.HTMLAttributes<HTMLPragmaGroupElement>;
       'pragma-list': LocalJSX.PragmaList & JSXBase.HTMLAttributes<HTMLPragmaListElement>;
+      'pragma-list-item': LocalJSX.PragmaListItem & JSXBase.HTMLAttributes<HTMLPragmaListItemElement>;
       'pragma-number': LocalJSX.PragmaNumber & JSXBase.HTMLAttributes<HTMLPragmaNumberElement>;
       'pragma-section': LocalJSX.PragmaSection & JSXBase.HTMLAttributes<HTMLPragmaSectionElement>;
       'pragma-select': LocalJSX.PragmaSelect & JSXBase.HTMLAttributes<HTMLPragmaSelectElement>;
       'pragma-string': LocalJSX.PragmaString & JSXBase.HTMLAttributes<HTMLPragmaStringElement>;
-      'pragma-tree': LocalJSX.PragmaTree & JSXBase.HTMLAttributes<HTMLPragmaTreeElement>;
     }
   }
 }

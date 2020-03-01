@@ -69,7 +69,7 @@ export class Group {
           : null
         }
         <span>
-          <slot/>
+          <pragma-fields fields={this.field.children}/>
         </span>
       </div>
     );

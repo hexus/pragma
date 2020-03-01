@@ -41,17 +41,6 @@ export class Select {
   @Prop({ mutable: true, reflect: true }) disabled: boolean = false;
 
   /**
-   * Handle the underlying input changing value.
-   *
-   * @param {Event} event
-   */
-  inputChanged(event) {
-    const target = event.target as HTMLSelectElement;
-
-    this.value = target.value;
-  }
-
-  /**
    * Handle the component loading.
    */
   componentWillLoad() {
@@ -77,12 +66,23 @@ export class Select {
     this.disabled = this.field.disabled;
   };
 
+  /**
+   * Handle the underlying input changing value.
+   *
+   * @param {Event} event
+   */
+  inputChanged = (event) => {
+    const target = event.target as HTMLSelectElement;
+
+    this.value = target.value;
+  };
+
   render() {
     return <select
       name={this.path}
       title={this.label}
       disabled={this.disabled}
-      onInput={this.inputChanged.bind(this)}
+      onInput={this.inputChanged}
     >
       {
         Object.keys(this.options).map((value) => {

@@ -57,9 +57,7 @@ export class List {
   parseFieldDefinition(newValue, oldValue) {
     this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
-    if (!this.field.children) {
-      this.field.children = [];
-    }
+    this.field.children = this.field.children || [];
 
     console.log('pragma-list', oldValue, newValue, this.field);
 
@@ -71,18 +69,14 @@ export class List {
   };
 
   render() {
-    console.log('Hello, world!');
-
     return <div class="list-container">
       {this.options.showLabel ? <div>{this.label}</div> : null}
 
-      <ul>
-        {
-          this.field.children.map((child) => {
-            return <li>{child.value}</li>
-          })
-        }
-      </ul>
+      {
+        this.field.children.map((child) => {
+          return <pragma-list-item field={child}/>
+        })
+      }
 
       <button type="button">Add</button>
     </div>;

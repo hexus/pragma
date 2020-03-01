@@ -57,6 +57,17 @@ export class String {
     this.disabled = this.field.disabled;
   };
 
+  /**
+   * Handle the underlying input changing value.
+   *
+   * @param {Event} event
+   */
+  inputChanged = (event) => {
+    const target = event.target as HTMLInputElement;
+
+    this.value = target.value;
+  };
+
   render() {
     return <input
       type="text"
@@ -64,6 +75,7 @@ export class String {
       title={this.label}
       value={this.value}
       disabled={this.disabled}
+      onInput={this.inputChanged}
     />;
   }
 }

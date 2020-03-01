@@ -161,9 +161,9 @@ export type Field = {
 /**
  * Default field definition.
  */
-export const defaultField = {
+export const defaultField: Field = {
   path: null,
-  name: null,
+  key: null,
   value: null,
   options: {},
   visible: true,
