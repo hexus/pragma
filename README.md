@@ -14,5 +14,5 @@ webpack -w
 
 ```
 cd pragma
-npx stencil build
+npx stencil build --dev --watch
 ```
