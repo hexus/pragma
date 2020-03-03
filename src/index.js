@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
 						showLabel: true
 					},
 					visible: true,
-					rendersChildren: true,
 					children: [
 						{
 							tag: 'pragma-string',
@@ -82,6 +81,63 @@ document.addEventListener('DOMContentLoaded', function () {
 							path: 'lists.list.2',
 							value: 'Three',
 							visible: true
+						}
+					]
+				},
+				{
+					tag: 'pragma-table',
+					path: 'lists.table',
+					label: 'Table',
+					description: 'First table test',
+					options: {
+						showLabel: true,
+						headings: [
+							'Label',
+							'First column',
+							'Second column'
+						]
+					},
+					visible: true,
+					children: [
+						{
+							tag: 'pragma-group',
+							path: 'lists.table.0',
+							label: 'First row',
+							visible: true,
+							children: [
+								{
+									tag: 'pragma-string',
+									path: 'lists.table.0.0',
+									value: 'One',
+									visible: true
+								},
+								{
+									tag: 'pragma-string',
+									path: 'lists.table.0.1',
+									value: 'Two',
+									visible: true
+								}
+							]
+						},
+						{
+							tag: 'pragma-group',
+							path: 'lists.table.1',
+							label: 'Second row',
+							visible: true,
+							children: [
+								{
+									tag: 'pragma-string',
+									path: 'lists.table.1.0',
+									value: 'Three',
+									visible: true
+								},
+								{
+									tag: 'pragma-string',
+									path: 'lists.table.1.1',
+									value: 'Four',
+									visible: true
+								}
+							]
 						}
 					]
 				}

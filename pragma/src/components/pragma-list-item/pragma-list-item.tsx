@@ -6,6 +6,9 @@ import { Field, defaultField } from "../../types";
  * A list item component.
  *
  * Wraps a single field as part of a list. Intended for use with <pragma-list>.
+ *
+ * Does not represent an actual field, but wraps a field for display and
+ * interactivity.
  */
 @Component({
   tag: 'pragma-list-item',

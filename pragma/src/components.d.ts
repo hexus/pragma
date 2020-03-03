@@ -175,6 +175,32 @@ export namespace Components {
     */
     'value': string;
   }
+  interface PragmaTable {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled': boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field': Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label': string;
+    /**
+    * The field's options.
+    */
+    'options': object | any;
+    /**
+    * The field's path.
+    */
+    'path': string;
+    /**
+    * The field's value.
+    */
+    'value': any;
+  }
 }
 
 declare global {
@@ -233,6 +259,12 @@ declare global {
     prototype: HTMLPragmaStringElement;
     new (): HTMLPragmaStringElement;
   };
+
+  interface HTMLPragmaTableElement extends Components.PragmaTable, HTMLStencilElement {}
+  var HTMLPragmaTableElement: {
+    prototype: HTMLPragmaTableElement;
+    new (): HTMLPragmaTableElement;
+  };
   interface HTMLElementTagNameMap {
     'pragma-boolean': HTMLPragmaBooleanElement;
     'pragma-fields': HTMLPragmaFieldsElement;
@@ -243,6 +275,7 @@ declare global {
     'pragma-section': HTMLPragmaSectionElement;
     'pragma-select': HTMLPragmaSelectElement;
     'pragma-string': HTMLPragmaStringElement;
+    'pragma-table': HTMLPragmaTableElement;
   }
 }
 
@@ -410,6 +443,32 @@ declare namespace LocalJSX {
     */
     'value'?: string;
   }
+  interface PragmaTable {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled'?: boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field'?: Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label'?: string;
+    /**
+    * The field's options.
+    */
+    'options'?: object | any;
+    /**
+    * The field's path.
+    */
+    'path'?: string;
+    /**
+    * The field's value.
+    */
+    'value'?: any;
+  }
 
   interface IntrinsicElements {
     'pragma-boolean': PragmaBoolean;
@@ -421,6 +480,7 @@ declare namespace LocalJSX {
     'pragma-section': PragmaSection;
     'pragma-select': PragmaSelect;
     'pragma-string': PragmaString;
+    'pragma-table': PragmaTable;
   }
 }
 
@@ -439,6 +499,7 @@ declare module "@stencil/core" {
       'pragma-section': LocalJSX.PragmaSection & JSXBase.HTMLAttributes<HTMLPragmaSectionElement>;
       'pragma-select': LocalJSX.PragmaSelect & JSXBase.HTMLAttributes<HTMLPragmaSelectElement>;
       'pragma-string': LocalJSX.PragmaString & JSXBase.HTMLAttributes<HTMLPragmaStringElement>;
+      'pragma-table': LocalJSX.PragmaTable & JSXBase.HTMLAttributes<HTMLPragmaTableElement>;
     }
   }
 }

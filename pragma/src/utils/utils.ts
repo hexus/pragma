@@ -10,14 +10,17 @@
  * @param {Array<string|object>} fields - The fields to parse and merge.
  * @return {object} The parsed Field
  */
-export function parseAndMergeFields(...fields: Array<string | object>) {
-  fields = fields.map(parseField) as Array<object>;
+export function parseAndMergeFields(...fields: Array<string | object>): object {
+  let parsedFields: Array<object> = fields.map(parseField);
 
-  let field = fields.shift();
+  /**
+   * @var {object} field
+   */
+  let field: object = parsedFields.shift();
 
   return Object.assign(
     field,
-    fields.reduce((previous, current) => {
+    parsedFields.reduce((previous, current) => {
       return Object.assign(
         Object.assign({}, previous),
         Object.assign({}, current)
@@ -35,12 +38,11 @@ export function parseAndMergeFields(...fields: Array<string | object>) {
  * @return {object} The parsed field.
  * @throws {Error} If the given value is not a string or an object. Accepts null.
  */
-export function parseField(field?: string | object) {
+export function parseField(field?: string | object): object {
   if (field == null)
     return {};
 
-  field = parseJson(field);
-
+  field = parseJson(field) as object;
 
   if (!Array.isArray(field) && typeof field !== 'object')
     throw Error('Field definition must be a JSON object string or an object literal');
