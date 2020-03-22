@@ -2,6 +2,12 @@
 
 Declarative form builder and processor.
 
+## Dependencies
+
+```
+npm i && npm i pragma
+```
+
 ## Build
 
 ### Pragma

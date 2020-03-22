@@ -138,6 +138,26 @@ document.addEventListener('DOMContentLoaded', function () {
 									visible: true
 								}
 							]
+						},
+						{
+							tag: 'pragma-group',
+							path: 'lists.table.2',
+							label: 'Third row',
+							visible: true,
+							children: [
+								{
+									tag: 'pragma-string',
+									path: 'lists.table.2.0',
+									value: 'Five',
+									visible: true
+								},
+								{
+									tag: 'pragma-string',
+									path: 'lists.table.2.1',
+									value: 'Six',
+									visible: true
+								}
+							]
 						}
 					]
 				}

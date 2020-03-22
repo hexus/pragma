@@ -124,6 +124,32 @@ export namespace Components {
     */
     'value': number;
   }
+  interface PragmaPicker {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled': boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field': Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label': string;
+    /**
+    * The field's path.
+    */
+    'path': string;
+    /**
+    * Source URL to load picker options from.
+    */
+    'source': string;
+    /**
+    * The field's value.
+    */
+    'value': boolean;
+  }
   interface PragmaSection {
     'field': any;
   }
@@ -242,6 +268,12 @@ declare global {
     new (): HTMLPragmaNumberElement;
   };
 
+  interface HTMLPragmaPickerElement extends Components.PragmaPicker, HTMLStencilElement {}
+  var HTMLPragmaPickerElement: {
+    prototype: HTMLPragmaPickerElement;
+    new (): HTMLPragmaPickerElement;
+  };
+
   interface HTMLPragmaSectionElement extends Components.PragmaSection, HTMLStencilElement {}
   var HTMLPragmaSectionElement: {
     prototype: HTMLPragmaSectionElement;
@@ -272,6 +304,7 @@ declare global {
     'pragma-list': HTMLPragmaListElement;
     'pragma-list-item': HTMLPragmaListItemElement;
     'pragma-number': HTMLPragmaNumberElement;
+    'pragma-picker': HTMLPragmaPickerElement;
     'pragma-section': HTMLPragmaSectionElement;
     'pragma-select': HTMLPragmaSelectElement;
     'pragma-string': HTMLPragmaStringElement;
@@ -392,6 +425,32 @@ declare namespace LocalJSX {
     */
     'value'?: number;
   }
+  interface PragmaPicker {
+    /**
+    * Whether the field is disabled.
+    */
+    'disabled'?: boolean;
+    /**
+    * Pragma field definition.
+    */
+    'field'?: Field | string | any;
+    /**
+    * The field's label.
+    */
+    'label'?: string;
+    /**
+    * The field's path.
+    */
+    'path'?: string;
+    /**
+    * Source URL to load picker options from.
+    */
+    'source'?: string;
+    /**
+    * The field's value.
+    */
+    'value'?: boolean;
+  }
   interface PragmaSection {
     'field'?: any;
   }
@@ -477,6 +536,7 @@ declare namespace LocalJSX {
     'pragma-list': PragmaList;
     'pragma-list-item': PragmaListItem;
     'pragma-number': PragmaNumber;
+    'pragma-picker': PragmaPicker;
     'pragma-section': PragmaSection;
     'pragma-select': PragmaSelect;
     'pragma-string': PragmaString;
@@ -496,6 +556,7 @@ declare module "@stencil/core" {
       'pragma-list': LocalJSX.PragmaList & JSXBase.HTMLAttributes<HTMLPragmaListElement>;
       'pragma-list-item': LocalJSX.PragmaListItem & JSXBase.HTMLAttributes<HTMLPragmaListItemElement>;
       'pragma-number': LocalJSX.PragmaNumber & JSXBase.HTMLAttributes<HTMLPragmaNumberElement>;
+      'pragma-picker': LocalJSX.PragmaPicker & JSXBase.HTMLAttributes<HTMLPragmaPickerElement>;
       'pragma-section': LocalJSX.PragmaSection & JSXBase.HTMLAttributes<HTMLPragmaSectionElement>;
       'pragma-select': LocalJSX.PragmaSelect & JSXBase.HTMLAttributes<HTMLPragmaSelectElement>;
       'pragma-string': LocalJSX.PragmaString & JSXBase.HTMLAttributes<HTMLPragmaStringElement>;
