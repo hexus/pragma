@@ -75,6 +75,8 @@ export class Select {
     const target = event.target as HTMLSelectElement;
 
     this.value = target.value;
+
+    // TODO: Fire input/change event
   };
 
   render() {

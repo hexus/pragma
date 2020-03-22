@@ -162,6 +162,28 @@ document.addEventListener('DOMContentLoaded', function () {
 					]
 				}
 			]
+		},
+		{
+			tag: 'pragma-section',
+			path: 'other',
+			label: 'Test other components',
+			visible: true,
+			children: [
+				{
+					tag: 'pragma-picker',
+					path: 'other.picker',
+					label: 'Picker',
+					visible: true,
+					options: {
+						placeholder: 'Select an option',
+						source: null,
+						target: null,
+						listPath: null,
+						labelKey: null,
+						valueKey: null
+					}
+				}
+			]
 		}
 	];
 });

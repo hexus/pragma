@@ -138,17 +138,37 @@ export namespace Components {
     */
     'label': string;
     /**
+    * The item key to draw option labels from.
+    */
+    'labelKey': string|null;
+    /**
+    * Path to the item list to draw options from in the source data.
+    */
+    'listPath': string | null;
+    /**
     * The field's path.
     */
     'path': string;
+    /**
+    * Placeholder value displayed when an option hasn't been selected.
+    */
+    'placeholder': string;
     /**
     * Source URL to load picker options from.
     */
     'source': string;
     /**
+    * Target field path for selected options to be added to.
+    */
+    'target': string | null;
+    /**
     * The field's value.
     */
     'value': boolean;
+    /**
+    * The item key to draw option values from.
+    */
+    'valueKey': string|null;
   }
   interface PragmaSection {
     'field': any;
@@ -439,17 +459,37 @@ declare namespace LocalJSX {
     */
     'label'?: string;
     /**
+    * The item key to draw option labels from.
+    */
+    'labelKey'?: string|null;
+    /**
+    * Path to the item list to draw options from in the source data.
+    */
+    'listPath'?: string | null;
+    /**
     * The field's path.
     */
     'path'?: string;
+    /**
+    * Placeholder value displayed when an option hasn't been selected.
+    */
+    'placeholder'?: string;
     /**
     * Source URL to load picker options from.
     */
     'source'?: string;
     /**
+    * Target field path for selected options to be added to.
+    */
+    'target'?: string | null;
+    /**
     * The field's value.
     */
     'value'?: boolean;
+    /**
+    * The item key to draw option values from.
+    */
+    'valueKey'?: string|null;
   }
   interface PragmaSection {
     'field'?: any;

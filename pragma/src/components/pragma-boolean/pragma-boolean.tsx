@@ -4,7 +4,7 @@ import { Field, defaultField } from "../../types";
 
 
 /**
- * A number field component.
+ * A boolean field component.
  */
 @Component({
   tag: 'pragma-boolean',
