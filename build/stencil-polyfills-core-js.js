@@ -1,4 +1,4 @@
-(window["webpackJsonp_name_"] = window["webpackJsonp_name_"] || []).push([[15],{
+(window["webpackJsonp_name_"] = window["webpackJsonp_name_"] || []).push([["stencil-polyfills-core-js"],{
 
 /***/ "./pragma/dist/esm/polyfills/core-js.js":
 /*!**********************************************!*\

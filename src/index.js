@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// Baby demo data
 	form.state = {
 		test: {
-			number: 1,
+			number: 5,
 			string: 'Hello there',
 			select: 'two',
 			select2: '2' // TODO: Literal 2 doesn't work here - JavaScript object indexes cannot be integers

@@ -25,7 +25,7 @@ import traverseTree     from '../functions/traverseTree';
 import splitPath        from '../functions/splitPath';
 import joinPath         from '../functions/joinPath';
 import flatten          from 'flat';
-import { detailedDiff } from 'deep-object-diff';
+import detailedDiff     from 'deep-object-diff/dist/detailed';
 
 const UP = -1;
 const BOTH = 0;
