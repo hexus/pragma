@@ -29,11 +29,6 @@ export class PragmaTable {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
-   * The field's options.
-   */
-  @State() options: { showLabel?: boolean, headings?: Array<string> } = {};
-
-  /**
    * Whether the field is disabled.
    */
   @Prop({ mutable: true, reflect: true }) disabled: boolean = false;
@@ -43,7 +38,7 @@ export class PragmaTable {
    *
    * Displayed in an extra column on the far left of the table.
    */
-  @State() showLabel: boolean = false;
+  @Prop({ mutable: true, reflect: true }) showLabel: boolean = false;
 
   /**
    * Table column headings.

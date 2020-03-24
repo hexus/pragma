@@ -283,7 +283,7 @@ export default class FormProcessor
 	 */
 	getFieldDescendants(field)
 	{
-		let i, descendants = [];
+		let descendants = [];
 		
 		traverseTree(field, (descendant) => {
 			descendants.push(descendant);

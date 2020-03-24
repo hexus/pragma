@@ -1,4 +1,4 @@
-import { Component, Prop, State, Watch, h } from '@stencil/core';
+import { Component, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from "../../utils/utils";
 import { Field, defaultField } from "../../types";
 
@@ -26,14 +26,14 @@ export class PragmaList {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
-   * The field's options.
-   */
-  @State() options: { showLabel?: boolean } = {};
-
-  /**
    * Whether the field is disabled.
    */
   @Prop({ mutable: true, reflect: true }) disabled: boolean = false;
+
+  /**
+   * Whether to show the list's label.
+   */
+  @Prop({ mutable: true, reflect: true }) showLabel: boolean = false;
 
   /**
    * Handle the component loading.
@@ -58,13 +58,15 @@ export class PragmaList {
 
     this.path = this.field.path;
     this.label = this.field.label;
-    this.options = this.field.options || {};
     this.disabled = this.field.disabled;
+
+    const options = this.field.options || {};
+    this.showLabel= options ? options.showLabel : this.showLabel;
   };
 
   render() {
     return <div class="list-container">
-      {this.options.showLabel ? <div>{this.label}</div> : null}
+      {this.showLabel ? <div>{this.label}</div> : null}
 
       {
         this.field.children.map((child) => {

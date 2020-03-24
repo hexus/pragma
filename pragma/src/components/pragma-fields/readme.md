@@ -16,6 +16,7 @@
 
 ### Used by
 
+ - [pragma-form](../pragma-form)
  - [pragma-group](../pragma-group)
  - [pragma-list-item](../pragma-list-item)
  - [pragma-section](../pragma-section)
@@ -24,6 +25,7 @@
 ### Graph
 ```mermaid
 graph TD;
+  pragma-form --> pragma-fields
   pragma-group --> pragma-fields
   pragma-list-item --> pragma-fields
   pragma-section --> pragma-fields

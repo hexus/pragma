@@ -40,6 +40,24 @@ export namespace Components {
     */
     'fields': Array<Field>;
   }
+  interface PragmaForm {
+    /**
+    * Default properties for different field types.
+    */
+    'defaults': { [key: string]: any };
+    /**
+    * Pragma fields to maintain.
+    */
+    'fields': Array<Field>;
+    /**
+    * Functions to provide to form expressions.
+    */
+    'functions': Array<Function>;
+    /**
+    * Form state data.
+    */
+    'state': any;
+  }
   interface PragmaGroup {
     /**
     * Pragma field definition.
@@ -75,6 +93,10 @@ export namespace Components {
     * The field's path.
     */
     'path': string;
+    /**
+    * Whether to show the list's label.
+    */
+    'showLabel': boolean;
   }
   interface PragmaListItem {
     /**
@@ -179,7 +201,7 @@ export namespace Components {
     */
     'label': string;
     /**
-    * The selectable options.
+    * The selectable options.  TODO: Support objects *and* arrays.
     */
     'options': object;
     /**
@@ -230,6 +252,10 @@ export namespace Components {
     * The field's path.
     */
     'path': string;
+    /**
+    * Whether to show labels for each row.  Displayed in an extra column on the far left of the table.
+    */
+    'showLabel': boolean;
   }
 }
 
@@ -246,6 +272,12 @@ declare global {
   var HTMLPragmaFieldsElement: {
     prototype: HTMLPragmaFieldsElement;
     new (): HTMLPragmaFieldsElement;
+  };
+
+  interface HTMLPragmaFormElement extends Components.PragmaForm, HTMLStencilElement {}
+  var HTMLPragmaFormElement: {
+    prototype: HTMLPragmaFormElement;
+    new (): HTMLPragmaFormElement;
   };
 
   interface HTMLPragmaGroupElement extends Components.PragmaGroup, HTMLStencilElement {}
@@ -304,6 +336,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'pragma-boolean': HTMLPragmaBooleanElement;
     'pragma-fields': HTMLPragmaFieldsElement;
+    'pragma-form': HTMLPragmaFormElement;
     'pragma-group': HTMLPragmaGroupElement;
     'pragma-list': HTMLPragmaListElement;
     'pragma-list-item': HTMLPragmaListItemElement;
@@ -345,6 +378,24 @@ declare namespace LocalJSX {
     */
     'fields'?: Array<Field>;
   }
+  interface PragmaForm {
+    /**
+    * Default properties for different field types.
+    */
+    'defaults'?: { [key: string]: any };
+    /**
+    * Pragma fields to maintain.
+    */
+    'fields'?: Array<Field>;
+    /**
+    * Functions to provide to form expressions.
+    */
+    'functions'?: Array<Function>;
+    /**
+    * Form state data.
+    */
+    'state'?: any;
+  }
   interface PragmaGroup {
     /**
     * Pragma field definition.
@@ -380,6 +431,10 @@ declare namespace LocalJSX {
     * The field's path.
     */
     'path'?: string;
+    /**
+    * Whether to show the list's label.
+    */
+    'showLabel'?: boolean;
   }
   interface PragmaListItem {
     /**
@@ -484,7 +539,7 @@ declare namespace LocalJSX {
     */
     'label'?: string;
     /**
-    * The selectable options.
+    * The selectable options.  TODO: Support objects *and* arrays.
     */
     'options'?: object;
     /**
@@ -535,11 +590,16 @@ declare namespace LocalJSX {
     * The field's path.
     */
     'path'?: string;
+    /**
+    * Whether to show labels for each row.  Displayed in an extra column on the far left of the table.
+    */
+    'showLabel'?: boolean;
   }
 
   interface IntrinsicElements {
     'pragma-boolean': PragmaBoolean;
     'pragma-fields': PragmaFields;
+    'pragma-form': PragmaForm;
     'pragma-group': PragmaGroup;
     'pragma-list': PragmaList;
     'pragma-list-item': PragmaListItem;
@@ -560,6 +620,7 @@ declare module "@stencil/core" {
     interface IntrinsicElements {
       'pragma-boolean': LocalJSX.PragmaBoolean & JSXBase.HTMLAttributes<HTMLPragmaBooleanElement>;
       'pragma-fields': LocalJSX.PragmaFields & JSXBase.HTMLAttributes<HTMLPragmaFieldsElement>;
+      'pragma-form': LocalJSX.PragmaForm & JSXBase.HTMLAttributes<HTMLPragmaFormElement>;
       'pragma-group': LocalJSX.PragmaGroup & JSXBase.HTMLAttributes<HTMLPragmaGroupElement>;
       'pragma-list': LocalJSX.PragmaList & JSXBase.HTMLAttributes<HTMLPragmaListElement>;
       'pragma-list-item': LocalJSX.PragmaListItem & JSXBase.HTMLAttributes<HTMLPragmaListItemElement>;

@@ -27,6 +27,8 @@ export class PragmaSelect {
 
   /**
    * The selectable options.
+   *
+   * TODO: Support objects *and* arrays.
    */
   @Prop({ mutable: true }) options: object = {};
 
@@ -86,20 +88,18 @@ export class PragmaSelect {
       disabled={this.disabled}
       onInput={this.inputChanged}
     >
-      <slot>
-        {
-          Object.keys(this.options).map((value) => {
-            let label = this.options[value];
+      {
+        Object.keys(this.options).map((value) => {
+          let label = this.options[value];
 
-            return <option
-              value={value}
-              selected={this.value === value}
-            >
-              {label !== null ? label : value}
-            </option>;
-          })
-        }
-      </slot>
+          return <option
+            value={value}
+            selected={this.value === value}
+          >
+            {label !== null ? label : value}
+          </option>;
+        })
+      }
     </select>
   }
 }

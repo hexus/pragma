@@ -7,9 +7,10 @@ applyPolyfills().then(() => {
 
 document.addEventListener('DOMContentLoaded', function () {
 	let tree = document.getElementById('tree');
-
+	let form = document.getElementById('form');
+	
 	// Baby demo tree
-	tree.fields = [
+	form.fields = [
 		{
 			tag: 'pragma-section',
 			path: 'test',
@@ -186,6 +187,15 @@ document.addEventListener('DOMContentLoaded', function () {
 			]
 		}
 	];
+	
+	// Baby demo data
+	form.state = {
+		test: {
+			number: 1,
+			string: 'Hello there',
+			select: 2
+		}
+	};
 });
 
 // Riot
