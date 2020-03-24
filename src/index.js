@@ -7,12 +7,12 @@ applyPolyfills().then(() => {
 
 document.addEventListener('DOMContentLoaded', function () {
 	let tree = document.getElementById('tree');
-	let form = document.getElementById('form');
 	
 	// Baby demo tree
-	form.fields = [
+	tree.fields = [
 		{
 			tag: 'pragma-section',
+			type: 'section',
 			path: 'test',
 			label: 'Test section',
 			description: 'This is a test section',
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			children: [
 				{
 					tag: 'pragma-number',
+					type: 'number',
 					path: 'test.number',
 					label: 'Test number',
 					value: 72,
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				},
 				{
 					tag: 'pragma-string',
+					type: 'string',
 					path: 'test.string',
 					label: 'Test string',
 					value: 'Shade',
@@ -34,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				},
 				{
 					tag: 'pragma-select',
+					type: 'select',
 					path: 'test.select',
 					label: 'Test select',
 					options: {
@@ -188,12 +191,60 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	];
 	
+	let form = document.getElementById('form');
+	
+	form.fields = [
+		{
+			tag: 'pragma-section',
+			type: 'section',
+			path: 'test',
+			label: 'Test section'
+		},
+		{
+			tag: 'pragma-number',
+			type: 'number',
+			path: 'test.number'
+		},
+		{
+			tag: 'pragma-string',
+			type: 'string',
+			path: 'test.string'
+		},
+		{
+			tag: 'pragma-select',
+			type: 'select',
+			path: 'test.select',
+			label: 'Selecty boi',
+			options: {
+				options: {
+					one: 'One',
+					two: 'Two',
+					three: 'Three'
+				}
+			}
+		},
+		{
+			tag: 'pragma-select',
+			type: 'select',
+			path: 'test.select2',
+			label: 'Selecty boi',
+			options: {
+				options: {
+					1: 'One',
+					2: 'Two',
+					3: 'Three'
+				}
+			}
+		}
+	];
+	
 	// Baby demo data
 	form.state = {
 		test: {
 			number: 1,
 			string: 'Hello there',
-			select: 2
+			select: 'two',
+			select2: '2' // TODO: Literal 2 doesn't work here - JavaScript object indexes cannot be integers
 		}
 	};
 });
