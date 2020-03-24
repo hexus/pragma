@@ -9,7 +9,7 @@ import { Field, defaultField } from "../../types";
   tag: 'pragma-select',
   shadow: true
 })
-export class Select {
+export class PragmaSelect {
   /**
    * Pragma field definition.
    */
@@ -86,18 +86,20 @@ export class Select {
       disabled={this.disabled}
       onInput={this.inputChanged}
     >
-      {
-        Object.keys(this.options).map((value) => {
-          let label = this.options[value];
+      <slot>
+        {
+          Object.keys(this.options).map((value) => {
+            let label = this.options[value];
 
-          return <option
-            value={value}
-            selected={this.value === value}
-          >
-            {label}
-          </option>;
-        })
-      }
+            return <option
+              value={value}
+              selected={this.value === value}
+            >
+              {label !== null ? label : value}
+            </option>;
+          })
+        }
+      </slot>
     </select>
   }
 }

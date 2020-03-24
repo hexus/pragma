@@ -1,4 +1,4 @@
-import { Component, Prop, Watch, h } from '@stencil/core';
+import { Component, Prop, State, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from "../../utils/utils";
 import { Field, defaultField } from "../../types";
 
@@ -9,7 +9,7 @@ import { Field, defaultField } from "../../types";
   tag: 'pragma-list',
   shadow: true
 })
-export class List {
+export class PragmaList {
   /**
    * Pragma field definition.
    */
@@ -26,14 +26,9 @@ export class List {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
-   * The field's value.
-   */
-  @Prop({ mutable: true, reflect: true }) value;
-
-  /**
    * The field's options.
    */
-  @Prop({ mutable: true }) options: object | any = {};
+  @State() options: { showLabel?: boolean } = {};
 
   /**
    * Whether the field is disabled.
@@ -64,7 +59,6 @@ export class List {
     this.path = this.field.path;
     this.label = this.field.label;
     this.options = this.field.options || {};
-    this.value = this.field.value; // TODO: How dis property even werk
     this.disabled = this.field.disabled;
   };
 

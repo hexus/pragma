@@ -18,7 +18,7 @@ import { Field, defaultField } from "../../types";
     }
   `
 })
-export class Group {
+export class PragmaGroup {
   /**
    * Pragma field definition.
    */

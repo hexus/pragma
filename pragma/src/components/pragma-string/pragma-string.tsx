@@ -6,7 +6,7 @@ import { Field, defaultField } from "../../types";
   tag: 'pragma-string',
   shadow: true
 })
-export class String {
+export class PragmaString {
   /**
    * Pragma field definition.
    */

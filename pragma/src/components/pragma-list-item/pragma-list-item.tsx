@@ -8,7 +8,7 @@ import { Field, defaultField } from "../../types";
  * Wraps a single field as part of a list. Intended for use with <pragma-list>.
  *
  * Does not represent an actual field, but wraps a field for display and
- * interactivity.
+ * interactivity purposes.
  */
 @Component({
   tag: 'pragma-list-item',

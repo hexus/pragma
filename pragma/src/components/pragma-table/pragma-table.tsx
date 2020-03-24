@@ -1,4 +1,4 @@
-import { Component, Prop, Watch, h } from '@stencil/core';
+import { Component, Prop, State, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from "../../utils/utils";
 import { Field, defaultField } from "../../types";
 
@@ -29,19 +29,26 @@ export class PragmaTable {
   @Prop({ mutable: true, reflect: true }) label: string;
 
   /**
-   * The field's value.
-   */
-  @Prop({ mutable: true, reflect: true }) value;
-
-  /**
    * The field's options.
    */
-  @Prop({ mutable: true }) options: object | any = {};
+  @State() options: { showLabel?: boolean, headings?: Array<string> } = {};
 
   /**
    * Whether the field is disabled.
    */
   @Prop({ mutable: true, reflect: true }) disabled: boolean = false;
+
+  /**
+   * Whether to show labels for each row.
+   *
+   * Displayed in an extra column on the far left of the table.
+   */
+  @State() showLabel: boolean = false;
+
+  /**
+   * Table column headings.
+   */
+  @State() headings: Array<string> = [];
 
   /**
    * Handle the component loading.
@@ -68,13 +75,17 @@ export class PragmaTable {
 
     this.path = this.field.path;
     this.label = this.field.label;
-    this.options = this.field.options || {};
-    this.value = this.field.value; // TODO: How dis property even werk
     this.disabled = this.field.disabled;
+
+    const options = this.field.options;
+    this.showLabel = options ? options.showLabel : false;
+    this.headings = options ? options.headings : [];
   };
 
   render() {
-    const hasHeadings = this.options.headings && Array.isArray(this.options.headings);
+    const hasHeadings = this.headings
+      && Array.isArray(this.headings)
+      && this.headings.length > 0;
 
     return <div style={{ overflow: 'auto' }}>
       <table data-name={this.path}>
@@ -82,7 +93,7 @@ export class PragmaTable {
           hasHeadings ?
             <thead>
               {
-                this.options.headings.map((heading) => {
+                this.headings.map((heading) => {
                   return <th>{heading}</th>
                 })
               }
@@ -91,10 +102,10 @@ export class PragmaTable {
         }
         <tbody>
           {
-            this.field.children.map((row) => {
+            this.field.children.map((row: Field) => {
               return <tr key={row.path}>
                 {
-                  this.options.showLabel ? <th>{row.label}</th> : null
+                  this.showLabel ? <th>{row.label}</th> : null
                 }
                 {
                   row.children ? row.children.map((child) => {

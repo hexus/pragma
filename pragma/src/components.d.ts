@@ -72,17 +72,9 @@ export namespace Components {
     */
     'label': string;
     /**
-    * The field's options.
-    */
-    'options': object | any;
-    /**
     * The field's path.
     */
     'path': string;
-    /**
-    * The field's value.
-    */
-    'value': any;
   }
   interface PragmaListItem {
     /**
@@ -235,17 +227,9 @@ export namespace Components {
     */
     'label': string;
     /**
-    * The field's options.
-    */
-    'options': object | any;
-    /**
     * The field's path.
     */
     'path': string;
-    /**
-    * The field's value.
-    */
-    'value': any;
   }
 }
 
@@ -393,17 +377,9 @@ declare namespace LocalJSX {
     */
     'label'?: string;
     /**
-    * The field's options.
-    */
-    'options'?: object | any;
-    /**
     * The field's path.
     */
     'path'?: string;
-    /**
-    * The field's value.
-    */
-    'value'?: any;
   }
   interface PragmaListItem {
     /**
@@ -556,17 +532,9 @@ declare namespace LocalJSX {
     */
     'label'?: string;
     /**
-    * The field's options.
-    */
-    'options'?: object | any;
-    /**
     * The field's path.
     */
     'path'?: string;
-    /**
-    * The field's value.
-    */
-    'value'?: any;
   }
 
   interface IntrinsicElements {
