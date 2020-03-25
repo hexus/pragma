@@ -1,4 +1,4 @@
-import { Component, Prop, State, h } from '@stencil/core';
+import { Component, Listen, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
 import FormProcessor from '../../../../src/services/FormProcessor';
 
@@ -51,6 +51,11 @@ export class PragmaForm {
 
   componentWillUpdate() {
     this.sync();
+  }
+
+  @Listen('input')
+  handleInput(event) {
+    console.log(event);
   }
 
   /**
