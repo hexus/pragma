@@ -1,6 +1,7 @@
 import { Component, Element, Listen, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
 import FormProcessor from '../../../../src/services/FormProcessor';
+import { HTMLStencilElement } from '@stencil/core/internal';
 
 /**
  * Pragma form component.
@@ -9,7 +10,7 @@ import FormProcessor from '../../../../src/services/FormProcessor';
  *
  * TODO:
  *  - [ ] Maintain form state
- *  - [ ] Initial binding to any underlying <pragma-fields> elements
+ *  - [x] Initial binding to any underlying <pragma-fields> elements
  *  - [ ] True one way binding to any element... right?
  *  - [ ] Generate fields from elements into the fields tree if they have name and data-pragma attributes
  *  - [ ] fetch() fields and state via fields-src and state-src or similar
@@ -22,7 +23,7 @@ export class PragmaForm {
   /**
    * The host element.
    */
-  @Element() element: HTMLElement;
+  @Element() element: HTMLStencilElement;
 
   /**
    * Pragma fields to maintain.
@@ -62,7 +63,7 @@ export class PragmaForm {
    * every time the form changes.
    */
   findFieldElements(): Array<HTMLElement> {
-    return Array.from(this.element.querySelectorAll('pragma-fields'));
+    return Array.from(this.element.querySelectorAll(':scope > pragma-fields'));
   }
 
   componentWillRender() {
@@ -71,15 +72,29 @@ export class PragmaForm {
 
   @Listen('input')
   onInputEvent(event: InputEvent) {
-    console.log('pragma-form input event', event, event.target, event.currentTarget);
+    let element = event.target as HTMLInputElement;
+
+    if (!event.target) {
+      return;
+    }
+
+    let fieldName = element.getAttribute('path') || element.getAttribute('name');
+
+    if (!fieldName) {
+      return;
+    }
+
+    console.log('pragma-form onInputEvent', fieldName, element.value);
+
+    this.form.setValue(this.state, fieldName, element.value);
+
+    this.element.forceUpdate();
   }
 
   /**
    * Synchronize component state with the form processor and underlying fields.
    */
   sync() {
-    this.fieldElements = this.findFieldElements();
-
     this.form.setDefaults(this.defaults);
     this.form.addFunctions(this.functions);
     this.form.setFields(this.fields);
@@ -89,6 +104,10 @@ export class PragmaForm {
     console.log('form.tree.children', this.form.tree.children);
     console.log('fieldElements', this.fieldElements);
 
+    // Find and update any field elements in the host element's light DOM
+    // TODO: Find a way to not look these up every update; could end up quite redundant
+    //       Perhaps there are some DOM observers that can be used to detect such changes
+    this.fieldElements = this.findFieldElements();
     this.fieldElements.forEach((element: HTMLPragmaFieldsElement) => {
       return element.setFields(this.form.tree.children);
     }, this);

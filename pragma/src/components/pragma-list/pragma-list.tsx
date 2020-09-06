@@ -70,7 +70,7 @@ export class PragmaList {
 
       {
         this.field.children.map((child) => {
-          return <pragma-list-item field={child}/>
+          return <pragma-list-item field={{...child}}/>
         })
       }
 

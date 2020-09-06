@@ -1,5 +1,6 @@
-import { Component, Method, Prop, h } from '@stencil/core';
+import { Component, Element, Method, Prop, h } from '@stencil/core';
 import { Field } from "../../types";
+import { HTMLStencilElement } from '@stencil/core/internal';
 
 /**
  * Pragma fields component.
@@ -11,6 +12,11 @@ import { Field } from "../../types";
   shadow: false
 })
 export class PragmaFields {
+  /**
+   * The host element.
+   */
+  @Element() element: HTMLStencilElement;
+
   /**
    * The path to the subset of fields to render.
    *
@@ -32,11 +38,14 @@ export class PragmaFields {
   @Method()
   async setFields(fields: Array<Field>) {
     this.fields = fields;
+    this.element.forceUpdate();
   }
 
   render() {
     if (!this.fields.length)
       return;
+
+    console.log('pragma-fields render()');
 
     // TODO: Functional component that renders an array of fields
     return (
@@ -45,6 +54,10 @@ export class PragmaFields {
           return;
 
         const ChildTag = child.tag;
+
+        // Force stencil to update the child component
+        // TODO: Is there a better way?
+        child = { ...child };
 
         return <ChildTag key={child.path} field={child}/>;
       })

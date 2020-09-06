@@ -60,6 +60,20 @@ export class Number {
   }
 
   /**
+   * Handle input events.
+   *
+   * @param {InputEvent} event
+   */
+  private onInputEvent = (event: InputEvent) => {
+    let target = event.target as HTMLInputElement;
+
+    this.value = parseFloat(target.value);
+    // this.field = {...this.field};
+
+    console.log('pragma-number onInputEvent()', event, target, target.value);
+  };
+
+  /**
    * Parse the field attribute when it changes.
    *
    * @param {object|string} newValue
@@ -104,6 +118,7 @@ export class Number {
       step={this.step}
       value={this.value}
       disabled={this.disabled}
+      onInput={this.onInputEvent}
     />;
   }
 }

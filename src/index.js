@@ -11,6 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	form.fields = [
 		{
+			tag: 'pragma-number',
+			type: 'number',
+			path: 'number',
+			options: {
+				max: 1000000
+			}
+		},
+		{
 			tag: 'pragma-section',
 			type: 'section',
 			path: 'test',
