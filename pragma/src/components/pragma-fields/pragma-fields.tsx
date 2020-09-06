@@ -1,4 +1,4 @@
-import { Component, Element, Prop, h } from '@stencil/core';
+import { Component, Method, Prop, h } from '@stencil/core';
 import { Field } from "../../types";
 
 /**
@@ -12,19 +12,27 @@ import { Field } from "../../types";
 })
 export class PragmaFields {
   /**
-   * The host element.
-   */
-  @Element() element: HTMLElement;
-
-  /**
    * The path to the subset of fields to render.
+   *
+   * This prop is informational for parent `<pragma-form>` elements, so that
+   * they know which fields to provide to the `setFields()` setter method.
    */
-  @Prop({}) path: string;
+  @Prop() path: string;
 
   /**
    * The set of fields to render.
    */
   @Prop() fields: Array<Field> = [];
+
+  /**
+   * Set the set of fields to render.
+   *
+   * @param {Array<Field>} fields - The set of fields to render.
+   */
+  @Method()
+  async setFields(fields: Array<Field>) {
+    this.fields = fields;
+  }
 
   render() {
     if (!this.fields.length)

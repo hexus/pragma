@@ -7,17 +7,29 @@
 
 ## Properties
 
-| Property | Attribute | Description                                 | Type      | Default     |
-| -------- | --------- | ------------------------------------------- | --------- | ----------- |
-| `fields` | --        | The set of fields to render.                | `Field[]` | `[]`        |
-| `path`   | `path`    | The path to the subset of fields to render. | `string`  | `undefined` |
+| Property | Attribute | Description                                                                                                                                                                                | Type      | Default     |
+| -------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----------- |
+| `fields` | --        | The set of fields to render.                                                                                                                                                               | `Field[]` | `[]`        |
+| `path`   | `path`    | The path to the subset of fields to render.  This prop is informational for parent `<pragma-form>` elements, so that they know which fields to provide to the `setFields()` setter method. | `string`  | `undefined` |
+
+
+## Methods
+
+### `setFields(fields: Field[]) => Promise<void>`
+
+Set the set of fields to render.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
 
 
 ## Dependencies
 
 ### Used by
 
- - [pragma-form](../pragma-form)
  - [pragma-group](../pragma-group)
  - [pragma-list-item](../pragma-list-item)
  - [pragma-section](../pragma-section)
@@ -26,7 +38,6 @@
 ### Graph
 ```mermaid
 graph TD;
-  pragma-form --> pragma-fields
   pragma-group --> pragma-fields
   pragma-list-item --> pragma-fields
   pragma-section --> pragma-fields

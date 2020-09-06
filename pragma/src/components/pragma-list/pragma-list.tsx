@@ -7,7 +7,7 @@ import { Field, defaultField } from "../../types";
  */
 @Component({
   tag: 'pragma-list',
-  shadow: true
+  shadow: false
 })
 export class PragmaList {
   /**

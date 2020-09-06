@@ -1,4 +1,4 @@
-import { Component, Listen, Prop, State, h } from '@stencil/core';
+import { Component, Element, Listen, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
 import FormProcessor from '../../../../src/services/FormProcessor';
 
@@ -19,6 +19,11 @@ import FormProcessor from '../../../../src/services/FormProcessor';
   shadow: false
 })
 export class PragmaForm {
+  /**
+   * The host element.
+   */
+  @Element() element: HTMLElement;
+
   /**
    * Pragma fields to maintain.
    */
@@ -44,13 +49,23 @@ export class PragmaForm {
    *
    * This is where the magic happens.
    */
-  @State() form = new FormProcessor;
+  @State() form: FormProcessor = new FormProcessor;
 
-  componentWillLoad() {
-    this.sync();
+  /**
+   * Field elements in the host component's light DOM that need updating every
+   * time the form changes.
+   */
+  @State() fieldElements: Array<HTMLElement> = [];
+
+  /**
+   * Find field elements in the host component's light DOM that need updating
+   * every time the form changes.
+   */
+  findFieldElements(): Array<HTMLElement> {
+    return Array.from(this.element.querySelectorAll('pragma-fields'));
   }
 
-  componentWillUpdate() {
+  componentWillRender() {
     this.sync();
   }
 
@@ -63,6 +78,8 @@ export class PragmaForm {
    * Synchronize component state with the form processor and underlying fields.
    */
   sync() {
+    this.fieldElements = this.findFieldElements();
+
     this.form.setDefaults(this.defaults);
     this.form.addFunctions(this.functions);
     this.form.setFields(this.fields);
@@ -70,12 +87,14 @@ export class PragmaForm {
 
     console.log('fields, state', this.fields, this.state);
     console.log('form.tree.children', this.form.tree.children);
+    console.log('fieldElements', this.fieldElements);
+
+    this.fieldElements.forEach((element: HTMLPragmaFieldsElement) => {
+      return element.setFields(this.form.tree.children);
+    }, this);
   }
 
   render() {
-    return <pragma-fields fields={this.form.tree.children}/>;
-
-    // TODO: This should be all that's needed, reach into the slot to find <pragma-fields> elements
-    // return <slot/>;
+    return <slot/>;
   }
 }
