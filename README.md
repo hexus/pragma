@@ -42,3 +42,6 @@ Stencil currently [only bundles using Rollup](https://stenciljs.com/docs/module-
 With better [Public Compiler APIs](https://stenciljs.com/blog/stencil-roadmap-fall-2019#public-compiler-apis) it should
 instead be possible to compile Stencil components and bundle them as part of Webpack, instead of needing to run two
 watches. For now, the two watches are seemingly necessary.
+
+**Update**: The [Stencil Core Compiler API](https://stenciljs.com/docs/compiler-api) is now documented, but there does
+not yet appear to be a Webpack plugin that utilises it.
