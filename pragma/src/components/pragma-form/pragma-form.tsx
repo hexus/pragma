@@ -9,7 +9,7 @@ import { HTMLStencilElement } from '@stencil/core/internal';
  * Maintains form state and provides one-way value binding to any slotted fields.
  *
  * TODO:
- *  - [ ] Maintain form state
+ *  - [~] Maintain form state
  *  - [x] Initial binding to any underlying <pragma-fields> elements
  *  - [ ] True one way binding to any element... right?
  *  - [ ] Generate fields from elements into the fields tree if they have name and data-pragma attributes

@@ -15,8 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			type: 'number',
 			path: 'number',
 			options: {
-				max: 1000000
+				max: 999
 			}
+		},
+		{
+			tag: 'pragma-number',
+			type: 'number',
+			path: 'number-double',
+			expression: 'number * 2'
 		},
 		{
 			tag: 'pragma-section',
