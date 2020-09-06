@@ -11,6 +11,7 @@ import FormProcessor from '../../../../src/services/FormProcessor';
  *  - [ ] Maintain form state
  *  - [ ] Initial binding to any underlying <pragma-fields> elements
  *  - [ ] True one way binding to any element... right?
+ *  - [ ] Generate fields from elements into the fields tree if they have name and data-pragma attributes
  *  - [ ] fetch() fields and state via fields-src and state-src or similar
  */
 @Component({

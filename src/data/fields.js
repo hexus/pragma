@@ -677,7 +677,7 @@ const fields = [
 			type:        'csv',                    // TODO: Support different source data types
 			key:         'id',                     // Item value key
 			label:       'name',                   // Item label key
-			placeholder: 'Search for a spell' // Placeholder text
+			placeholder: 'Search for a spell'      // Placeholder text
 		}
 	},
 	{
