@@ -1,6 +1,5 @@
-import { Component, Element, Listen, Prop, h } from '@stencil/core';
+import { Component, Element, Prop, h } from '@stencil/core';
 import { Field } from "../../types";
-import { propagateEvent } from "../../utils/utils";
 
 /**
  * Pragma fields component.
@@ -20,28 +19,12 @@ export class PragmaFields {
   /**
    * The path to the subset of fields to render.
    */
-  @Prop() path: string;
+  @Prop({}) path: string;
 
   /**
    * The set of fields to render.
    */
   @Prop() fields: Array<Field> = [];
-
-  @Listen('input')
-  onInputEvent(event: InputEvent) {
-    console.log(
-      'pragma-fields input event',
-      event,
-      event.target === this.element,
-      event.target,
-      event.currentTarget
-    );
-
-    if (event.currentTarget !== this.element) {
-      // propagateEvent(this.element, event);
-      console.log(propagateEvent);
-    }
-  }
 
   render() {
     if (!this.fields.length)
