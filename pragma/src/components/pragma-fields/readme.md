@@ -7,9 +7,10 @@
 
 ## Properties
 
-| Property | Attribute | Description                  | Type      | Default |
-| -------- | --------- | ---------------------------- | --------- | ------- |
-| `fields` | --        | The set of fields to render. | `Field[]` | `[]`    |
+| Property | Attribute | Description                                 | Type      | Default     |
+| -------- | --------- | ------------------------------------------- | --------- | ----------- |
+| `fields` | --        | The set of fields to render.                | `Field[]` | `[]`        |
+| `path`   | `path`    | The path to the subset of fields to render. | `string`  | `undefined` |
 
 
 ## Dependencies

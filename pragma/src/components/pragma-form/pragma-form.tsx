@@ -55,8 +55,8 @@ export class PragmaForm {
   }
 
   @Listen('input')
-  handleInput(event) {
-    console.log(event);
+  onInputEvent(event: InputEvent) {
+    console.log('pragma-form input event', event, event.target, event.currentTarget);
   }
 
   /**

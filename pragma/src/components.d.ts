@@ -34,6 +34,10 @@ export namespace Components {
           * The set of fields to render.
          */
         "fields": Array<Field>;
+        /**
+          * The path to the subset of fields to render.
+         */
+        "path": string;
     }
     interface PragmaForm {
         /**
@@ -371,6 +375,10 @@ declare namespace LocalJSX {
           * The set of fields to render.
          */
         "fields"?: Array<Field>;
+        /**
+          * The path to the subset of fields to render.
+         */
+        "path"?: string;
     }
     interface PragmaForm {
         /**

@@ -80,6 +80,9 @@ export class Number {
     this.disabled = this.field.disabled;
   };
 
+  /**
+   * Render the component.
+   */
   render() {
     console.log(
       this.field,

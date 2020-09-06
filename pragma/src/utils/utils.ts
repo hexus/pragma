@@ -68,6 +68,36 @@ export function parseJson(value: any) {
 }
 
 /**
+ * Propagate a DOM event from a given element.
+ *
+ * @param {HTMLElement} element - The DOM element to propagate the event from.
+ * @param {Event} event - The event to propagate.
+ */
+export function propagateEvent(element: HTMLElement, event: Event) {
+  element.dispatchEvent(cloneEvent(event));
+}
+
+/**
+ * Clone the given DOM event.
+ *
+ * Typically used for propagating an event that has already been dispatched inside shadow DOM.
+ *
+ * @param {Event} event - The event to clone.
+ * @return {Event} The cloned event.
+ */
+export function cloneEvent(event: Event) {
+  if (event instanceof InputEvent) {
+    return new InputEvent(event.type, {
+      data: event.data,
+      inputType: event.inputType,
+      isComposing: event.isComposing
+    });
+  }
+
+  return new CustomEvent(event.type);
+}
+
+/**
  * Dump the given values to the console as formatted JSON.
  *
  * @param {*[]} values
