@@ -2,7 +2,6 @@ import { Component, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from '../../utils/utils';
 import { Field, defaultField } from "../../types";
 
-
 /**
  * A boolean field component.
  */
@@ -59,6 +58,17 @@ export class Boolean {
     this.disabled = this.field.disabled;
   };
 
+  /**
+   * Handle the underlying input changing value.
+   *
+   * @param {InputEvent} event
+   */
+  inputChanged = (event: InputEvent) => {
+    const target = event.target as HTMLInputElement;
+
+    this.value = target.checked;
+  };
+
   render() {
     console.log(
       this.field,
@@ -74,6 +84,7 @@ export class Boolean {
       title={this.label}
       checked={this.value}
       disabled={this.disabled}
+      onInput={this.inputChanged}
     />;
   }
 }

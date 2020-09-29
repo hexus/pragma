@@ -67,6 +67,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		},
 		{
+			tag: 'pragma-boolean',
+			type: 'boolean',
+			path: 'test.boolean',
+			label: 'Boolean'
+		},
+		{
 			tag: 'pragma-section',
 			type: 'section',
 			path: 'lists',
@@ -84,18 +90,21 @@ document.addEventListener('DOMContentLoaded', function () {
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.list.0',
 			value: 'One',
 			visible: true
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.list.1',
 			value: 'Two',
 			visible: true
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.list.2',
 			value: 'Three',
 			visible: true
@@ -121,11 +130,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.table.0.0',
 			value: 'One'
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.table.0.1',
 			value: 'Two'
 		},
@@ -136,11 +147,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.table.1.0',
 			value: 'Three'
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.table.1.1',
 			value: 'Four'
 		},
@@ -151,11 +164,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.table.2.0',
 			value: 'Five'
 		},
 		{
 			tag: 'pragma-string',
+			type: 'string',
 			path: 'lists.table.2.1',
 			value: 'Six'
 		},
@@ -186,7 +201,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			number: 1,
 			string: 'Hello there',
 			select: 'two',
-			select2: '2' // TODO: Literal 2 doesn't work here - JavaScript object indexes cannot be integers
+			select2: '2', // TODO: Literal 2 doesn't work here - JavaScript object indexes cannot be integers
+			boolean: true
 		}
 	};
 });

@@ -104,8 +104,8 @@ export class PragmaTable {
                 }
                 {
                   row.children ? row.children.map((child) => {
-                    return <td>
-                      <pragma-fields fields={[child]}/>
+                    return <td key={child.path}>
+                      <pragma-fields key={child.path} path={child.path} fields={[child]}/>
                     </td>
                   }) : null
                 }

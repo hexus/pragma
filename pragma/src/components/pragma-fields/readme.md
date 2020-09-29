@@ -7,23 +7,10 @@
 
 ## Properties
 
-| Property | Attribute | Description                                                                                                                                                                                | Type      | Default     |
-| -------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----------- |
-| `fields` | --        | The set of fields to render.                                                                                                                                                               | `Field[]` | `[]`        |
-| `path`   | `path`    | The path to the subset of fields to render.  This prop is informational for parent `<pragma-form>` elements, so that they know which fields to provide to the `setFields()` setter method. | `string`  | `undefined` |
-
-
-## Methods
-
-### `setFields(fields: Field[]) => Promise<void>`
-
-Set the set of fields to render.
-
-#### Returns
-
-Type: `Promise<void>`
-
-
+| Property | Attribute | Description                                                                                                                                             | Type      | Default |
+| -------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| `fields` | --        | The set of fields to render.                                                                                                                            | `Field[]` | `[]`    |
+| `path`   | `path`    | The path to the subset of fields to render.  This prop is informational for parent `<pragma-form>` elements, so that they know which fields to provide. | `string`  | `''`    |
 
 
 ## Dependencies

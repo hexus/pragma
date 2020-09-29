@@ -14,7 +14,7 @@
 | `label`    | `label`    | The field's label.                                           | `string`  | `undefined`    |
 | `options`  | --         | The selectable options.  TODO: Support objects *and* arrays. | `object`  | `{}`           |
 | `path`     | `path`     | The field's path.                                            | `string`  | `undefined`    |
-| `value`    | `value`    | The field's value.                                           | `any`     | `undefined`    |
+| `value`    | `value`    | The field's value.  The value of the selected option.        | `any`     | `undefined`    |
 
 
 ----------------------------------------------

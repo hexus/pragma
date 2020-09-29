@@ -34,6 +34,8 @@ export class PragmaSelect {
 
   /**
    * The field's value.
+   *
+   * The value of the selected option.
    */
   @Prop({ mutable: true, reflect: true }) value;
 

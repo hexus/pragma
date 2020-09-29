@@ -4,6 +4,8 @@ import { Field, defaultField } from "../../types";
 
 /**
  * A list component.
+ *
+ * TODO: Slotted list item templates and/or render props.
  */
 @Component({
   tag: 'pragma-list',
@@ -61,7 +63,7 @@ export class PragmaList {
     this.disabled = this.field.disabled;
 
     const options = this.field.options || {};
-    this.showLabel= options ? options.showLabel : this.showLabel;
+    this.showLabel = options ? options.showLabel : this.showLabel;
   };
 
   render() {
@@ -70,7 +72,7 @@ export class PragmaList {
 
       {
         this.field.children.map((child) => {
-          return <pragma-list-item field={{...child}}/>
+          return <pragma-list-item key={child.path} field={{ ...child }}/>
         })
       }
 

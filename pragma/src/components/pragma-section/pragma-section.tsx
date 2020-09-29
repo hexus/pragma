@@ -2,7 +2,6 @@ import { Component, Prop, h } from '@stencil/core';
 
 /**
  * TODO: Flesh out @Prop to field mappings
- * TODO: Add slot?
  *
  * @slot - Section content.
  */
@@ -22,8 +21,8 @@ export class PragmaSection {
 
     return <fieldset name={this.field.path} title={this.field.description}>
       <legend>{ this.field.label }</legend>
-      <pragma-fields fields={children}/>
       <slot/>
+      <pragma-fields path={this.field.path} fields={children}/>
     </fieldset>
   }
 }

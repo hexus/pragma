@@ -1,4 +1,4 @@
-import { Component, Element, Method, Prop, h } from '@stencil/core';
+import { Component, Element, Prop, Watch, h } from '@stencil/core';
 import { Field } from "../../types";
 import { HTMLStencilElement } from '@stencil/core/internal';
 
@@ -21,9 +21,9 @@ export class PragmaFields {
    * The path to the subset of fields to render.
    *
    * This prop is informational for parent `<pragma-form>` elements, so that
-   * they know which fields to provide to the `setFields()` setter method.
+   * they know which fields to provide.
    */
-  @Prop() path: string;
+  @Prop({ reflect: true }) path: string = '';
 
   /**
    * The set of fields to render.
@@ -31,23 +31,21 @@ export class PragmaFields {
   @Prop() fields: Array<Field> = [];
 
   /**
-   * Set the set of fields to render.
-   *
-   * @param {Array<Field>} fields - The set of fields to render.
+   * Force an update when fields are updated.
    */
-  @Method()
-  async setFields(fields: Array<Field>) {
-    this.fields = fields;
+  @Watch('fields')
+  async updateFields() {
     this.element.forceUpdate();
   }
 
   render() {
-    if (!this.fields.length)
+    if (!this.fields?.length)
       return;
 
     console.log('pragma-fields render()');
 
     // TODO: Functional component that renders an array of fields
+    // TODO: "Render props" for non-pragma elements?
     return (
       this.fields.map((child) => {
         if (!child || !child.tag || !child.visible)
@@ -55,8 +53,8 @@ export class PragmaFields {
 
         const ChildTag = child.tag;
 
-        // Force stencil to update the child component
-        // TODO: Is there a better way?
+        // Force Stencil to update the child component
+        // TODO: Is there a better way? There must be.
         child = { ...child };
 
         return <ChildTag key={child.path} field={child}/>;

@@ -60,9 +60,9 @@ export class PragmaString {
   /**
    * Handle the underlying input changing value.
    *
-   * @param {Event} event
+   * @param {InputEvent} event
    */
-  inputChanged = (event) => {
+  inputChanged = (event: InputEvent) => {
     const target = event.target as HTMLInputElement;
 
     this.value = target.value;

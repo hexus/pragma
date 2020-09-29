@@ -35,14 +35,9 @@ export namespace Components {
          */
         "fields": Array<Field>;
         /**
-          * The path to the subset of fields to render.  This prop is informational for parent `<pragma-form>` elements, so that they know which fields to provide to the `setFields()` setter method.
+          * The path to the subset of fields to render.  This prop is informational for parent `<pragma-form>` elements, so that they know which fields to provide.
          */
         "path": string;
-        /**
-          * Set the set of fields to render.
-          * @param fields - The set of fields to render.
-         */
-        "setFields": (fields: Field[]) => Promise<void>;
     }
     interface PragmaForm {
         /**
@@ -59,6 +54,10 @@ export namespace Components {
           * Functions to provide to form expressions.
          */
         "functions": Array<Function>;
+        /**
+          * The name of the Pragma form.
+         */
+        "name": string;
         /**
           * Form state data.
          */
@@ -215,7 +214,7 @@ export namespace Components {
          */
         "path": string;
         /**
-          * The field's value.
+          * The field's value.  The value of the selected option.
          */
         "value": any;
     }
@@ -381,7 +380,7 @@ declare namespace LocalJSX {
          */
         "fields"?: Array<Field>;
         /**
-          * The path to the subset of fields to render.  This prop is informational for parent `<pragma-form>` elements, so that they know which fields to provide to the `setFields()` setter method.
+          * The path to the subset of fields to render.  This prop is informational for parent `<pragma-form>` elements, so that they know which fields to provide.
          */
         "path"?: string;
     }
@@ -400,6 +399,10 @@ declare namespace LocalJSX {
           * Functions to provide to form expressions.
          */
         "functions"?: Array<Function>;
+        /**
+          * The name of the Pragma form.
+         */
+        "name"?: string;
         /**
           * Form state data.
          */
@@ -556,7 +559,7 @@ declare namespace LocalJSX {
          */
         "path"?: string;
         /**
-          * The field's value.
+          * The field's value.  The value of the selected option.
          */
         "value"?: any;
     }

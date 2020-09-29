@@ -12,6 +12,7 @@ import { HTMLStencilElement } from '@stencil/core/internal';
  *  - [~] Maintain form state
  *  - [x] Initial binding to any underlying <pragma-fields> elements
  *  - [ ] True one way binding to any element... right?
+ *    - [ ] Find them on DOM changes with mutation observers https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  *  - [ ] Generate fields from elements into the fields tree if they have name and data-pragma attributes
  *  - [ ] fetch() fields and state via fields-src and state-src or similar
  */
@@ -24,6 +25,11 @@ export class PragmaForm {
    * The host element.
    */
   @Element() element: HTMLStencilElement;
+
+  /**
+   * The name of the Pragma form.
+   */
+  @Prop() name: string;
 
   /**
    * Pragma fields to maintain.
@@ -50,7 +56,7 @@ export class PragmaForm {
    *
    * This is where the magic happens.
    */
-  @State() form: FormProcessor = new FormProcessor;
+  @State() form: FormProcessor = new FormProcessor();
 
   /**
    * Field elements in the host component's light DOM that need updating every
@@ -59,17 +65,12 @@ export class PragmaForm {
   @State() fieldElements: Array<HTMLElement> = [];
 
   /**
-   * Find field elements in the host component's light DOM that need updating
-   * every time the form changes.
+   * Handle input events to update form data.
+   *
+   * Forces an update of the form component.
+   *
+   * @param {InputEvent} event
    */
-  findFieldElements(): Array<HTMLElement> {
-    return Array.from(this.element.querySelectorAll(':scope > pragma-fields'));
-  }
-
-  componentWillRender() {
-    this.sync();
-  }
-
   @Listen('input')
   onInputEvent(event: InputEvent) {
     let element = event.target as HTMLInputElement;
@@ -84,11 +85,64 @@ export class PragmaForm {
       return;
     }
 
-    console.log('pragma-form onInputEvent', fieldName, element.value);
+    let value = element.type === 'checkbox' ? element.checked : element.value;
 
-    this.form.setValue(this.state, fieldName, element.value);
+    console.log('pragma-form onInputEvent', event, fieldName, element.value, value);
+
+    this.form.setValue(this.state, fieldName, value);
 
     this.element.forceUpdate();
+  }
+
+  /**
+   * Find field elements in the host component's light DOM that need updating
+   * every time the form changes.
+   */
+  findFieldElements(): Array<HTMLElement> {
+    return Array.from(this.element.querySelectorAll(':scope pragma-fields, :scope input'));
+  }
+
+  /**
+   * Get the field path of a given element.
+   *
+   * @param {HTMLElement} element
+   * @return string
+   */
+  getFieldElementPath(element: HTMLElement) {
+    return element.getAttribute('path') || element.getAttribute('name') || '';
+  }
+
+  getFieldElementField(element: HTMLElement): Field {
+    return this.form.getField(this.getFieldElementPath(element));
+  }
+
+  /**
+   * Sync a given element with the form data.
+   *
+   * @param {HTMLElement} element
+   */
+  syncElement(element: HTMLElement) {
+    let field = this.getFieldElementField(element);
+
+    if (!field) {
+      return;
+    }
+
+    if (element.nodeName === 'PRAGMA-FIELDS') {
+      let fieldsElement = element as HTMLPragmaFieldsElement;
+
+      if (!element.parentElement.closest('pragma-fields')) {
+        fieldsElement.fields = Array.isArray(field.children) ? [...field.children] : [];
+      }
+    }
+
+    if (element instanceof HTMLInputElement) {
+      if (element.type === 'checkbox') {
+        element.checked = !!field.value;
+      } else {
+        element.value = field.value;
+      }
+    }
   }
 
   /**
@@ -109,8 +163,12 @@ export class PragmaForm {
     //       Perhaps there are some DOM observers that can be used to detect such changes
     this.fieldElements = this.findFieldElements();
     this.fieldElements.forEach((element: HTMLPragmaFieldsElement) => {
-      return element.setFields(this.form.tree.children);
+      this.syncElement(element);
     }, this);
+  }
+
+  componentWillRender() {
+    this.sync();
   }
 
   render() {

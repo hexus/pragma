@@ -68,7 +68,6 @@ export class Number {
     let target = event.target as HTMLInputElement;
 
     this.value = parseFloat(target.value);
-    // this.field = {...this.field};
 
     console.log('pragma-number onInputEvent()', event, target, target.value);
   };

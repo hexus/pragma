@@ -64,12 +64,13 @@ export class PragmaGroup {
   render() {
     return (
       <div class="group-container">
-        {!this.hideLabel
-          ? <span>{this.label}</span>
-          : null
+        {
+          !this.hideLabel
+            ? <span>{this.label}</span>
+            : null
         }
         <span>
-          <pragma-fields fields={this.field.children}/>
+          <pragma-fields path={this.field.path} fields={this.field.children}/>
         </span>
       </div>
     );
