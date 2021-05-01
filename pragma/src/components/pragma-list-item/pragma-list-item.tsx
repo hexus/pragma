@@ -37,7 +37,7 @@ export class PragmaListItem {
   parseFieldDefinition(newValue, oldValue) {
     this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
-    console.log('pragma-list-item', oldValue, newValue, this.field);
+    // console.log('pragma-list-item', oldValue, newValue, this.field);
   };
 
   render() {

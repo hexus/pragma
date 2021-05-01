@@ -1,4 +1,4 @@
-import { Component, Element, Listen, Method, Prop, State, h } from '@stencil/core';
+import { Component, Element, forceUpdate, Listen, Method, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
 import FormProcessor from '../../../../src/services/FormProcessor';
 import { HTMLStencilElement } from '@stencil/core/internal';
@@ -93,7 +93,7 @@ export class PragmaForm {
 
     this.form.setValue(this.state, fieldName, value);
 
-    this.element.forceUpdate();
+    forceUpdate(this.element);
   }
 
   /**
@@ -134,7 +134,7 @@ export class PragmaForm {
     }
 
     if (changes > 0) {
-      this.element.forceUpdate();
+      forceUpdate(this.element);
     }
   }
 
@@ -228,7 +228,7 @@ export class PragmaForm {
   }
 
   @Method()
-  async getForm(): Promise<FormProcessor> {
+  async getForm() {
     return this.form;
   }
 

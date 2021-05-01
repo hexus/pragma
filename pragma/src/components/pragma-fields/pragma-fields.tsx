@@ -1,4 +1,4 @@
-import { Component, Element, Prop, Watch, h } from '@stencil/core';
+import { Component, Element, forceUpdate, Prop, Watch, h } from '@stencil/core';
 import { Field } from "../../types";
 import { HTMLStencilElement } from '@stencil/core/internal';
 
@@ -35,7 +35,7 @@ export class PragmaFields {
    */
   @Watch('fields')
   async updateFields() {
-    this.element.forceUpdate();
+    forceUpdate(this.element);
   }
 
   render() {

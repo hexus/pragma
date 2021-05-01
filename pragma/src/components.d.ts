@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Field, } from "./types";
+import { Field } from "./types";
 export namespace Components {
     interface PragmaBoolean {
         /**
@@ -43,9 +43,7 @@ export namespace Components {
         /**
           * Default properties for different field types.
          */
-        "defaults": {
-            [key: string]: any;
-        };
+        "defaults": { [key: string]: any };
         /**
           * Pragma fields to maintain.
          */
@@ -160,7 +158,7 @@ export namespace Components {
         /**
           * The item key to draw option labels from.
          */
-        "labelKey": string | null;
+        "labelKey": string|null;
         /**
           * Path to the item list to draw options from in the source data.
          */
@@ -188,7 +186,7 @@ export namespace Components {
         /**
           * The item key to draw option values from.
          */
-        "valueKey": string | null;
+        "valueKey": string|null;
     }
     interface PragmaSection {
         "field": any;
@@ -389,9 +387,7 @@ declare namespace LocalJSX {
         /**
           * Default properties for different field types.
          */
-        "defaults"?: {
-            [key: string]: any;
-        };
+        "defaults"?: { [key: string]: any };
         /**
           * Pragma fields to maintain.
          */
@@ -505,7 +501,7 @@ declare namespace LocalJSX {
         /**
           * The item key to draw option labels from.
          */
-        "labelKey"?: string | null;
+        "labelKey"?: string|null;
         /**
           * Path to the item list to draw options from in the source data.
          */
@@ -533,7 +529,7 @@ declare namespace LocalJSX {
         /**
           * The item key to draw option values from.
          */
-        "valueKey"?: string | null;
+        "valueKey"?: string|null;
     }
     interface PragmaSection {
         "field"?: any;
