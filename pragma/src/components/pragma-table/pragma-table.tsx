@@ -66,7 +66,7 @@ export class PragmaTable {
       this.field.children = [];
     }
 
-    console.log('pragma-table', oldValue, newValue, this.field);
+    // console.log('pragma-table', oldValue, newValue, this.field);
 
     this.path = this.field.path;
     this.label = this.field.label;

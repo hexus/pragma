@@ -128,23 +128,21 @@ export class PragmaPicker {
 
 
   render() {
-    console.log(
-      this.field,
-      this.path,
-      this.label,
-      this.value,
-      this.disabled,
-      this.source,
-      this.placeholder
-    );
+    // console.log(
+    //   this.field,
+    //   this.path,
+    //   this.label,
+    //   this.value,
+    //   this.disabled,
+    //   this.source,
+    //   this.placeholder
+    // );
 
     return [
       <select>
         {this.getPlaceholder()}
         <slot/>
       </select>
-
-
     ];
   }
 }

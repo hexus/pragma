@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			tag: 'pragma-number',
 			type: 'number',
 			path: 'number-double',
-			expression: 'number * 2'
+			expression: 'number * 3'
 		},
 		{
 			tag: 'pragma-section',
@@ -133,19 +133,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					'Second column'
 				]
 			},
-			template: 'templates.table-row'
-		},
-		{
-			tag: 'pragma-group',
-			type: 'group',
-			path: 'lists.table.one',
-			label: 'One'
-		},
-		{
-			tag: 'pragma-group',
-			type: 'group',
-			path: 'lists.table.two',
-			label: 'Two'
+			template: 'templates.table-row',
+			fixed: ['one', 'two']
 		},
 		{
 			tag: 'pragma-section',
@@ -179,6 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		},
 		lists: {
 			table: {
+				// TODO: Currently bugged and not showing values unless the
+				//       templated fields are explicitly defined, work out why
 				one: {
 					first:  'One',
 					second: 'Two'

@@ -70,13 +70,13 @@ export class Boolean {
   };
 
   render() {
-    console.log(
-      this.field,
-      this.path,
-      this.label,
-      this.value,
-      this.disabled
-    );
+    // console.log(
+    //   this.field,
+    //   this.path,
+    //   this.label,
+    //   this.value,
+    //   this.disabled
+    // );
 
     return <input
       type="checkbox"

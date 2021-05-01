@@ -1,6 +1,7 @@
-import { Component, Prop, Watch, h } from '@stencil/core';
+import { Component, Element, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from "../../utils/utils";
 import { Field, defaultField } from "../../types";
+import { HTMLStencilElement } from "@stencil/core/internal";
 
 /**
  * A select field component.
@@ -11,9 +12,33 @@ import { Field, defaultField } from "../../types";
 })
 export class PragmaSelect {
   /**
+   * The host element.
+   */
+  @Element() element: HTMLStencilElement;
+
+  /**
    * Pragma field definition.
    */
   @Prop() field: Field | string | any = defaultField;
+
+  /**
+   * Parse the field attribute when it changes.
+   *
+   * @param {object|string} newValue
+   * @param {object|string} oldValue
+   */
+  @Watch('field')
+  parseFieldDefinition(newValue, oldValue) {
+    this.field = parseAndMergeFields(this.field, oldValue, newValue);
+
+    // console.log('pragma-select', oldValue, newValue, this.field);
+
+    this.path = this.field.path;
+    this.label = this.field.name;
+    this.options = this.field.options.options || {};
+    this.value = this.field.value;
+    this.disabled = this.field.disabled;
+  };
 
   /**
    * The field's path.
@@ -52,35 +77,25 @@ export class PragmaSelect {
   }
 
   /**
-   * Parse the field attribute when it changes.
-   *
-   * @param {object|string} newValue
-   * @param {object|string} oldValue
-   */
-  @Watch('field')
-  parseFieldDefinition(newValue, oldValue) {
-    this.field = parseAndMergeFields(this.field, oldValue, newValue);
-
-    console.log('pragma-select', oldValue, newValue, this.field);
-
-    this.path = this.field.path;
-    this.label = this.field.name;
-    this.options = this.field.options.options || {};
-    this.value = this.field.value;
-    this.disabled = this.field.disabled;
-  };
-
-  /**
    * Handle the underlying input changing value.
    *
-   * @param {Event} event
+   * @param {InputEvent} event
    */
-  inputChanged = (event) => {
+  inputChanged = (event: InputEvent) => {
     const target = event.target as HTMLSelectElement;
 
     this.value = target.value;
 
     // TODO: Fire input/change event
+    //       It seems like this isn't necessary in the current version of Stencil
+    // let newEvent = new InputEvent(event.type, {
+    //   bubbles: event.bubbles,
+    //   cancelable: event.cancelable,
+    //   inputType: event.inputType,
+    //   data: event.data,
+    //   detail: event.detail
+    // });
+    // this.element.dispatchEvent(newEvent);
   };
 
   render() {

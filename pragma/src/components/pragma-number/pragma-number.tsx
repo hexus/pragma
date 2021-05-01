@@ -97,16 +97,16 @@ export class Number {
    * Render the component.
    */
   render() {
-    console.log(
-      this.field,
-      this.path,
-      this.label,
-      this.min,
-      this.max,
-      this.step,
-      this.value,
-      this.disabled
-    );
+    // console.log(
+    //   this.field,
+    //   this.path,
+    //   this.label,
+    //   this.min,
+    //   this.max,
+    //   this.step,
+    //   this.value,
+    //   this.disabled
+    // );
 
     return <input
       type="number"

@@ -42,7 +42,7 @@ export class PragmaFields {
     if (!this.fields?.length)
       return;
 
-    console.log('pragma-fields render()');
+    // console.log('pragma-fields render()');
 
     // TODO: Functional component that renders an array of fields
     // TODO: "Render props" for non-pragma elements?

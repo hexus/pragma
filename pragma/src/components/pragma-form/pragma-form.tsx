@@ -73,6 +73,8 @@ export class PragmaForm {
    */
   @Listen('input')
   onInputEvent(event: InputEvent) {
+    console.log(event);
+
     if (!event.target) {
       return;
     }
@@ -139,9 +141,15 @@ export class PragmaForm {
   /**
    * Find field elements in the host component's light DOM that need updating
    * every time the form changes.
+   *
+   * @return {Array<HTMLElement>}
    */
   findFieldElements(): Array<HTMLElement> {
-    return Array.from(this.element.querySelectorAll(':scope pragma-fields, :scope input'));
+    return Array.from(
+      this.element.querySelectorAll(
+        ':scope pragma-fields, :scope input, :scope select'
+      )
+    );
   }
 
   /**
@@ -167,6 +175,7 @@ export class PragmaForm {
     let field = this.getFieldElementField(element);
 
     if (!field) {
+      console.debug('No field found for element', element);
       return;
     }
 
@@ -184,6 +193,11 @@ export class PragmaForm {
       } else {
         element.value = field.value;
       }
+    }
+
+    if (element instanceof HTMLSelectElement) {
+      // TODO: Sync <option>s?
+      element.value = field.value;
     }
   }
 
