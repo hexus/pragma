@@ -54,6 +54,7 @@ export namespace Components {
           * Functions to provide to form expressions.
          */
         "functions": Array<Function>;
+        "getForm": () => Promise<any>;
         /**
           * The name of the Pragma form.
          */

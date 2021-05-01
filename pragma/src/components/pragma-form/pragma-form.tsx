@@ -1,4 +1,4 @@
-import { Component, Element, Listen, Prop, State, h } from '@stencil/core';
+import { Component, Element, Listen, Method, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
 import FormProcessor from '../../../../src/services/FormProcessor';
 import { HTMLStencilElement } from '@stencil/core/internal';
@@ -27,6 +27,19 @@ export class PragmaForm {
   @Element() element: HTMLStencilElement;
 
   /**
+   * The form.
+   *
+   * This is where the magic happens.
+   */
+  @State() form: FormProcessor = new FormProcessor();
+
+  /**
+   * Field elements in the host component's light DOM that need updating every
+   * time the form changes.
+   */
+  @State() fieldElements: Array<HTMLElement> = [];
+
+  /**
    * The name of the Pragma form.
    */
   @Prop() name: string;
@@ -52,19 +65,6 @@ export class PragmaForm {
   @Prop({ mutable: true }) state: any = {};
 
   /**
-   * The form.
-   *
-   * This is where the magic happens.
-   */
-  @State() form: FormProcessor = new FormProcessor();
-
-  /**
-   * Field elements in the host component's light DOM that need updating every
-   * time the form changes.
-   */
-  @State() fieldElements: Array<HTMLElement> = [];
-
-  /**
    * Handle input events to update form data.
    *
    * Forces an update of the form component.
@@ -73,11 +73,11 @@ export class PragmaForm {
    */
   @Listen('input')
   onInputEvent(event: InputEvent) {
-    let element = event.target as HTMLInputElement;
-
     if (!event.target) {
       return;
     }
+
+    let element = event.target as HTMLInputElement;
 
     let fieldName = element.getAttribute('path') || element.getAttribute('name');
 
@@ -87,11 +87,53 @@ export class PragmaForm {
 
     let value = element.type === 'checkbox' ? element.checked : element.value;
 
-    console.log('pragma-form onInputEvent', event, fieldName, element.value, value);
+    // console.log('pragma-form onInputEvent', event, fieldName, element.value, value);
 
     this.form.setValue(this.state, fieldName, value);
 
     this.element.forceUpdate();
+  }
+
+  /**
+   * Handle add events.
+   *
+   * Adds fields to the form based on data attributes of the event's target
+   * element.
+   *
+   * @param {MouseEvent} event
+   */
+  @Listen('click', { capture: true })
+  onClickEvent(event: MouseEvent) {
+    // console.log(event);
+
+    if (!event.target) {
+      return;
+    }
+
+    let element = event.target as HTMLElement;
+
+    if (!element.dataset) {
+      return;
+    }
+
+    // console.log(element, element.dataset);
+
+    let changes = 0;
+    let data = element.dataset;
+
+    if (data.pragmaAdd) {
+      this.form.addItem(this.state, data.pragmaAdd);
+      changes++;
+    }
+
+    if (data.pragmaRemove) {
+      this.form.removeValue(this.state, data.pragmaRemove);
+      changes++;
+    }
+
+    if (changes > 0) {
+      this.element.forceUpdate();
+    }
   }
 
   /**
@@ -154,9 +196,9 @@ export class PragmaForm {
     this.form.setFields(this.fields);
     this.form.update(this.state);
 
-    console.log('fields, state', this.fields, this.state);
-    console.log('form.tree.children', this.form.tree.children);
-    console.log('fieldElements', this.fieldElements);
+    // console.log('fields, state', this.fields, this.state);
+    // console.log('form.tree.children', this.form.tree.children);
+    // console.log('fieldElements', this.fieldElements);
 
     // Find and update any field elements in the host element's light DOM
     // TODO: Find a way to not look these up every update; could end up quite redundant
@@ -169,6 +211,11 @@ export class PragmaForm {
 
   componentWillRender() {
     this.sync();
+  }
+
+  @Method()
+  async getForm(): Promise<FormProcessor> {
+    return this.form;
   }
 
   render() {

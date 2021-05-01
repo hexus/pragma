@@ -14,7 +14,7 @@
 		<h2>Stencil.js test</h2>
 		<pragma-number field='{"path": "test", "value": 6}'></pragma-number>
 
-		<h2>Stencil.js</h2>
+		<h2>Stencil.js Pragma Form</h2>
 		<pragma-form id="form">
 			<div>
 				<label>
@@ -26,11 +26,15 @@
 					Test boolean: <input type="checkbox" name="test.boolean"/>
 				</label>
 			</div>
-			<pragma-fields></pragma-fields>
+			<div>
+				<label>
+					Test button: <button type="button" data-pragma-add="lists.list">Add List Item</button>
+				</label>
+			</div>
 			<pragma-fields></pragma-fields>
 		</pragma-form>
 
-		<h2>Riot.js</h2>
+		<h2>Riot.js Pragma Form</h2>
 		<div class="container">
 			<character-sheet id="characterSheet" debug></character-sheet>
 		</div>

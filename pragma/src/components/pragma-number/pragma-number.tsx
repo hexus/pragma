@@ -82,7 +82,7 @@ export class Number {
   parseFieldDefinition(newValue, oldValue) {
     this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
-    console.log('pragma-number', oldValue, newValue, this.field);
+    // console.log('pragma-number', oldValue, newValue, this.field);
 
     this.path = this.field.path;
     this.label = this.field.name;

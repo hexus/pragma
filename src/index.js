@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	form.fields = [
 		{
+			// Templates placeholder parent
+			path: 'templates',
+			type: 'virtual'
+		},
+		{
 			tag: 'pragma-number',
 			type: 'number',
 			path: 'number',
@@ -80,37 +85,43 @@ document.addEventListener('DOMContentLoaded', function () {
 			description: 'This is a test section for lists'
 		},
 		{
+			// Simple list item template
+			tag: 'pragma-string',
+			type: 'string',
+			path: 'templates.list-item',
+			visible: true
+		},
+		{
 			tag: 'pragma-list',
+			type: 'list',
 			path: 'lists.list',
 			label: 'List',
 			description: 'First test list',
 			options: {
+				editable: true,
 				showLabel: true
 			},
+			template: 'templates.list-item'
+		},
+		{
+			tag: 'pragma-group',
+			type: 'group',
+			path: 'templates.table-row',
+			label: 'Row'
 		},
 		{
 			tag: 'pragma-string',
 			type: 'string',
-			path: 'lists.list.0',
-			value: 'One',
-			visible: true
+			path: 'templates.table-row.first'
 		},
 		{
 			tag: 'pragma-string',
 			type: 'string',
-			path: 'lists.list.1',
-			value: 'Two',
-			visible: true
-		},
-		{
-			tag: 'pragma-string',
-			type: 'string',
-			path: 'lists.list.2',
-			value: 'Three',
-			visible: true
+			path: 'templates.table-row.second'
 		},
 		{
 			tag: 'pragma-table',
+			type: 'table',
 			path: 'lists.table',
 			label: 'Table',
 			description: 'First table test',
@@ -121,58 +132,20 @@ document.addEventListener('DOMContentLoaded', function () {
 					'First column',
 					'Second column'
 				]
-			}
+			},
+			template: 'templates.table-row'
 		},
 		{
 			tag: 'pragma-group',
-			path: 'lists.table.0',
-			label: 'First row'
-		},
-		{
-			tag: 'pragma-string',
-			type: 'string',
-			path: 'lists.table.0.0',
-			value: 'One'
-		},
-		{
-			tag: 'pragma-string',
-			type: 'string',
-			path: 'lists.table.0.1',
-			value: 'Two'
+			type: 'group',
+			path: 'lists.table.one',
+			label: 'One'
 		},
 		{
 			tag: 'pragma-group',
-			path: 'lists.table.1',
-			label: 'Second row'
-		},
-		{
-			tag: 'pragma-string',
-			type: 'string',
-			path: 'lists.table.1.0',
-			value: 'Three'
-		},
-		{
-			tag: 'pragma-string',
-			type: 'string',
-			path: 'lists.table.1.1',
-			value: 'Four'
-		},
-		{
-			tag: 'pragma-group',
-			path: 'lists.table.2',
-			label: 'Third row',
-		},
-		{
-			tag: 'pragma-string',
-			type: 'string',
-			path: 'lists.table.2.0',
-			value: 'Five'
-		},
-		{
-			tag: 'pragma-string',
-			type: 'string',
-			path: 'lists.table.2.1',
-			value: 'Six'
+			type: 'group',
+			path: 'lists.table.two',
+			label: 'Two'
 		},
 		{
 			tag: 'pragma-section',
@@ -203,6 +176,18 @@ document.addEventListener('DOMContentLoaded', function () {
 			select: 'two',
 			select2: '2', // TODO: Literal 2 doesn't work here - JavaScript object indexes cannot be integers
 			boolean: true
+		},
+		lists: {
+			table: {
+				one: {
+					first:  'One',
+					second: 'Two'
+				},
+				two: {
+					first:  'Three',
+					second: 'Four'
+				}
+			}
 		}
 	};
 });

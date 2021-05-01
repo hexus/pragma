@@ -16,6 +16,19 @@
 | `state`     | `state`   | Form state data.                              | `any`                     | `{}`        |
 
 
+## Methods
+
+### `getForm() => Promise<any>`
+
+
+
+#### Returns
+
+Type: `Promise<any>`
+
+
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

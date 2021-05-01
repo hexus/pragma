@@ -18,6 +18,28 @@ export class PragmaList {
   @Prop() field: Field | string | any = defaultField;
 
   /**
+   * Parse the field attribute when it changes.
+   *
+   * @param {object|string} newValue
+   * @param {object|string} oldValue
+   */
+  @Watch('field')
+  parseFieldDefinition(newValue, oldValue) {
+    this.field = parseAndMergeFields(this.field, oldValue, newValue);
+
+    this.field.children = this.field.children || [];
+
+    // console.log('pragma-list', oldValue, newValue, this.field);
+
+    this.path = this.field.path;
+    this.label = this.field.label;
+    this.disabled = this.field.disabled;
+
+    const options = this.field.options || {};
+    this.showLabel = options ? options.showLabel : this.showLabel;
+  };
+
+  /**
    * The field's path.
    */
   @Prop({ mutable: true, reflect: true }) path: string;
@@ -44,28 +66,6 @@ export class PragmaList {
     this.parseFieldDefinition(this.field, defaultField);
   }
 
-  /**
-   * Parse the field attribute when it changes.
-   *
-   * @param {object|string} newValue
-   * @param {object|string} oldValue
-   */
-  @Watch('field')
-  parseFieldDefinition(newValue, oldValue) {
-    this.field = parseAndMergeFields(this.field, oldValue, newValue);
-
-    this.field.children = this.field.children || [];
-
-    console.log('pragma-list', oldValue, newValue, this.field);
-
-    this.path = this.field.path;
-    this.label = this.field.label;
-    this.disabled = this.field.disabled;
-
-    const options = this.field.options || {};
-    this.showLabel = options ? options.showLabel : this.showLabel;
-  };
-
   render() {
     return <div class="list-container">
       {this.showLabel ? <div>{this.label}</div> : null}
@@ -76,7 +76,7 @@ export class PragmaList {
         })
       }
 
-      <button type="button">Add</button>
+      <button type="button" data-pragma-add={this.path}>Add</button>
     </div>;
   }
 }

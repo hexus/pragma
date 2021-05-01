@@ -42,7 +42,7 @@ export class PragmaListItem {
 
   render() {
     return <div>
-      <pragma-fields path={this.field.path} fields={[{...this.field}]}/><button>Remove</button>
+      <pragma-fields path={this.field.path} fields={[{...this.field}]}/><button data-pragma-remove={this.field.path}>Remove</button>
     </div>
   }
 }
