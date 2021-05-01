@@ -84,11 +84,11 @@ export default class FormProcessor
 				omit: true
 			},
 			'string': {
-				input: 'string',
+				input: 'pragma-string',
 				default: ''
 			},
 			'number': {
-				input: 'number',
+				input: 'pragma-number',
 				default: 0,
 				options: {
 					min: -100,
@@ -97,26 +97,26 @@ export default class FormProcessor
 				}
 			},
 			'boolean': {
-				input: 'boolean',
+				input: 'pragma-boolean',
 				default: false
 			},
 			'selection': {
-				input: 'selection',
+				input: 'pragma-select',
 				options: {
 					options: {}
 				}
 			},
 			'section': {
-				input: 'section'
+				input: 'pragma-section'
 			},
 			'group': {
-				input: 'group'
+				input: 'pragma-group'
 			},
 			'list': {
-				input: 'list'
+				input: 'pragma-list'
 			},
 			'list-item': {
-				input: 'list-item'
+				input: 'pragma-list-item'
 			},
 			'table': {
 				input: 'pragma-table'

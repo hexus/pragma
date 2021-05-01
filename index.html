@@ -2,62 +2,12 @@
 <html lang="en">
 	<head>
 		<title>Pragma - Character Sheet</title>
-		<style>
-			.container {
-				/*width: 968px;*/
-				margin: 0 auto;
-			}
-		</style>
 		<link rel="stylesheet" href="node_modules/choices.js/public/assets/styles/choices.css"/>
 	</head>
 	<body>
-		<h2>Stencil.js test</h2>
-		<pragma-number field='{"path": "test", "value": 6}'></pragma-number>
-
-		<h2>Stencil.js Pragma Form</h2>
 		<pragma-form id="form">
-			<div>
-				<label>
-					Test string: <input type="text" name="test.string"/>
-				</label>
-			</div>
-			<div>
-				<label>
-					Test select:
-					<select name="test.select">
-						<option value="one">One</option>
-						<option value="two">Two</option>
-						<option value="three">Three</option>
-					</select>
-				</label>
-			</div>
-			<div>
-				<label>
-					Test select (2):
-					<select name="test.select2">
-						<option value="1">One</option>
-						<option value="2">Two</option>
-						<option value="3">Three</option>
-					</select>
-				</label>
-			</div>
-			<div>
-				<label>
-					Test boolean: <input type="checkbox" name="test.boolean"/>
-				</label>
-			</div>
-			<div>
-				<label>
-					Test button: <button type="button" data-pragma-add="lists.list">Add List Item</button>
-				</label>
-			</div>
 			<pragma-fields></pragma-fields>
 		</pragma-form>
-
-		<h2>Riot.js Pragma Form</h2>
-		<div class="container">
-			<character-sheet id="characterSheet" debug></character-sheet>
-		</div>
 
 		<script src="build/index.js"></script>
 	</body>

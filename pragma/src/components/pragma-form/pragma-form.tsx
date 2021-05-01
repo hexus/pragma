@@ -73,8 +73,6 @@ export class PragmaForm {
    */
   @Listen('input')
   onInputEvent(event: InputEvent) {
-    console.log(event);
-
     if (!event.target) {
       return;
     }
