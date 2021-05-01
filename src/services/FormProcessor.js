@@ -562,7 +562,7 @@ export default class FormProcessor
 	 *
 	 * Causes the evaluation of any field dependencies as a result.
 	 *
-	 * TODO: Evaluate (and cache) expressions for other field properties! :D
+	 * TODO: Evaluate (and cache) expressions for other field properties to reuse! :D
 	 *
 	 * @param {Field}  field   - The field to compute the value of.
 	 * @param {Object} data    - The data to derive values from.
@@ -624,9 +624,8 @@ export default class FormProcessor
 		try {
 			value = expression.evaluate(values);
 		} catch (error) {
-			console.log('evaluateFieldExpression', field, data, value);
-
-			console.error(`Error evaluating expression for field '${field.path}': ${error.message}`);
+			console.error(`Error evaluating expression for field '${field.path}'`, error);
+			console.error('evaluateFieldExpression', field, data, value, values);
 		}
 
 		//console.log('evaluateFieldExpression', field.path, expression.toString(), variables, values, value);

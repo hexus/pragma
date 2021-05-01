@@ -145,7 +145,7 @@ export class PragmaForm {
   findFieldElements(): Array<HTMLElement> {
     return Array.from(
       this.element.querySelectorAll(
-        ':scope pragma-fields, :scope input, :scope select'
+        ':scope pragma-fields, :scope input, :scope select, :scope textarea'
       )
     );
   }
@@ -180,6 +180,8 @@ export class PragmaForm {
     if (element.nodeName === 'PRAGMA-FIELDS') {
       let fieldsElement = element as HTMLPragmaFieldsElement;
 
+      console.log(fieldsElement, field);
+
       if (!element.parentElement.closest('pragma-fields')) {
         fieldsElement.fields = Array.isArray(field.children) ? [...field.children] : [];
       }
@@ -196,6 +198,10 @@ export class PragmaForm {
     if (element instanceof HTMLSelectElement) {
       // TODO: Sync <option>s?
       element.value = field.value;
+    }
+
+    if (element instanceof HTMLTextAreaElement) {
+      element.innerText = field.value;
     }
   }
 
