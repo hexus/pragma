@@ -18,6 +18,27 @@ export class Number {
   @Prop() field: Field | string | any = defaultField;
 
   /**
+   * Parse the field attribute when it changes.
+   *
+   * @param {object|string} newValue
+   * @param {object|string} oldValue
+   */
+  @Watch('field')
+  parseFieldDefinition(newValue, oldValue) {
+    this.field = parseAndMergeFields(this.field, oldValue, newValue);
+
+    // console.log('pragma-number', oldValue, newValue, this.field);
+
+    this.path = this.field.path;
+    this.label = this.field.label;
+    this.min = this.field.options.min;
+    this.max = this.field.options.max;
+    this.step = this.field.options.step;
+    this.value = this.field.value;
+    this.disabled = this.field.disabled;
+  };
+
+  /**
    * The field's path.
    */
   @Prop({ mutable: true, reflect: true }) path: string;
@@ -69,28 +90,7 @@ export class Number {
 
     this.value = parseFloat(target.value);
 
-    console.log('pragma-number onInputEvent()', event, target, target.value);
-  };
-
-  /**
-   * Parse the field attribute when it changes.
-   *
-   * @param {object|string} newValue
-   * @param {object|string} oldValue
-   */
-  @Watch('field')
-  parseFieldDefinition(newValue, oldValue) {
-    this.field = parseAndMergeFields(this.field, oldValue, newValue);
-
-    // console.log('pragma-number', oldValue, newValue, this.field);
-
-    this.path = this.field.path;
-    this.label = this.field.name;
-    this.min = this.field.options.min;
-    this.max = this.field.options.max;
-    this.step = this.field.options.step;
-    this.value = this.field.value;
-    this.disabled = this.field.disabled;
+    // console.log('pragma-number onInputEvent()', event, target, target.value);
   };
 
   /**

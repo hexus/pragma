@@ -275,20 +275,18 @@ export default class CharacterSheetProcessor
 /**
  * Character sheet data structure.
  *
- * // TODO: Rename general to background, profile or basics?
- *
  * @typedef {Object} CharacterSheet
  *
- * @property {Object} general              - General character statistics
- * @property {string} general.name         - Character name
- * @property {string} [general.alignment]  - Character alignment
- * @property {number} [general.age]        - Character age, in years
- * @property {string} [general.gender]     - Character gender
- * @property {string} [general.height]     - Character standing height
- * @property {string} [general.weight]     - Character weight
- * @property {string} [general.hair]       - Character hair color
- * @property {string} [general.eyes]       - Character eye color
- * @property {string} [general.home]       - Character homeland
+ * @property {Object} profile              - General character statistics
+ * @property {string} profile.name         - Character name
+ * @property {string} [profile.alignment]  - Character alignment
+ * @property {number} [profile.age]        - Character age, in years
+ * @property {string} [profile.gender]     - Character gender
+ * @property {string} [profile.height]     - Character standing height
+ * @property {string} [profile.weight]     - Character weight
+ * @property {string} [profile.hair]       - Character hair color
+ * @property {string} [profile.eyes]       - Character eye color
+ * @property {string} [profile.home]       - Character homeland
  *
  * @property {Object} size                 - Character size
  * @property {string} size.type            - Size type

@@ -180,8 +180,6 @@ export class PragmaForm {
     if (element.nodeName === 'PRAGMA-FIELDS') {
       let fieldsElement = element as HTMLPragmaFieldsElement;
 
-      console.log(fieldsElement, field);
-
       if (!element.parentElement.closest('pragma-fields')) {
         fieldsElement.fields = Array.isArray(field.children) ? [...field.children] : [];
       }
@@ -214,9 +212,8 @@ export class PragmaForm {
     this.form.setFields(this.fields);
     this.form.update(this.state);
 
-    // console.log('fields, state', this.fields, this.state);
-    // console.log('form.tree.children', this.form.tree.children);
-    // console.log('fieldElements', this.fieldElements);
+    console.log('fields, state', this.fields, this.state);
+    console.log('form.tree.children', this.form.tree.children);
 
     // Find and update any field elements in the host element's light DOM
     // TODO: Find a way to not look these up every update; could end up quite redundant
@@ -225,12 +222,20 @@ export class PragmaForm {
     this.fieldElements.forEach((element: HTMLPragmaFieldsElement) => {
       this.syncElement(element);
     }, this);
+
+    console.log('fieldElements', this.fieldElements);
   }
 
   componentWillRender() {
-    this.sync();
+    return new Promise((resolve) => {
+      this.sync()
+      resolve(true);
+    });
   }
 
+  /**
+   * @returns {FormProcessor}
+   */
   @Method()
   async getForm() {
     return this.form;

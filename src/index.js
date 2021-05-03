@@ -16,11 +16,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		return;
 	}
 
-	console.log(fields, store);
-
 	form.functions = {
 		abilityModifier
 	};
+
 	form.fields = fields;
-	form.state = store;
+	form.state = store.characters[1];
 });

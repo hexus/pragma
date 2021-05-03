@@ -84,11 +84,11 @@ export default class FormProcessor
 				omit: true
 			},
 			'string': {
-				input: 'pragma-string',
+				tag: 'pragma-string',
 				default: ''
 			},
 			'number': {
-				input: 'pragma-number',
+				tag: 'pragma-number',
 				default: 0,
 				options: {
 					min: -100,
@@ -97,34 +97,34 @@ export default class FormProcessor
 				}
 			},
 			'boolean': {
-				input: 'pragma-boolean',
+				tag: 'pragma-boolean',
 				default: false
 			},
 			'selection': {
-				input: 'pragma-select',
+				tag: 'pragma-select',
 				options: {
 					options: {}
 				}
 			},
 			'section': {
-				input: 'pragma-section'
+				tag: 'pragma-section'
 			},
 			'group': {
-				input: 'pragma-group'
+				tag: 'pragma-group'
 			},
 			'list': {
-				input: 'pragma-list'
+				tag: 'pragma-list'
 			},
 			'list-item': {
-				input: 'pragma-list-item'
+				tag: 'pragma-list-item'
 			},
 			'table': {
-				input: 'pragma-table'
+				tag: 'pragma-table'
 			}
 		});
 
 		/**
-		 * Default input options for each input type.
+		 * Default field options for each input type.
 		 *
 		 * @type {Object.<string, Object>}
 		 */
@@ -815,13 +815,13 @@ export default class FormProcessor
 	}
 
 	/**
-	 * Derive a field's name from its path.
+	 * Derive a field's label from its path.
 	 *
 	 * @protected
-	 * @param {Field} field
-	 * @return {string} The derived name
+	 * @param {Field} field The field to derive a label for
+	 * @return {string} The derived label
 	 */
-	deriveFieldName(field)
+	deriveFieldLabel(field)
 	{
 		let path = field.path;
 		let lastDotIndex = path.lastIndexOf('.');
@@ -845,7 +845,7 @@ export default class FormProcessor
 	/**
 	 * Apply the form's default properties to the given fields.
 	 *
-	 * Fills in default values, derives default names.
+	 * Fills in default values, derives default labels.
 	 *
 	 * @protected
 	 * @param {Field[]} fields - The fields to apply default values to.
@@ -862,9 +862,9 @@ export default class FormProcessor
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
 
-			// Derive a name
-			if (field.name === undefined) {
-				field.name = this.deriveFieldName(field);
+			// Derive a label
+			if (field.label === undefined) {
+				field.label = this.deriveFieldLabel(field);
 			}
 
 			// Apply global defaults
@@ -876,10 +876,10 @@ export default class FormProcessor
 			}
 
 			// Apply default input options
-			if (this.inputOptions[field.input]) {
+			if (this.inputOptions[field.tag]) {
 				field.options = field.options || {};
 
-				field.options = defaults(field.options, this.inputOptions[field.input]);
+				field.options = defaults(field.options, this.inputOptions[field.tag]);
 			}
 
 			// Disable the field implicitly if it has an expression
@@ -970,7 +970,7 @@ export default class FormProcessor
 			(field) => {
 				// Skip fields that have already been visited
 				if (visited[field.path]) {
-					//console.warn('skipped visited field', field.path);
+					console.warn('skipped visited field', field.path);
 					return;
 				}
 
@@ -1366,8 +1366,8 @@ export default class FormProcessor
 			// Merge sandwich to retain original values
 			field = merge(field, templateClone, clone(field));
 
-			if (field.name == null) {
-				field.name = this.deriveFieldName(field);
+			if (field.label == null) {
+				field.label = this.deriveFieldLabel(field);
 			}
 
 			field.extended = template.path;
@@ -1761,9 +1761,9 @@ export default class FormProcessor
  * @property {string}         [parent]         - The path of the field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
  * @property {string}         [pathFragment]   - The leaf of the field's path. TODO: Rename to key
  * @property {string}         [type]           - The type of the field. Determines the type of value to read and store. Defaults to `'number'`.
- * @property {string}         [input]          - The input type to use for this field, if any. // TODO: Rename? Might not be an actual input... (i.e. section). `element` might be a good name.
+ * @property {string}         [tag]            - The tag to use for this field, if any.
  * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
- * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the field's key. TODO: Rename to label?
+ * @property {string}         [label]          - The field's label. Defaults to a sentence-case translation of the field's key.
  * @property {string}         [description]    - The field's description.
  * @property {boolean}        [omit=false]     - Whether to prevent storing the field's value in data AND prevent updating any of its children. Defaults to `false`.
  * @property {boolean}        [virtual=false]  - Whether to prevent storing the field's value in data. Defaults to `false`.
