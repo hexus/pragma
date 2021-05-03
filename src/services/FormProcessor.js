@@ -40,8 +40,9 @@ const DOWN = 1;
  * TODO: Rename to Form?
  *
  * @class FormProcessor
+ * @type FormProcessor
  */
-export default class FormProcessor
+export class FormProcessor
 {
 	/**
 	 * Create a new property processor.
@@ -68,9 +69,9 @@ export default class FormProcessor
 		};
 
 		this.options = merge({
-			expressionCache: true,
-			updateCache: true,
-			valueCache: true
+			expressionCache: false,
+			updateCache: false,
+			valueCache: false
 		}, options);
 
 		/**
@@ -247,7 +248,7 @@ export default class FormProcessor
 	/**
 	 * Get the field at the given path.
 	 *
-	 * @protected
+	 * //@protected
 	 * @param {string} path - The path of the field to get.
 	 * @return {Field}
 	 */
@@ -762,7 +763,7 @@ export default class FormProcessor
 
 		// Clear all caches
 		this.valueCache = {};
-		// this.expressionCache = {};
+		this.expressionCache = {};
 		this.expressionDependents = {};
 	}
 
@@ -969,7 +970,7 @@ export default class FormProcessor
 		this.parser.functions = merge(this.parser.functions, this.functions);
 
 		// Clear the expression cache
-		//this.expressionCache = {};
+		this.expressionCache = {};
 	}
 
 	/**
@@ -1024,6 +1025,7 @@ export default class FormProcessor
 
 		if (this.options.updateCache && visited[field.path]) {
 			// console.info('Skipped visited path', field.path);
+			return;
 		}
 
 		this.clearValueCache(path);
@@ -1114,7 +1116,7 @@ export default class FormProcessor
 	 */
 	updateField(field, data, visited = {})
 	{
-		let isDebugField = field.path.indexOf('abilities.str') === 0;
+		let isDebugField = field.path.indexOf('classes.') === 0;
 
 		if (isDebugField) {
 			console.log('updateField()', field.path);
@@ -1138,7 +1140,7 @@ export default class FormProcessor
 		// Cache invalidation for dependent field updates
 		if (previousValue !== field.value) {
 			// console.log('field value changed', field.path, previousValue, field.value);
-			this.clearValueCache(field.path);
+			// this.clearValueCache(field.path);
 			// delete this.valueCache[field.path];
 
 			// let dependents = this.getFieldExpressionDependents(field);
@@ -1146,7 +1148,7 @@ export default class FormProcessor
 			// for (let i = 0; i < dependents.length; i++) {
 			// 	delete visited[dependents[i].path];
 			// }
-			visited = {}; // TODO: Lazy
+			// visited = {}; // TODO: Lazy
 		}
 
 		// Update the paths of fields that are dependent upon the value of this field
@@ -1888,6 +1890,6 @@ export default class FormProcessor
  * @property {string}         [extended]       - The path of a field that been has inherited from.
  * @property {string}         [mirror]         - The path of a field to mirror. TODO: Implement
  * @property {Field[]}        [children]       - Child fields.
- * @property {string}         [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
+ * @property {Field|string}   [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
  * @property {Object|array}   [fixed]          - A map or list of child keys that cannot be removed at runtime, if present.
  */

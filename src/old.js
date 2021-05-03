@@ -5,7 +5,7 @@ import './tags/pragma.tag';
 
 import CharacterFactory        from './services/CharacterFactory';
 import CharacterSheetProcessor from "./services/CharacterSheetProcessor";
-import FormProcessor           from './services/FormProcessor';
+import { FormProcessor }       from './services/FormProcessor';
 import abilityModifier         from './model/functions/abilityModifier';
 
 import data from './data';

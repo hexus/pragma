@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Field } from "./types";
+import { FormProcessor } from "../../src/services/FormProcessor";
 export namespace Components {
     interface PragmaBoolean {
         /**
@@ -51,11 +52,8 @@ export namespace Components {
         /**
           * Functions to provide to form expressions.
          */
-        "functions": Array<Function>;
-        /**
-          * @returns
-         */
-        "getForm": () => Promise<any>;
+        "functions": { [key: string]: Function };
+        "getForm": () => Promise<FormProcessor>;
         /**
           * The name of the Pragma form.
          */
@@ -398,7 +396,7 @@ declare namespace LocalJSX {
         /**
           * Functions to provide to form expressions.
          */
-        "functions"?: Array<Function>;
+        "functions"?: { [key: string]: Function };
         /**
           * The name of the Pragma form.
          */

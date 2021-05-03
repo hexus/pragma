@@ -1,7 +1,7 @@
 import { Component, Element, forceUpdate, Listen, Method, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
-import FormProcessor from '../../../../src/services/FormProcessor';
 import { HTMLStencilElement } from '@stencil/core/internal';
+import { FormProcessor } from "../../../../src/services/FormProcessor";
 
 /**
  * Pragma form component.
@@ -52,7 +52,7 @@ export class PragmaForm {
   /**
    * Functions to provide to form expressions.
    */
-  @Prop({ mutable: true }) functions: Array<Function> = [];
+  @Prop({ mutable: true }) functions: { [key: string]: Function } = {};
 
   /**
    * Default properties for different field types.
@@ -233,9 +233,6 @@ export class PragmaForm {
     });
   }
 
-  /**
-   * @returns {FormProcessor}
-   */
   @Method()
   async getForm() {
     return this.form;

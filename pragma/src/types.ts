@@ -80,7 +80,7 @@ export type Field = {
    *
    * TODO: Defaults to `true`.
    */
-  visible: boolean|string;
+  visible?: boolean|string;
 
   /**
    * Whether the field is disabled.
