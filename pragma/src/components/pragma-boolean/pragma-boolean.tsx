@@ -53,7 +53,7 @@ export class Boolean {
     this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
     this.path = this.field.path;
-    this.label = this.field.name;
+    this.label = this.field.label;
     this.value = this.field.value;
     this.disabled = this.field.disabled;
   };

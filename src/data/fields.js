@@ -158,9 +158,9 @@ const fields = [
 	{
 		path: 'templates.ability.score',
 		expression:
-			  '$parent.base +' +
-				  '$parent.racialBonus +' +
-				  '$parent.miscBonus +' +
+			  '$parent.base + ' +
+				  '$parent.racialBonus + ' +
+				  '$parent.miscBonus + ' +
 				  '$parent.tempBonus'
 	},
 	{

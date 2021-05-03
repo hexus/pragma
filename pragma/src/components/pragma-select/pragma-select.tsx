@@ -34,7 +34,7 @@ export class PragmaSelect {
     // console.log('pragma-select', oldValue, newValue, this.field);
 
     this.path = this.field.path;
-    this.label = this.field.name;
+    this.label = this.field.label;
     this.options = this.field.options.options || {};
     this.value = this.field.value;
     this.disabled = this.field.disabled;

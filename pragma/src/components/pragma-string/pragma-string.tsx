@@ -52,7 +52,7 @@ export class PragmaString {
     // console.log('pragma-string', oldValue, newValue, this.field);
 
     this.path = this.field.path;
-    this.label = this.field.name;
+    this.label = this.field.label;
     this.value = this.field.value;
     this.disabled = this.field.disabled;
   };

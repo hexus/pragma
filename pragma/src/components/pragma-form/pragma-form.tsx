@@ -223,7 +223,7 @@ export class PragmaForm {
       this.syncElement(element);
     }, this);
 
-    console.log('fieldElements', this.fieldElements);
+    // console.log('fieldElements', this.fieldElements);
   }
 
   componentWillRender() {

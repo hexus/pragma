@@ -47,11 +47,12 @@ export default class FormProcessor
 	 * Create a new property processor.
 	 *
 	 * @constructor
-	 * @param {Field[]}                     [fields=[]]       - Initial form fields.
-	 * @param {Object.<string, Function>}   [functions={}]    - Functions to make available for field expressions.
-	 * @param {Object.<string, Object>}     [inputOptions={}] - Default input options keyed by input type.
+	 * @param {Field[]}                     [fields=[]]     - Initial form fields.
+	 * @param {Object.<string, Function>}   [functions={}]  - Functions to make available for field expressions.
+	 * @param {Object.<string, Object>}     [tagOptions={}] - Default tag options keyed by tag type.
+	 * @param {Object.<string, *>}          [options={}]    - Form options.
 	 */
-	constructor(fields = [], functions = {}, inputOptions = {})
+	constructor(fields = [], functions = {}, tagOptions = {}, options = {})
 	{
 		/**
 		 * Typecasting functions for each field type.
@@ -65,6 +66,12 @@ export default class FormProcessor
 			'number':  (f, v) => toNumber(util.clamp(v, get(f, 'options.min'), get(f, 'options.max'))),
 			'boolean': (f, v) => !!v
 		};
+
+		this.options = merge({
+			expressionCache: false,
+			updateCache: false,
+			valueCache: false
+		}, options);
 
 		/**
 		 * Default property values for each field type.
@@ -124,11 +131,11 @@ export default class FormProcessor
 		});
 
 		/**
-		 * Default field options for each input type.
+		 * Default field options for each tag type.
 		 *
 		 * @type {Object.<string, Object>}
 		 */
-		this.inputOptions = merge({}, inputOptions);
+		this.tagOptions = merge({}, tagOptions);
 
 		/**
 		 * Expression functions.
@@ -198,7 +205,7 @@ export default class FormProcessor
 		this.expressionCache = {};
 
 		/**
-		 * Field update dependencies keyed by path.
+		 * Field expression update dependencies keyed by path; adjacency list.
 		 *
 		 * @type {Object.<string, string[]>}
 		 */
@@ -468,7 +475,7 @@ export default class FormProcessor
 	deriveValue(path, data)
 	{
 		// Return from the value cache if a value is set
-		if (this.valueCache.hasOwnProperty(path)) {
+		if (this.options.valueCache && this.valueCache.hasOwnProperty(path)) {
 			return this.valueCache[path];
 		}
 
@@ -509,7 +516,7 @@ export default class FormProcessor
 		}
 
 		// Use the cached expression if one is available
-		if (this.expressionCache[field.path]) {
+		if (this.options.expressionCache && this.expressionCache[field.path]) {
 			return this.expressionCache[field.path];
 		}
 
@@ -706,7 +713,7 @@ export default class FormProcessor
 
 		// Clear all caches
 		this.valueCache = {};
-		//this.expressionCache = {};
+		// this.expressionCache = {};
 		this.expressionDependencies = {};
 	}
 
@@ -875,11 +882,11 @@ export default class FormProcessor
 				field = defaults(field, this.defaults[field.type]);
 			}
 
-			// Apply default input options
-			if (this.inputOptions[field.tag]) {
+			// Apply default tag options
+			if (this.tagOptions[field.tag]) {
 				field.options = field.options || {};
 
-				field.options = defaults(field.options, this.inputOptions[field.tag]);
+				field.options = defaults(field.options, this.tagOptions[field.tag]);
 			}
 
 			// Disable the field implicitly if it has an expression
@@ -954,7 +961,7 @@ export default class FormProcessor
 	{
 		let field = this.getField(path);
 
-		if (!field || visited[field.path]) {
+		if (!field || (this.options.updateCache && visited[field.path])) {
 			return;
 		}
 
@@ -969,8 +976,8 @@ export default class FormProcessor
 			},
 			(field) => {
 				// Skip fields that have already been visited
-				if (visited[field.path]) {
-					console.warn('skipped visited field', field.path);
+				if (this.options.updateCache && visited[field.path]) {
+					console.warn('Skipped visited field', field.path);
 					return;
 				}
 
@@ -985,8 +992,8 @@ export default class FormProcessor
 		let ancestors = this.getFieldAncestors(field);
 
 		for (i = 0; i < ancestors.length; i++) {
-			if (visited[ancestors[i].path]) {
-				//console.log('skipped visited ancestor', field.path, ancestors[i].path, visited);
+			if (this.options.updateCache && visited[ancestors[i].path]) {
+				console.log('Skipped visited ancestor', field.path, ancestors[i].path, visited);
 				continue;
 			}
 
@@ -1046,19 +1053,39 @@ export default class FormProcessor
 	 */
 	updateField(field, data, visited = {})
 	{
-		//console.log('updateField()', field.path);
+		let isDebugField = field.path.indexOf('abilities.str') === 0;
+
+		if (isDebugField) {
+			console.log('updateField()', field.path, field);
+		}
 
 		// Apply default values
 		this.applyDefaults([field]);
 
+		if (isDebugField) {
+			console.log('applied defaults', field.default, field.value, get(data, field.path));
+		}
+
 		// Update the state's value
 		this.updateDataValue(field, data);
+
+		if (isDebugField) {
+			console.log('updated data value', field.value, get(data, field.path));
+		}
 
 		// Update the field's value
 		this.updateFieldValue(field, data);
 
+		if (isDebugField) {
+			console.log('updated field value', field.value, get(data, field.path));
+		}
+
 		// Update the fields that are dependent upon the value of this field
 		this.updateFieldDependencies(field, data, visited);
+
+		if (isDebugField) {
+			console.log('updated field dependencies', field.path, field.value, get(data, field.path));
+		}
 	}
 
 	/**
@@ -1111,6 +1138,10 @@ export default class FormProcessor
 	{
 		// Update the field's expression dependencies
 		let dependencies = this.getFieldExpressionDependencies(field);
+
+		if (field.path.indexOf('abilities.str') === 0) {
+			console.log('dependencies of', field.path, dependencies);
+		}
 
 		for (let i = 0; i < dependencies.length; i++) {
 			this.updatePath(dependencies[i].path, data, visited);
@@ -1762,7 +1793,7 @@ export default class FormProcessor
  * @property {string}         [pathFragment]   - The leaf of the field's path. TODO: Rename to key
  * @property {string}         [type]           - The type of the field. Determines the type of value to read and store. Defaults to `'number'`.
  * @property {string}         [tag]            - The tag to use for this field, if any.
- * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
+ * @property {Object}         [options]        - The tag options. A free-form object for different tag types to interpret and utilise.
  * @property {string}         [label]          - The field's label. Defaults to a sentence-case translation of the field's key.
  * @property {string}         [description]    - The field's description.
  * @property {boolean}        [omit=false]     - Whether to prevent storing the field's value in data AND prevent updating any of its children. Defaults to `false`.

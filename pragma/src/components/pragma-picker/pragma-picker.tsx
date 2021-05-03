@@ -88,7 +88,7 @@ export class PragmaPicker {
     }
 
     this.path = this.path || this.field.path;
-    this.label = this.label || this.field.name;
+    this.label = this.label || this.field.label;
     this.value = this.value || this.field.value;
     this.disabled = this.disabled || this.field.disabled;
     this.placeholder = this.placeholder || this.field.options.placeholder;
