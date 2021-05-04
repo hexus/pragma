@@ -11,7 +11,7 @@ import { Field, defaultField } from "../../types";
  */
 @Component({
   tag: 'pragma-group',
-  shadow: true,
+  shadow: false,
   styles: `
     .group-container {
       margin: 8px 0;
@@ -70,7 +70,7 @@ export class PragmaGroup {
             : null
         }
         <span>
-          <pragma-fields path={this.field.path} fields={this.field.children}/>
+          <pragma-fields path={this.field.path} fields={...this.field.children}/>
         </span>
       </div>
     );

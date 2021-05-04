@@ -87,7 +87,7 @@ export class PragmaForm {
 
     let value = element.type === 'checkbox' ? element.checked : element.value;
 
-    // console.log('pragma-form onInputEvent', event, fieldName, element.value, value);
+    console.log('pragma-form onInputEvent', event, fieldName, element.value, value);
 
     this.form.setValue(this.state, fieldName, value);
 

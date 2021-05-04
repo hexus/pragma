@@ -69,8 +69,8 @@ export class FormProcessor
 		};
 
 		this.options = merge({
-			expressionCache: false,
-			updateCache: false,
+			expressionCache: true,
+			updateCache: true,
 			valueCache: false
 		}, options);
 
@@ -549,7 +549,7 @@ export class FormProcessor
 	 * Build a field's expression.
 	 *
 	 * @param {Field} field - The field to build an expression for.
-	 * @return {Expression} The built expression.
+	 * @return {Expression|null} The built expression, null on failure.
 	 */
 	buildFieldExpression(field)
 	{
@@ -674,6 +674,10 @@ export class FormProcessor
 		// Evaluate the expression
 		try {
 			value = expression.evaluate(values);
+
+			if (field.path.indexOf('defense.hitPoints.total') === 0) {
+				console.log(expression, JSON.stringify(values), value);
+			}
 		} catch (error) {
 			console.error(`Error evaluating expression for field '${field.path}'`, error);
 			console.error('evaluateFieldExpression', field, data, value, values);
@@ -1143,12 +1147,11 @@ export class FormProcessor
 			// this.clearValueCache(field.path);
 			// delete this.valueCache[field.path];
 
-			// let dependents = this.getFieldExpressionDependents(field);
-			//
-			// for (let i = 0; i < dependents.length; i++) {
-			// 	delete visited[dependents[i].path];
-			// }
-			// visited = {}; // TODO: Lazy
+			let dependents = this.getFieldExpressionDependents(field);
+
+			for (let i = 0; i < dependents.length; i++) {
+				delete visited[dependents[i].path];
+			}
 		}
 
 		// Update the paths of fields that are dependent upon the value of this field

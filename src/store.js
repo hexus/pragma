@@ -20,30 +20,13 @@ export default {
 				list: [
 					{
 						name: 'Sorcerer',
-						levels: 11
+						levels: 14
 					},
 					{
 						name: 'Test second class',
 						levels: 1
-					},
-					{
-						name: 'Two',
-						levels: 2,
-					},
-					{
-						name: 'Three',
-						levels: 3
-					},
-					{
-						name: 'Four',
-						levels: 4
-					},
-					{
-						name: 'Five',
-						levels: 5
 					}
-				],
-				level: 11
+				]
 			},
 			abilities: {
 				str: {

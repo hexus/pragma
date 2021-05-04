@@ -7,7 +7,7 @@ import { Field, defaultField } from "../../types";
  */
 @Component({
   tag: 'pragma-number',
-  shadow: true
+  shadow: false
 })
 export class Number {
   /**
@@ -31,9 +31,9 @@ export class Number {
 
     this.path = this.field.path;
     this.label = this.field.label;
-    this.min = this.field.options.min;
-    this.max = this.field.options.max;
-    this.step = this.field.options.step;
+    this.min = this.field.options?.min;
+    this.max = this.field.options?.max;
+    this.step = this.field.options?.step;
     this.value = this.field.value;
     this.disabled = this.field.disabled;
   };
@@ -85,7 +85,7 @@ export class Number {
    *
    * @param {InputEvent} event
    */
-  private onInputEvent = (event: InputEvent) => {
+  onInputEvent = (event: InputEvent) => {
     let target = event.target as HTMLInputElement;
 
     this.value = parseFloat(target.value);
