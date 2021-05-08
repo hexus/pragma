@@ -165,6 +165,10 @@ export namespace Components {
          */
         "listPath": string | null;
         /**
+          * Picker options.
+         */
+        "options": any[];
+        /**
           * The field's path.
          */
         "path": string;
@@ -507,6 +511,10 @@ declare namespace LocalJSX {
           * Path to the item list to draw options from in the source data.
          */
         "listPath"?: string | null;
+        /**
+          * Picker options.
+         */
+        "options"?: any[];
         /**
           * The field's path.
          */

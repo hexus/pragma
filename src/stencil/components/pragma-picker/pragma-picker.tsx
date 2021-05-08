@@ -1,6 +1,7 @@
-import { Component, Prop, Watch, h } from '@stencil/core';
+import { Component, Element, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from '../../utils/utils';
 import { Field, defaultField } from "../../types";
+import Choices from 'choices.js';
 import Papa from 'papaparse';
 
 /**
@@ -11,6 +12,16 @@ import Papa from 'papaparse';
   shadow: true
 })
 export class PragmaPicker {
+  /**
+   * Choices instance.
+   */
+  choices?: Choices = null;
+
+  /**
+   * Host element.
+   */
+  @Element() element: HTMLElement;
+
   /**
    * Pragma field definition.
    */
@@ -35,6 +46,11 @@ export class PragmaPicker {
    * Whether the field is disabled.
    */
   @Prop({ mutable: true, reflect: true }) disabled: boolean = false;
+
+  /**
+   * Picker options.
+   */
+  @Prop({ mutable: true }) options: any[] = [];
 
   /**
    * Source URL to load picker options from.
@@ -67,13 +83,6 @@ export class PragmaPicker {
   @Prop({ mutable: true, reflect: true}) valueKey: string|null;
 
   /**
-   * Handle the component loading.
-   */
-  componentWillLoad() {
-    this.parseFieldDefinition(this.field, defaultField);
-  }
-
-  /**
    * Parse the field attribute when it changes.
    *
    * @param {object|string} newValue
@@ -102,17 +111,61 @@ export class PragmaPicker {
     // TODO: Define further properties
   };
 
-  componentWillRender() {
-    // TODO: Load options from source if available
-    if (this.source) {
-      return fetch(this.source)
-        .then(response => response.text())
-        .then(this.parseOptions)
-        .then(this.updateOptions)
-        .catch((error) => {
-          console.error(`Error loading source data for picker field ${this.path}`, error);
-        })
+  connectedCallback() {
+    // TODO: this.element has no children here??
+  }
+
+  /**
+   * Handle the component loading.
+   */
+  componentWillLoad() {
+    this.parseFieldDefinition(this.field, defaultField);
+
+    this.loadOptions().catch((error) => {
+      console.error(`Error loading updated options for picker field '${this.path}'`, error);
+    });
+  }
+
+  componentDidLoad() {
+
+  }
+
+  componentWillUpdate() {
+
+  }
+
+  componentDidRender() {
+    if (!this.choices) {
+      let select = this.element.shadowRoot.querySelector('#picker');
+
+      this.choices = new Choices(select, {
+        renderChoiceLimit: 50,
+        searchResultLimit: 50
+      });
     }
+
+    this.choices.setChoices(
+      this.options,
+      this.valueKey,
+      this.labelKey
+    );
+  }
+
+  /**
+   * TODO: Handle light DOM <option>s in some way
+   */
+  async loadOptions(): Promise<any[]> {
+    if (this.source) {
+      this.options = await fetch(this.source)
+        .then(response => response.text())
+        .then(data => this.parseOptions(data))
+        .catch((error) => {
+          console.error(`Error loading options source data for picker field '${this.path}'`, error);
+          return [];
+        });
+    }
+
+    return this.options;
   }
 
   /**
@@ -120,22 +173,17 @@ export class PragmaPicker {
    *
    * Uses Papa Parse for CSV data.
    *
-   * @param {string} data
+   * TODO: Parse more than just CSVs yo; REST APIs! JSON!
+   *
+   * @param {string} data - Raw option data from an HTTP response
    */
-  async parseOptions(data) {
+  async parseOptions(data): Promise<any[]> {
     return Papa.parse(data, {
       delimiter: ',',
       header: true,
       dynamicTyping: true
       //worker: true // TODO: Try this out later
     }).data;
-  }
-
-  async updateOptions(data) {
-    console.log('<pragma-picker> updateOptions()', data);
-
-    // TODO: Update the options property
-    //       Update Choices instance options
   }
 
   /**
@@ -170,7 +218,7 @@ export class PragmaPicker {
     // );
 
     return [
-      <select>
+      <select id="picker">
         {this.getPlaceholder()}
         <slot/>
       </select>
