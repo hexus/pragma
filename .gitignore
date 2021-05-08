@@ -1,3 +1,7 @@
-.stencil/
 .idea/
+.stencil/
+.vscode/
+dist/
 node_modules/
+loader/
+www/

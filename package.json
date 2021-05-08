@@ -1,12 +1,33 @@
 {
   "name": "pragma",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Declarative form builder",
-  "main": "src/pragma.js",
+  "main_old": "src/pragma.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "es2015": "dist/esm/index.js",
+  "es2017": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/pragma/pragma.js",
+  "files": [
+    "build/",
+    "dist/",
+    "loader/"
+  ],
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack -w",
-    "watch prod": "webpack -w --mode=production"
+    "build": "npm run stencil.build && npm run webpack.build",
+    "watch": "npm run stencil.watch & npm run webpack.watch",
+    "webpack.build": "webpack",
+    "webpack.watch": "webpack -w",
+    "webpack.watch.prod": "webpack -w --mode=production",
+    "stencil.build": "stencil build --docs",
+    "stencil.watch": "stencil build --docs --watch",
+    "stencil.start": "stencil build --dev --watch --serve",
+    "stencil.test": "stencil test --spec --e2e",
+    "stencil.test.watch": "stencil test --spec --e2e --watchAll",
+    "stencil.generate": "stencil generate"
   },
   "repository": {
     "type": "git",
@@ -15,6 +36,8 @@
   "keywords": [
     "form builder",
     "declarative",
+    "stencil",
+    "web components",
     "ui"
   ],
   "author": "Chris Andrew <chris@hexus.io>",
@@ -28,6 +51,8 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/polyfill": "^7.6.0",
     "@babel/preset-env": "^7.6.3",
+    "@stencil/core": "^2.5.2",
+    "@types/jest": "^26.0.23",
     "babel-loader": "^8.0.6",
     "babel-minify-webpack-plugin": "^0.3.1",
     "case": "^1.6.2",

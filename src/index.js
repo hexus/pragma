@@ -1,5 +1,5 @@
 // Stencil
-import { defineCustomElements, applyPolyfills } from "../pragma/loader";
+import { defineCustomElements, applyPolyfills } from "../loader";
 import abilityModifier                          from "./model/functions/abilityModifier";
 import fields                                   from "../src/data/fields";
 import store                                    from "../src/store";

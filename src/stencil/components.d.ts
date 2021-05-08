@@ -6,7 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Field } from "./types";
-import { FormProcessor } from "../../src/services/FormProcessor";
+import { FormProcessor } from "../services/FormProcessor";
 export namespace Components {
     interface PragmaBoolean {
         /**

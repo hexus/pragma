@@ -2,29 +2,26 @@
 
 Declarative form builder and processor.
 
+> :warning: This library is in early development.
+
 ## Dependencies
 
 ```
-npm i && npm i pragma
+npm i
 ```
 
 ## Build
 
-### Pragma
+Build the Pragma runtime, example project and Stencil components:
 
-Build and watch the Pragma runtime and example project.
-
-```
-webpack -w
+```bash
+$ npm run build
 ```
 
-### Pragma components
+Build and watch:
 
-Build and watch Pragma's Stencil components.
-
-```
-cd pragma
-npx stencil build --watch
+```bash
+$ npm run watch
 ```
 
 ### TODO

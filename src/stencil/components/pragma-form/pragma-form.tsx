@@ -1,7 +1,7 @@
 import { Component, Element, forceUpdate, Listen, Method, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
 import { HTMLStencilElement } from '@stencil/core/internal';
-import { FormProcessor } from "../../../../src/services/FormProcessor";
+import { FormProcessor } from "../../../services/FormProcessor";
 
 /**
  * Pragma form component.
