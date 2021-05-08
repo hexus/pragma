@@ -1,7 +1,7 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from '../../utils/utils';
 import { Field, defaultField } from "../../types";
-
+import Papa from 'papaparse';
 
 /**
  * A picker field component.
@@ -102,8 +102,40 @@ export class PragmaPicker {
     // TODO: Define further properties
   };
 
-  componentWillUpdate() {
+  componentWillRender() {
     // TODO: Load options from source if available
+    if (this.source) {
+      return fetch(this.source)
+        .then(response => response.text())
+        .then(this.parseOptions)
+        .then(this.updateOptions)
+        .catch((error) => {
+          console.error(`Error loading source data for picker field ${this.path}`, error);
+        })
+    }
+  }
+
+  /**
+   * Parse source data.
+   *
+   * Uses Papa Parse for CSV data.
+   *
+   * @param {string} data
+   */
+  async parseOptions(data) {
+    return Papa.parse(data, {
+      delimiter: ',',
+      header: true,
+      dynamicTyping: true
+      //worker: true // TODO: Try this out later
+    }).data;
+  }
+
+  async updateOptions(data) {
+    console.log('<pragma-picker> updateOptions()', data);
+
+    // TODO: Update the options property
+    //       Update Choices instance options
   }
 
   /**
@@ -125,7 +157,6 @@ export class PragmaPicker {
 
     return null;
   }
-
 
   render() {
     // console.log(
