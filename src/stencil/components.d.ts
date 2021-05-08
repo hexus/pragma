@@ -177,7 +177,7 @@ export namespace Components {
          */
         "placeholder": string;
         /**
-          * Source URL to load picker options from.
+          * Source to load picker options from.  TODO: Watch and reload options
          */
         "source": string;
         /**
@@ -524,7 +524,7 @@ declare namespace LocalJSX {
          */
         "placeholder"?: string;
         /**
-          * Source URL to load picker options from.
+          * Source to load picker options from.  TODO: Watch and reload options
          */
         "source"?: string;
         /**

@@ -53,7 +53,9 @@ export class PragmaPicker {
   @Prop({ mutable: true }) options: any[] = [];
 
   /**
-   * Source URL to load picker options from.
+   * Source to load picker options from.
+   *
+   * TODO: Watch and reload options
    */
   @Prop({ attribute: 'src', mutable: true }) source: string = '';
 
@@ -111,10 +113,6 @@ export class PragmaPicker {
     // TODO: Define further properties
   };
 
-  connectedCallback() {
-    // TODO: this.element has no children here??
-  }
-
   /**
    * Handle the component loading.
    */
@@ -124,14 +122,6 @@ export class PragmaPicker {
     this.loadOptions().catch((error) => {
       console.error(`Error loading updated options for picker field '${this.path}'`, error);
     });
-  }
-
-  componentDidLoad() {
-
-  }
-
-  componentWillUpdate() {
-
   }
 
   componentDidRender() {
@@ -153,6 +143,7 @@ export class PragmaPicker {
 
   /**
    * TODO: Handle light DOM <option>s in some way
+   * TODO: Handle more than just URL sources, e.g. DOM selectors
    */
   async loadOptions(): Promise<any[]> {
     if (this.source) {
