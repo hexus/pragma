@@ -238,16 +238,22 @@ export class PragmaPicker {
 
     // this.destroy(); // ???
 
-    this.select = <select data-choices={true}/>;
+    this.select = <select data-choices={true}>{this.getPlaceholder()}</select>;
 
-    return this.select;
+    // TODO: data-pragma-add-from="this.path"? Altered event propagation for full values?
+    return [
+      this.select,
+      <button type="button" data-pragma-add={this.target}>Add</button>
+    ];
   }
 
   init() {
     if (!this.choices) {
       const select = this.element.querySelector('select[data-choices]');
       const config = {
-        // choices: this.options,
+        placeholder: this.showPlaceholder(),
+        placeholderValue: '',
+        searchPlaceholderValue: this.placeholder,
         renderChoiceLimit: 50,
         searchResultLimit: 50
       };

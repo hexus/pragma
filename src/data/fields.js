@@ -673,7 +673,7 @@ const fields = [
 		//virtual: true
 		options: {
 			target:      'spells.list',            // Add selections to spell list
-			source:      '/src/data/spells.csv',   // Source URL for data
+			source:      '/src/data/spells.csv',   // Source URL for options data
 			static:      true,                     // Load the data source once
 			type:        'csv',                    // TODO: Support different source data types
 			valueKey:    'id',                     // Item value key
