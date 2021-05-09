@@ -89,14 +89,6 @@ export class PragmaPicker {
    */
   @Prop({ mutable: true }) options: any[] = [];
 
-  // @Watch('options')
-  // onOptions(newValue, oldValue) {
-  //   if (newValue !== oldValue) {
-  //     console.log('<pragma-picker> onOptions', newValue, oldValue);
-  //     this.updateOptions(newValue);
-  //   }
-  // }
-
   /**
    * Source to load picker options from.
    *
@@ -196,7 +188,7 @@ export class PragmaPicker {
    * Updates the Choices options.
    */
   async updateOptions() {
-    console.log('<pragma-picker> updateOptions()', this.options, this.valueKey, this.labelKey);
+    // console.log('<pragma-picker> updateOptions()', this.options, this.valueKey, this.labelKey);
     this.choices.setChoices(
       this.options,
       this.valueKey,
@@ -226,19 +218,19 @@ export class PragmaPicker {
   }
 
   render() {
-    console.log(
-      this.field,
-      this.path,
-      this.label,
-      this.value,
-      this.disabled,
-      this.source,
-      this.placeholder
-    );
+    // console.log(
+    //   this.field,
+    //   this.path,
+    //   this.label,
+    //   this.value,
+    //   this.disabled,
+    //   this.source,
+    //   this.placeholder
+    // );
 
     // this.destroy(); // ???
 
-    this.select = <select data-choices={true}>{this.getPlaceholder()}</select>;
+    this.select = <select data-choices={true}>{this.getPlaceholder()}<slot/></select>;
 
     // TODO: data-pragma-add-from="this.path"? Altered event propagation for full values?
     return [
@@ -258,7 +250,7 @@ export class PragmaPicker {
         searchResultLimit: 50
       };
 
-      console.log('<pragma-picker> init()', select, config);
+      // console.log('<pragma-picker> init()', select, config);
 
       this.choices = new Choices(select, config);
     }
