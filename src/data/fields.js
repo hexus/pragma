@@ -676,8 +676,8 @@ const fields = [
 			source:      '/src/data/spells.csv',   // Source URL for data
 			static:      true,                     // Load the data source once
 			type:        'csv',                    // TODO: Support different source data types
-			key:         'id',                     // Item value key
-			label:       'name',                   // Item label key
+			valueKey:    'id',                     // Item value key
+			labelKey:    'name',                   // Item label key
 			placeholder: 'Search for a spell'      // Placeholder text
 		}
 	},

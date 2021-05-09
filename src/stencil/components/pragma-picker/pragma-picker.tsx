@@ -3,19 +3,26 @@ import { parseAndMergeFields } from '../../utils/utils';
 import { Field, defaultField } from "../../types";
 import Choices from 'choices.js';
 import Papa from 'papaparse';
+import { HTMLStencilElement } from "@stencil/core/internal";
 
 /**
  * A picker field component.
  */
 @Component({
   tag: 'pragma-picker',
-  shadow: true
+  styleUrl: 'pragma-picker.scss',
+  // shadow: true
 })
 export class PragmaPicker {
   /**
    * Choices instance.
    */
   choices?: Choices = null;
+
+  /**
+   * JSX select element reference.
+   */
+  select?: HTMLStencilElement = null;
 
   /**
    * Host element.
@@ -26,6 +33,36 @@ export class PragmaPicker {
    * Pragma field definition.
    */
   @Prop() field: Field | string | any = defaultField;
+
+  /**
+   * Parse the field attribute when it changes.
+   *
+   * @param {object|string} newValue
+   * @param {object|string} oldValue
+   */
+  @Watch('field')
+  parseFieldDefinition(newValue, oldValue) {
+    this.field = parseAndMergeFields(this.field, oldValue, newValue);
+
+    if (!this.field.options) {
+      this.field.options = {};
+    }
+
+    this.path = this.path || this.field.path;
+    this.label = this.label || this.field.label;
+    this.value = this.value || this.field.value;
+    this.disabled = this.disabled || this.field.disabled;
+    this.placeholder = this.placeholder || this.field.options.placeholder;
+
+    this.source = this.source || this.field.options.source;
+    this.options = this.options || this.field.options.options;
+    this.target = this.target || this.field.options.target;
+    this.listPath = this.listPath || this.field.options.listPath;
+    this.labelKey = this.labelKey || this.field.options.labelKey;
+    this.valueKey = this.valueKey || this.field.options.valueKey;
+
+    // TODO: Define further properties
+  };
 
   /**
    * The field's path.
@@ -51,6 +88,14 @@ export class PragmaPicker {
    * Picker options.
    */
   @Prop({ mutable: true }) options: any[] = [];
+
+  // @Watch('options')
+  // onOptions(newValue, oldValue) {
+  //   if (newValue !== oldValue) {
+  //     console.log('<pragma-picker> onOptions', newValue, oldValue);
+  //     this.updateOptions(newValue);
+  //   }
+  // }
 
   /**
    * Source to load picker options from.
@@ -85,60 +130,30 @@ export class PragmaPicker {
   @Prop({ mutable: true, reflect: true}) valueKey: string|null;
 
   /**
-   * Parse the field attribute when it changes.
-   *
-   * @param {object|string} newValue
-   * @param {object|string} oldValue
-   */
-  @Watch('field')
-  parseFieldDefinition(newValue, oldValue) {
-    this.field = parseAndMergeFields(this.field, oldValue, newValue);
-
-    if (!this.field.options) {
-      this.field.options = {};
-    }
-
-    this.path = this.path || this.field.path;
-    this.label = this.label || this.field.label;
-    this.value = this.value || this.field.value;
-    this.disabled = this.disabled || this.field.disabled;
-    this.placeholder = this.placeholder || this.field.options.placeholder;
-
-    this.source = this.source || this.field.options.source;
-    this.target = this.target || this.field.options.target;
-    this.listPath = this.listPath || this.field.options.listPath;
-    this.labelKey = this.labelKey || this.field.options.labelKey;
-    this.valueKey = this.valueKey || this.field.options.valueKey;
-
-    // TODO: Define further properties
-  };
-
-  /**
    * Handle the component loading.
    */
-  componentWillLoad() {
+  async componentWillLoad() {
     this.parseFieldDefinition(this.field, defaultField);
 
-    this.loadOptions().catch((error) => {
+    return this.loadOptions().catch((error) => {
       console.error(`Error loading updated options for picker field '${this.path}'`, error);
     });
   }
 
   componentDidRender() {
-    if (!this.choices) {
-      let select = this.element.shadowRoot.querySelector('#picker');
 
-      this.choices = new Choices(select, {
-        renderChoiceLimit: 50,
-        searchResultLimit: 50
-      });
-    }
+  }
 
-    this.choices.setChoices(
-      this.options,
-      this.valueKey,
-      this.labelKey
-    );
+  componentDidLoad() {
+    this.init();
+  }
+
+  componentDidUpdate() {
+    this.init();
+  }
+
+  disconnectedCallback() {
+    this.destroy();
   }
 
   /**
@@ -151,7 +166,7 @@ export class PragmaPicker {
         .then(response => response.text())
         .then(data => this.parseOptions(data))
         .catch((error) => {
-          console.error(`Error loading options source data for picker field '${this.path}'`, error);
+          console.error(`Error loading options for picker field '${this.path}'`, error);
           return [];
         });
     }
@@ -178,6 +193,19 @@ export class PragmaPicker {
   }
 
   /**
+   * Updates the Choices options.
+   */
+  async updateOptions() {
+    console.log('<pragma-picker> updateOptions()', this.options, this.valueKey, this.labelKey);
+    this.choices.setChoices(
+      this.options,
+      this.valueKey,
+      this.labelKey,
+      true
+    );
+  }
+
+  /**
    * Determine whether to show a placeholder option.
    */
   showPlaceholder(): boolean {
@@ -198,21 +226,48 @@ export class PragmaPicker {
   }
 
   render() {
-    // console.log(
-    //   this.field,
-    //   this.path,
-    //   this.label,
-    //   this.value,
-    //   this.disabled,
-    //   this.source,
-    //   this.placeholder
-    // );
+    console.log(
+      this.field,
+      this.path,
+      this.label,
+      this.value,
+      this.disabled,
+      this.source,
+      this.placeholder
+    );
 
-    return [
-      <select id="picker">
-        {this.getPlaceholder()}
-        <slot/>
-      </select>
-    ];
+    // this.destroy(); // ???
+
+    this.select = <select data-choices={true}/>;
+
+    return this.select;
+  }
+
+  init() {
+    if (!this.choices) {
+      const select = this.element.querySelector('select[data-choices]');
+      const config = {
+        // choices: this.options,
+        renderChoiceLimit: 50,
+        searchResultLimit: 50
+      };
+
+      console.log('<pragma-picker> init()', select, config);
+
+      this.choices = new Choices(select, config);
+    }
+
+    this.updateOptions();
+  }
+
+  destroy() {
+    if (this.select) {
+      this.select = null;
+    }
+
+    if (this.choices) {
+      this.choices.destroy();
+      this.choices = null;
+    }
   }
 }

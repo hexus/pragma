@@ -52,6 +52,7 @@
     "@babel/polyfill": "^7.6.0",
     "@babel/preset-env": "^7.6.3",
     "@stencil/core": "^2.5.2",
+    "@stencil/sass": "^1.4.1",
     "@types/jest": "^26.0.23",
     "@types/papaparse": "^5.2.5",
     "babel-loader": "^8.0.6",

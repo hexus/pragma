@@ -1,4 +1,5 @@
 import { Config } from '@stencil/core';
+import { sass } from '@stencil/sass';
 
 export const config: Config = {
   namespace: 'pragma',
@@ -12,5 +13,8 @@ export const config: Config = {
       type: 'docs-readme',
       dir: 'docs'
     }
+  ],
+  plugins: [
+    sass()
   ]
 };
