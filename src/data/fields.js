@@ -723,9 +723,6 @@ const fields = [
 		type: 'string'
 	},
 	{
-		path: 'templates.spell.'
-	},
-	{
 		// TODO: Custom component for spell list
 		//       Groups spells by level, etc
 		path:     'spells.list',

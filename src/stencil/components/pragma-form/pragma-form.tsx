@@ -69,28 +69,43 @@ export class PragmaForm {
    *
    * Forces an update of the form component.
    *
-   * @param {InputEvent} event
+   * @param {InputEvent|CustomEvent} event
    */
   @Listen('input')
-  onInputEvent(event: InputEvent) {
+  onInputEvent(event: InputEvent|CustomEvent) {
     if (!event.target) {
       return;
     }
 
-    let element = event.target as HTMLInputElement;
+    let element = event.target as HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement;
 
-    let fieldName = element.getAttribute('path') || element.getAttribute('name');
+    let fieldName = event.detail?.name
+      || element.getAttribute('path')
+      || element.getAttribute('name');
 
     if (!fieldName) {
       return;
     }
 
-    let value = element.type === 'checkbox' ? element.checked : element.value;
+    // Determine the value
+    let value;
 
-    console.log('pragma-form onInputEvent', event, fieldName, element.value, value);
+    if (event instanceof CustomEvent && typeof event.detail === 'object') {
+      value = event.detail.value;
+    } else if (element instanceof HTMLTextAreaElement) {
+      value = element.innerText;
+    } else if (element instanceof HTMLInputElement && element.type === 'checkbox') {
+      value = element.checked;
+    } else {
+      value = element.value;
+    }
 
+    // console.log('pragma-form onInputEvent()', event, fieldName, event.detail?.value, element.value, value);
+
+    // Set the updated value
     this.form.setValue(this.state, fieldName, value);
 
+    // TODO: Conditional update like the click event handler
     forceUpdate(this.element);
   }
 
@@ -104,7 +119,7 @@ export class PragmaForm {
    */
   @Listen('click', { capture: true })
   onClickEvent(event: MouseEvent) {
-    // console.log(event);
+    console.log(event);
 
     if (!event.target) {
       return;
@@ -116,13 +131,19 @@ export class PragmaForm {
       return;
     }
 
-    // console.log(element, element.dataset);
+    console.log(element, element.dataset);
 
     let changes = 0;
     let data = element.dataset;
 
     if (data.pragmaAdd) {
-      this.form.addItem(this.state, data.pragmaAdd);
+      this.form.addItem(
+        this.state,
+        data.pragmaAdd,
+        data.pragmaKey || undefined,
+        element['data-pragma-value'] || null
+      );
+
       changes++;
     }
 

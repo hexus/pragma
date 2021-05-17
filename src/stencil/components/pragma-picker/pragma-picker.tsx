@@ -2,8 +2,8 @@ import { Component, Element, Prop, Watch, h } from '@stencil/core';
 import { parseAndMergeFields } from '../../utils/utils';
 import { Field, defaultField } from "../../types";
 import Choices from 'choices.js';
+import get from 'lodash/get';
 import Papa from 'papaparse';
-import { HTMLStencilElement } from "@stencil/core/internal";
 
 /**
  * A picker field component.
@@ -22,7 +22,7 @@ export class PragmaPicker {
   /**
    * JSX select element reference.
    */
-  select?: HTMLStencilElement = null;
+  select?: HTMLSelectElement = null;
 
   /**
    * Host element.
@@ -48,18 +48,18 @@ export class PragmaPicker {
       this.field.options = {};
     }
 
-    this.path = this.path || this.field.path;
-    this.label = this.label || this.field.label;
+    this.path = this.field.path;
+    this.label = this.field.label;
     this.value = this.value || this.field.value;
-    this.disabled = this.disabled || this.field.disabled;
-    this.placeholder = this.placeholder || this.field.options.placeholder;
+    this.disabled = this.field.disabled;
+    this.placeholder = this.field.options.placeholder;
 
-    this.source = this.source || this.field.options.source;
+    this.source = this.field.options.source;
     this.options = this.options || this.field.options.options;
-    this.target = this.target || this.field.options.target;
-    this.listPath = this.listPath || this.field.options.listPath;
-    this.labelKey = this.labelKey || this.field.options.labelKey;
-    this.valueKey = this.valueKey || this.field.options.valueKey;
+    this.target = this.field.options.target;
+    this.listPath = this.field.options.listPath;
+    this.labelKey = this.field.options.labelKey;
+    this.valueKey = this.field.options.valueKey;
 
     // TODO: Define further properties
   };
@@ -77,7 +77,7 @@ export class PragmaPicker {
   /**
    * The field's value.
    */
-  @Prop({ mutable: true, reflect: true }) value: boolean = false;
+  @Prop({ mutable: true, reflect: true }) value: any;
 
   /**
    * Whether the field is disabled.
@@ -109,17 +109,17 @@ export class PragmaPicker {
   /**
    * Path to the item list in the source data to read options from.
    */
-  @Prop( {mutable: true, reflect: true}) listPath: string | null;
+  @Prop({ mutable: true, reflect: true }) listPath: string | null;
 
   /**
    * The item key to draw option labels from.
    */
-  @Prop({mutable: true, reflect: true}) labelKey: string|null;
+  @Prop({ mutable: true, reflect: true }) labelKey: string | null;
 
   /**
    * The item key to draw option values from.
    */
-  @Prop({ mutable: true, reflect: true}) valueKey: string|null;
+  @Prop({ mutable: true, reflect: true }) valueKey: string | null;
 
   /**
    * Handle the component loading.
@@ -130,10 +130,6 @@ export class PragmaPicker {
     return this.loadOptions().catch((error) => {
       console.error(`Error loading updated options for picker field '${this.path}'`, error);
     });
-  }
-
-  componentDidRender() {
-
   }
 
   componentDidLoad() {
@@ -179,7 +175,8 @@ export class PragmaPicker {
     return Papa.parse(data, {
       delimiter: ',',
       header: true,
-      dynamicTyping: true
+      dynamicTyping: true,
+      transform: (value) => value.toLowerCase() === 'null' ? null : value
       //worker: true // TODO: Try this out later
     }).data;
   }
@@ -197,6 +194,25 @@ export class PragmaPicker {
     );
   }
 
+  onChangeEvent = (event: CustomEvent) => {
+    // console.log('<pragma-picker> onChangeEvent()', event, event.detail.value, typeof event.detail.value);
+
+    // Choices.js provides the raw value from the option
+    this.value = event.detail.value;
+
+    // TODO: Native event dispatch helper like `domEvent.js`
+    this.select.dispatchEvent(
+      new CustomEvent('input', {
+        bubbles: true,
+        cancelable: true,
+        detail: {
+          name: this.path,
+          value: event.detail.value
+        }
+      })
+    );
+  }
+
   /**
    * Determine whether to show a placeholder option.
    */
@@ -207,7 +223,7 @@ export class PragmaPicker {
   /**
    * Get the placeholder markup, if it is to be shown.
    *
-   * Returns null if the placeholder is not to be shown.
+   * Returns `null` if the placeholder is not to be shown.
    */
   getPlaceholder(): HTMLOptionElement|null {
     if (this.showPlaceholder()) {
@@ -217,31 +233,86 @@ export class PragmaPicker {
     return null;
   }
 
+  /**
+   * Get the option for the given picker value.
+   *
+   * Linear-searches the options list for an item matching the given value.
+   */
+  getOption(value: any): any {
+    // console.log('<pragma-picker> getOption()', value);
+
+    const keys = Object.keys(this.options);
+    let option;
+
+    for (let i = 0; i < keys.length; i++) {
+      option = this.options[keys[i]];
+
+      // TODO: Stencil casts the value prop to string even if we explicitly set numbers
+      //       so we're forced to use loose comparisons for the time being...
+      if (this.getOptionValue(option, keys[i]) == value) {
+        // console.log('<pragma-picker> selected option', keys[i], value, option);
+        return option;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get a single option's value.
+   *
+   * Reads the `valueKey` path from the given option when configured,
+   * otherwise falls back to the given option key.
+   */
+  getOptionValue(option: any, key: string|number): any {
+    if (this.valueKey) {
+      return get(option, this.valueKey);
+    }
+
+    return key;
+  }
+
   render() {
     // console.log(
+    //   '<pragma-picker>',
     //   this.field,
     //   this.path,
     //   this.label,
     //   this.value,
     //   this.disabled,
+    //   this.options,
     //   this.source,
     //   this.placeholder
     // );
 
     // this.destroy(); // ???
 
-    this.select = <select data-choices={true}>{this.getPlaceholder()}<slot/></select>;
+    const buttonAttributes = {
+      disabled: !this.value,
+      'data-pragma-add': this.target,
+      'data-pragma-value': this.getOption(this.value) // TODO: Configurable, this.value or this.getOption(this.value)
+    };
+
+    // console.log('<pragma-picker> render() buttonAttributes', buttonAttributes);
+
+    const select = <select
+      name={this.path}
+      data-choices={true}
+      onChange={this.onChangeEvent}
+    >
+      {this.getPlaceholder()}<slot/>
+    </select>;
 
     // TODO: data-pragma-add-from="this.path"? Altered event propagation for full values?
     return [
-      this.select,
-      <button type="button" data-pragma-add={this.target}>Add</button>
+      select,
+      <button type="button" { ...buttonAttributes }>Add</button>
     ];
   }
 
   init() {
     if (!this.choices) {
-      const select = this.element.querySelector('select[data-choices]');
+      const select = this.element.querySelector('select[data-choices]') as HTMLSelectElement;
       const config = {
         placeholder: this.showPlaceholder(),
         placeholderValue: '',
@@ -252,6 +323,7 @@ export class PragmaPicker {
 
       // console.log('<pragma-picker> init()', select, config);
 
+      this.select = select;
       this.choices = new Choices(select, config);
     }
 

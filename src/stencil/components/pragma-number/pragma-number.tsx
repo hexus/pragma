@@ -86,7 +86,7 @@ export class Number {
    * @param {InputEvent} event
    */
   onInputEvent = (event: InputEvent) => {
-    let target = event.target as HTMLInputElement;
+    const target = event.target as HTMLInputElement;
 
     this.value = parseFloat(target.value);
 

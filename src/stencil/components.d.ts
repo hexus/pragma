@@ -159,7 +159,7 @@ export namespace Components {
         /**
           * The item key to draw option labels from.
          */
-        "labelKey": string|null;
+        "labelKey": string | null;
         /**
           * Path to the item list in the source data to read options from.
          */
@@ -187,11 +187,11 @@ export namespace Components {
         /**
           * The field's value.
          */
-        "value": boolean;
+        "value": any;
         /**
           * The item key to draw option values from.
          */
-        "valueKey": string|null;
+        "valueKey": string | null;
     }
     interface PragmaSection {
         "field": any;
@@ -506,7 +506,7 @@ declare namespace LocalJSX {
         /**
           * The item key to draw option labels from.
          */
-        "labelKey"?: string|null;
+        "labelKey"?: string | null;
         /**
           * Path to the item list in the source data to read options from.
          */
@@ -534,11 +534,11 @@ declare namespace LocalJSX {
         /**
           * The field's value.
          */
-        "value"?: boolean;
+        "value"?: any;
         /**
           * The item key to draw option values from.
          */
-        "valueKey"?: string|null;
+        "valueKey"?: string | null;
     }
     interface PragmaSection {
         "field"?: any;

@@ -675,9 +675,9 @@ export class FormProcessor
 		try {
 			value = expression.evaluate(values);
 
-			if (field.path.indexOf('defense.hitPoints.total') === 0) {
-				console.log(expression, JSON.stringify(values), value);
-			}
+			// if (field.path.indexOf('defense.hitPoints.total') === 0) {
+			// 	console.log(expression, JSON.stringify(values), value);
+			// }
 		} catch (error) {
 			console.error(`Error evaluating expression for field '${field.path}'`, error);
 			console.error('evaluateFieldExpression', field, data, value, values);
@@ -1120,11 +1120,11 @@ export class FormProcessor
 	 */
 	updateField(field, data, visited = {})
 	{
-		let isDebugField = field.path.indexOf('classes.') === 0;
-
-		if (isDebugField) {
-			console.log('updateField()', field.path);
-		}
+		// let isDebugField = field.path.indexOf('classes.') === 0;
+		//
+		// if (isDebugField) {
+		// 	console.log('updateField()', field.path);
+		// }
 
 		let previousValue = field.value;
 

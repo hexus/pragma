@@ -20,7 +20,7 @@ Field components that handle scalar values. Good for single-value form inputs.
 | [`<pragma-string>`](pragma-string)   | `string`                       | Single-line freetext input.
 | [`<pragma-boolean>`](pragma-boolean) | `boolean`                      | Boolean checkbox input.
 | [`<pragma-select>`](pragma-select)   | `scalar`                       | Select drop-down with values derived from a fixed set of options.
-| [`<pragma-picker>`](pragma-picker)   | `any`                          | Searchable select drop-down, powered by Choices.js, that loads options from a `src` URL.
+| [`<pragma-picker>`](pragma-picker)   | `any`                          | Searchable select drop-down, powered by PapaParse and Choices.js, that loads options from a `src` URL.
 
 ## Field grouping components
 

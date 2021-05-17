@@ -19,7 +19,7 @@
 | `placeholder` | `placeholder` | Placeholder value displayed when an option hasn't been selected.    | `string`  | `''`           |
 | `source`      | `src`         | Source to load picker options from.  TODO: Watch and reload options | `string`  | `''`           |
 | `target`      | `target`      | Target field path for selected options to be added to.              | `string`  | `undefined`    |
-| `value`       | `value`       | The field's value.                                                  | `boolean` | `false`        |
+| `value`       | `value`       | The field's value.                                                  | `any`     | `undefined`    |
 | `valueKey`    | `value-key`   | The item key to draw option values from.                            | `string`  | `undefined`    |
 
 
