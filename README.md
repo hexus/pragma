@@ -1,8 +1,8 @@
 # Pragma
 
-Declarative form builder and processor.
+Declarative form builder and state processor.
 
-> :warning: This library is in early development.
+> :warning: This library is in **early development**.
 
 ## Dependencies
 
@@ -18,7 +18,7 @@ Build the Pragma runtime, example project and Stencil components:
 $ npm run build
 ```
 
-Build and watch:
+Build and watch for changes:
 
 ```bash
 $ npm run watch

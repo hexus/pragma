@@ -13,7 +13,7 @@
 | `field`       | `field`       | Pragma field definition.                                            | `any`     | `defaultField` |
 | `label`       | `label`       | The field's label.                                                  | `string`  | `undefined`    |
 | `labelKey`    | `label-key`   | The item key to draw option labels from.                            | `string`  | `undefined`    |
-| `listPath`    | `list-path`   | Path to the item list to draw options from in the source data.      | `string`  | `undefined`    |
+| `listPath`    | `list-path`   | Path to the item list in the source data to read options from.      | `string`  | `undefined`    |
 | `options`     | --            | Picker options.                                                     | `any[]`   | `[]`           |
 | `path`        | `path`        | The field's path.                                                   | `string`  | `undefined`    |
 | `placeholder` | `placeholder` | Placeholder value displayed when an option hasn't been selected.    | `string`  | `''`           |

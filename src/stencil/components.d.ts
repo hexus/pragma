@@ -161,7 +161,7 @@ export namespace Components {
          */
         "labelKey": string|null;
         /**
-          * Path to the item list to draw options from in the source data.
+          * Path to the item list in the source data to read options from.
          */
         "listPath": string | null;
         /**
@@ -508,7 +508,7 @@ declare namespace LocalJSX {
          */
         "labelKey"?: string|null;
         /**
-          * Path to the item list to draw options from in the source data.
+          * Path to the item list in the source data to read options from.
          */
         "listPath"?: string | null;
         /**

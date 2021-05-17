@@ -107,7 +107,7 @@ export class PragmaPicker {
   @Prop({ mutable: true, reflect: true }) target: string | null;
 
   /**
-   * Path to the item list to draw options from in the source data.
+   * Path to the item list in the source data to read options from.
    */
   @Prop( {mutable: true, reflect: true}) listPath: string | null;
 
