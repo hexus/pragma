@@ -15,7 +15,7 @@
 					</th>
 					<td each="{ child in row.children }" key="path">
 						<tree-child data-is="{ child.input }" property="{ child }">
-							<tree if="{ opts.property.children }" children="{ opts.property.children }"></tree>
+							<tree if="{ child.children }" children="{ child.children }"></tree>
 						</tree-child>
 					</td>
 				</tr>

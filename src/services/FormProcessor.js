@@ -25,7 +25,7 @@ import traverseTree     from '../functions/traverseTree';
 import splitPath        from '../functions/splitPath';
 import joinPath         from '../functions/joinPath';
 import flatten          from 'flat';
-import { detailedDiff } from 'deep-object-diff';
+import detailedDiff     from 'deep-object-diff/dist/detailed';
 
 const UP = -1;
 const BOTH = 0;
@@ -40,18 +40,20 @@ const DOWN = 1;
  * TODO: Rename to Form?
  *
  * @class FormProcessor
+ * @type FormProcessor
  */
-export default class FormProcessor
+export class FormProcessor
 {
 	/**
 	 * Create a new property processor.
 	 *
 	 * @constructor
-	 * @param {Field[]}                     [fields=[]]       - Initial form fields.
-	 * @param {Object.<string, Function>}   [functions={}]    - Functions to make available for field expressions.
-	 * @param {Object.<string, Object>}     [inputOptions={}] - Default input options keyed by input type.
+	 * @param {Field[]}                     [fields=[]]     - Initial form fields.
+	 * @param {Object.<string, Function>}   [functions={}]  - Functions to make available for field expressions.
+	 * @param {Object.<string, Object>}     [tagOptions={}] - Default tag options keyed by tag type.
+	 * @param {Object.<string, *>}          [options={}]    - Form options.
 	 */
-	constructor(fields = [], functions = {}, inputOptions = {})
+	constructor(fields = [], functions = {}, tagOptions = {}, options = {})
 	{
 		/**
 		 * Typecasting functions for each field type.
@@ -65,14 +67,20 @@ export default class FormProcessor
 			'number':  (f, v) => toNumber(util.clamp(v, get(f, 'options.min'), get(f, 'options.max'))),
 			'boolean': (f, v) => !!v
 		};
-		
+
+		this.options = merge({
+			expressionCache: true,
+			updateCache: true,
+			valueCache: false
+		}, options);
+
 		/**
 		 * Default property values for each field type.
 		 *
 		 * @type {Object}
 		 */
 		this.defaults = {};
-		
+
 		this.setDefaults({
 			'*': {
 				type: 'number',
@@ -84,11 +92,11 @@ export default class FormProcessor
 				omit: true
 			},
 			'string': {
-				input: 'string',
+				tag: 'pragma-string',
 				default: ''
 			},
 			'number': {
-				input: 'number',
+				tag: 'pragma-number',
 				default: 0,
 				options: {
 					min: -100,
@@ -97,46 +105,46 @@ export default class FormProcessor
 				}
 			},
 			'boolean': {
-				input: 'boolean',
+				tag: 'pragma-boolean',
 				default: false
 			},
 			'selection': {
-				input: 'selection',
+				tag: 'pragma-select',
 				options: {
 					options: {}
 				}
 			},
 			'section': {
-				input: 'section'
+				tag: 'pragma-section'
 			},
 			'group': {
-				input: 'group'
+				tag: 'pragma-group'
 			},
 			'list': {
-				input: 'list'
+				tag: 'pragma-list'
 			},
 			'list-item': {
-				input: 'list-item'
+				tag: 'pragma-list-item'
 			},
 			'table': {
-				input: 'pragma-table'
+				tag: 'pragma-table'
 			}
 		});
-		
+
 		/**
-		 * Default input options for each input type.
+		 * Default field options for each tag type.
 		 *
 		 * @type {Object.<string, Object>}
 		 */
-		this.inputOptions = merge({}, inputOptions);
-		
+		this.tagOptions = merge({}, tagOptions);
+
 		/**
 		 * Expression functions.
 		 *
 		 * @type {Object.<string, Function>}
 		 */
 		this.functions = {};
-		
+
 		/**
 		 * Expression parser.
 		 *
@@ -147,7 +155,7 @@ export default class FormProcessor
 				in: true
 			}
 		});
-		
+
 		// Set the functions
 		this.addFunctions(merge({
 			concat: (...args) => args.join(''),
@@ -158,52 +166,63 @@ export default class FormProcessor
 			map,
 			reduce
 		}, functions));
-		
+
 		/**
 		 * The set of form fields.
 		 *
 		 * @type {Field[]}
 		 */
 		this.fields = [];
-		
+
 		/**
 		 * Fields keyed by path.
 		 *
 		 * @type {FieldDictionary}
 		 */
 		this.dictionary = {};
-		
+
 		/**
 		 * The root node of the field tree.
 		 *
 		 * @type {Field}
 		 */
 		this.tree = {};
-		
+
 		// Set the form fields
 		this.setFields(fields);
-		
+
 		/**
 		 * Value cache for each field.
 		 *
 		 * @type {Object.<string, *>}
 		 */
 		this.valueCache = {};
-		
+
 		/**
 		 * Field expression cache keyed by path.
 		 *
 		 * @type {Object.<string, Expression>}
 		 */
 		this.expressionCache = {};
-		
+
 		/**
-		 * Field update dependencies keyed by path.
+		 * Field expression dependencies keyed by path; adjacency list.
+		 *
+		 * Values are the field paths of dependencies of the keyed path.
+		 *
+		 * @type {{}}
+		 */
+		this.expressionDependencies = {};
+
+		/**
+		 * Field expression update dependents keyed by path; adjacency list.
+		 *
+		 * Values are the field paths that are dependent on the keyed path.
 		 *
 		 * @type {Object.<string, string[]>}
 		 */
-		this.expressionDependencies = {};
-		
+		this.expressionDependents = {};
+
 		/**
 		 * Map of updated fields.
 		 *
@@ -213,7 +232,7 @@ export default class FormProcessor
 		 */
 		this.updatedFields = {};
 	}
-	
+
 	/**
 	 * Check whether a field exists at the given path.
 	 *
@@ -225,11 +244,11 @@ export default class FormProcessor
 	{
 		return has(this.dictionary, path);
 	}
-	
+
 	/**
 	 * Get the field at the given path.
 	 *
-	 * @protected
+	 * //@protected
 	 * @param {string} path - The path of the field to get.
 	 * @return {Field}
 	 */
@@ -237,7 +256,7 @@ export default class FormProcessor
 	{
 		return this.dictionary[path];
 	}
-	
+
 	/**
 	 * Get the parent field of the field at the given path.
 	 *
@@ -250,10 +269,10 @@ export default class FormProcessor
 		if (!field) {
 			return null;
 		}
-		
+
 		return this.getField(field.parent);
 	}
-	
+
 	/**
 	 * Get the ancestors of a field.
 	 *
@@ -264,16 +283,16 @@ export default class FormProcessor
 	getFieldAncestors(field)
 	{
 		let ancestors = [];
-		
+
 		while (field.hasOwnProperty('parent') && this.hasField(field.parent)) {
 			field = this.getFieldParent(field);
-			
+
 			ancestors.push(field);
 		}
-		
+
 		return ancestors;
 	}
-	
+
 	/**
 	 * Get the descendants of a field.
 	 *
@@ -283,15 +302,15 @@ export default class FormProcessor
 	 */
 	getFieldDescendants(field)
 	{
-		let i, descendants = [];
-		
+		let descendants = [];
+
 		traverseTree(field, (descendant) => {
 			descendants.push(descendant);
 		});
-		
+
 		return descendants;
 	}
-	
+
 	/**
 	 * Get the current value of a field.
 	 *
@@ -306,22 +325,22 @@ export default class FormProcessor
 		if (!field) {
 			return value;
 		}
-		
+
 		value = defaultTo(value, get(data, field.path));
-		
+
 		// Merge default values if specified
 		if (field.merge) {
 			if (isPlainObject(field.default)) {
 				return merge({}, field.default, field.value, value);
 			}
-			
+
 			// TODO: Handle arrays
 		}
-		
+
 		// Otherwise use the first defined value
 		return defaultTo(value, defaultTo(field.value, field.default));
 	}
-	
+
 	/**
 	 * Get the default value of a field.
 	 *
@@ -334,10 +353,10 @@ export default class FormProcessor
 		if (!field) {
 			return null;
 		}
-		
+
 		return field.default;
 	}
-	
+
 	/**
 	 * Get the template field that a field should a extend.
 	 *
@@ -349,10 +368,10 @@ export default class FormProcessor
 		if (!field) {
 			return null;
 		}
-		
+
 		return this.getField(field.extends);
 	}
-	
+
 	/**
 	 * Get the keys of the field's children.
 	 *
@@ -365,14 +384,14 @@ export default class FormProcessor
 		let i,
 			keys = [],
 			children = field.children || [];
-		
+
 		for (i = 0; i < children.length; i++) {
 			keys.push(children[i].pathFragment);
 		}
-		
+
 		return keys;
 	}
-	
+
 	/**
 	 * Get the template that a field's children should extend.
 	 *
@@ -385,41 +404,71 @@ export default class FormProcessor
 		if (!field) {
 			return null;
 		}
-		
+
 		return this.getField(field.template);
 	}
-	
+
 	/**
-	 * Get the fields dependent upon the given field's expression.
+	 * Get the fields that the given field is dependent upon the values of.
+	 *
+	 * @protected
+	 * @param {Field} field
+	 * @return {Field[]} The field dependencies of the given field's expression.
+	 */
+	getFieldExpressionDependencies(field)
+	{
+		let dependencies = this.expressionDependencies[field.path];
+
+		if (!dependencies || !dependencies.length) {
+			return [];
+		}
+
+		let fields = [];
+
+		for (let i = 0; i < dependencies.length; i++) {
+			let dependency = this.getField(dependencies[i]);
+
+			if (!dependency) {
+				continue;
+			}
+
+			fields.push(dependency);
+		}
+
+		return fields;
+	}
+
+	/**
+	 * Get the fields that are dependent upon the given field's value.
 	 *
 	 * @protected
 	 * @param {Field} field - The field whose expression to get dependent fields of.
 	 * @return {Field[]} The dependent fields of the given field's expression
 	 */
-	getFieldExpressionDependencies(field)
+	getFieldExpressionDependents(field)
 	{
-		let dependencies = this.expressionDependencies[field.path];
-		
-		// Skip if the field has no dependencies
-		if (!dependencies || !dependencies.length) {
+		let dependents = this.expressionDependents[field.path];
+
+		// Skip if the field has no dependents
+		if (!dependents || !dependents.length) {
 			return [];
 		}
-		
+
 		let fields = [];
-		
-		for (let i = 0; i < dependencies.length; i++) {
-			let dependency = this.getField(dependencies[i]);
-			
-			if (!dependency) {
+
+		for (let i = 0; i < dependents.length; i++) {
+			let dependent = this.getField(dependents[i]);
+
+			if (!dependent) {
 				continue;
 			}
-			
-			fields.push(dependency);
+
+			fields.push(dependent);
 		}
-		
+
 		return fields;
 	}
-	
+
 	/**
 	 * Get the current value of a field.
 	 *
@@ -433,7 +482,7 @@ export default class FormProcessor
 	{
 		return this.getFieldValue(this.getField(path));
 	}
-	
+
 	/**
 	 * Cast a value based on the property it belongs to.
 	 *
@@ -445,18 +494,18 @@ export default class FormProcessor
 	{
 		if (!field)
 			return value;
-		
+
 		if (!this.casts[field.type])
 			return value;
-		
+
 		// if (Array.isArray(value))
 		// 	return value.map(this.casts[field.type]);
-		
+
 		value = this.casts[field.type](field, value);
-		
+
 		return value;
 	}
-	
+
 	/**
 	 * Derive a field's value from some data.
 	 *
@@ -468,88 +517,101 @@ export default class FormProcessor
 	deriveValue(path, data)
 	{
 		// Return from the value cache if a value is set
-		if (this.valueCache.hasOwnProperty(path)) {
+		if (this.options.valueCache && this.valueCache.hasOwnProperty(path)) {
 			return this.valueCache[path];
 		}
-		
+
 		let field = this.getField(path);
 		let value = this.getFieldValue(field, data);
-		
+
 		// Return the raw value if there's no such field
 		if (!field) {
 			return value;
 		}
-		
+
 		// Cast the value
 		value = this.castValue(field, value);
-		
+
 		// Evaluate the field's expression
 		value = this.evaluateFieldExpression(field, data, value);
-		
+
 		// Fall back to defaults
 		//value = defaultTo(value, defaultTo(field.default, null));
 		value = this.getFieldValue(field, data, value);
-		
+
 		// Update the value cache
 		this.valueCache[path] = value;
-		
+
 		return value;
 	}
-	
+
 	/**
 	 * Build a field's expression.
 	 *
 	 * @param {Field} field - The field to build an expression for.
-	 * @return {Expression} The built expression.
+	 * @return {Expression|null} The built expression, null on failure.
 	 */
 	buildFieldExpression(field)
 	{
 		if (field.expression == null || typeof field.expression !== 'string') {
 			return null;
 		}
-		
+
 		// Use the cached expression if one is available
-		if (this.expressionCache[field.path]) {
+		if (this.options.expressionCache && this.expressionCache[field.path]) {
 			return this.expressionCache[field.path];
 		}
-		
+
 		// Build the initial expression
 		let expression;
-		
+
 		try {
 			expression = this.parser.parse(field.expression);
 		} catch (error) {
-			console.error(`Error parsing expression for field '${field.path}': ${error.message}`);
-			
+			console.error(`Error parsing expression for field '${field.path}': ${error.message}`, {
+				expressionString: field.expression,
+				expressionObject: expression
+			});
+
 			return null;
 		}
-		
+
 		// Substitute contextual variables
 		let substitutions = {
 			$parent: field.parent
 		};
-		
+
 		for (let s in substitutions) {
 			try {
+				// Skip null, NaN, undefined and empty strings
+				if (substitutions[s] == null || substitutions[s] === '') {
+					continue;
+				}
+
 				expression = expression.substitute(s, substitutions[s]);
 			} catch (error) {
-				console.error(`Error substituting expression variable '${s}' for field '${field.path}: ${error.message}`);
-				
+				console.error(`Error substituting expression variable '${s}' for field '${field.path}': "${error.message}"`, {
+					expressionString: field.expression,
+					expressionObject: expression,
+					substitutionName: s,
+					substitutionValue: substitutions[s]
+				});
+
 				return null;
 			}
 		}
-		
+
 		this.expressionCache[field.path] = expression;
-		
+
 		return expression;
 	}
-	
+
 	/**
 	 * Evaluate a field's value from its expression.
 	 *
 	 * Causes the evaluation of any field dependencies as a result.
 	 *
-	 * TODO: Evaluate (and cache) expressions for other field properties! :D
+	 * TODO: Evaluate (and cache) expressions for other field properties to reuse! :D
 	 *
 	 * @param {Field}  field   - The field to compute the value of.
 	 * @param {Object} data    - The data to derive values from.
@@ -559,83 +621,94 @@ export default class FormProcessor
 	evaluateFieldExpression(field, data, value)
 	{
 		value = this.getFieldValue(field, data, value);
-		
+
 		// Parse the expression
 		let expression = this.buildFieldExpression(field);
-		
+
 		if (!expression) {
 			return value;
 		}
-		
+
 		// TODO: Extract deriving variables and building contextual functions
 		//       let variables = buildExpressionContext(field, data, expression, value)?
 		//       Contextual functions should still update the same "variables" reference
-		
+
 		// Derive values for the variables in the expression
 		let variables = expression.variables({ withMembers: true });
-		
+
 		let values = {
 			$this: field,
 			$value: value
 		};
-		
+
 		for (let v = 0; v < variables.length; v++) {
 			let variable = variables[v];
-			
+
 			if (has(values, variable))
 				continue;
-			
+
 			set(values, variable, this.deriveValue(variable, data));
 		}
-		
+
 		// Build contextual functions
 		values = merge(
 			values,
 			{
 				field: (path) => {
+					// Add the path to the list of expression variables
 					variables.push(path);
-					
+
+					// Retrieve the field
 					return this.getField(path);
 				},
 				value: (path) => {
 					// Add the path to the list of expression variables
 					variables.push(path);
-					
+
 					// Derive the value for the expression
 					return this.deriveValue(path, data);
 				}
 			}
 		);
-		
+
 		// Evaluate the expression
 		try {
 			value = expression.evaluate(values);
+
+			if (field.path.indexOf('defense.hitPoints.total') === 0) {
+				console.log(expression, JSON.stringify(values), value);
+			}
 		} catch (error) {
-			console.log('evaluateFieldExpression', field, data, value);
-			
-			console.error(`Error evaluating expression for field '${field.path}': ${error.message}`);
+			console.error(`Error evaluating expression for field '${field.path}'`, error);
+			console.error('evaluateFieldExpression', field, data, value, values);
 		}
-		
+
 		//console.log('evaluateFieldExpression', field.path, expression.toString(), variables, values, value);
 		//console.log('evaluateFieldExpression expression', expression);
-		
-		// Update the map of field update dependencies
+
+		// Update the map of field dependencies and dependents
 		// TODO: Exclude contextual variables
 		// TODO: Move this to an earlier processing step that evaluates the
 		//       expression with spy functions
+		this.expressionDependencies[field.path] = this.expressionDependencies[field.path] || [];
+
 		for (let v = 0; v < variables.length; v++) {
 			let variable = variables[v];
-			
-			this.expressionDependencies[variable] = this.expressionDependencies[variable] || [];
-			
-			if (this.expressionDependencies[variable].indexOf(field.path) < 0) {
-				this.expressionDependencies[variable].push(field.path);
+
+			if (this.expressionDependencies[field.path].indexOf(variable) < 0) {
+				this.expressionDependencies[field.path].push(variable);
+			}
+
+			this.expressionDependents[variable] = this.expressionDependents[variable] || [];
+
+			if (this.expressionDependents[variable].indexOf(field.path) < 0) {
+				this.expressionDependents[variable].push(field.path);
 			}
 		}
-		
+
 		return value;
 	}
-	
+
 	/**
 	 * Prepare fields from a set of field descriptions.
 	 *
@@ -652,25 +725,25 @@ export default class FormProcessor
 		if (!fields || !fields.length) {
 			return fields;
 		}
-		
+
 		let i, field, pathFragment, parentPath;
-		
+
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
-			
+
 			if (!field.path)
 				continue;
-			
+
 			// Ascertain a parent path and path fragment
 			[parentPath, pathFragment] = splitPath(field.path);
-			
+
 			field.pathFragment = defaultTo(field.pathFragment, pathFragment);
 			field.parent = defaultTo(field.parent, parentPath);
 		}
-		
+
 		return fields;
 	}
-	
+
 	/**
 	 * Set the form's fields.
 	 *
@@ -683,21 +756,21 @@ export default class FormProcessor
 	{
 		// Prepare the fields
 		this.fields = this.prepareFields(fields);
-		
+
 		// TODO: Build dictionary from given fields, compare with current fields,
 		//       update things accordingly
 		//this.dictionary = this.buildDictionary(this.fields);
 		this.dictionary = this.updateDictionary(this.fields);
-		
+
 		// Compose the fields into a tree
 		this.tree = this.buildTree(this.dictionary);
-		
+
 		// Clear all caches
 		this.valueCache = {};
-		//this.expressionCache = {};
-		this.expressionDependencies = {};
+		this.expressionCache = {};
+		this.expressionDependents = {};
 	}
-	
+
 	/**
 	 * Add a form field.
 	 *
@@ -705,23 +778,23 @@ export default class FormProcessor
 	 */
 	addField(field) {
 		let parent = this.getFieldParent(field);
-		
+
 		if (!parent) {
 			console.warn(`Could not set field ${field.path} - its parent does not exist`);
 			return;
 		}
-		
+
 		if (!parent.children) {
 			parent.children = [];
 		}
-		
+
 		if (!parent.children.includes(field)) {
 			parent.children.push(field);
 		}
-		
+
 		this.dictionary[field.path] = field;
 	}
-	
+
 	/**
 	 * Update a property with the given value.
 	 *
@@ -734,23 +807,23 @@ export default class FormProcessor
 	setValue(data, path, value)
 	{
 		let field = this.getField(path);
-		
+
 		// Update the value if one is given
 		if (value !== undefined) {
 			if (field) {
 				field.value = value;
 			}
-			
+
 			set(data, path, value);
 		}
-		
+
 		// Update the field at this path
 		this.updatePath(path, data);
-		
+
 		// Get the updated value
 		return get(data, path);
 	}
-	
+
 	/**
 	 * Clear the value cache.
 	 *
@@ -767,56 +840,64 @@ export default class FormProcessor
 
 			return;
 		}
-		
+
 		let i, field = this.getField(path);
-		
+
 		// Clear cached values of child fields iteratively
 		let child,
 			children = field.children,
 			nextChildren = [];
-		
+
 		while (children && children.length) {
 			nextChildren = [];
-			
+
 			for (i = 0; i < children.length; i++) {
 				child = children[i];
-				
+
 				delete this.valueCache[child.path];
-				
+
 				if (child.children) {
 					nextChildren = nextChildren.concat(child.children);
 				}
 			}
-			
+
 			children = nextChildren;
 		}
-		
+
 		// Clear the cached value for this field
 		delete this.valueCache[field.path];
-		
+
 		// Clear cached values of parent fields iteratively
 		let ancestors = this.getFieldAncestors(field);
-		
+
 		for (i = 0; i < ancestors.length; i++) {
 			delete this.valueCache[ancestors[i].path];
 		}
+
+		// Clear cached values of dependents
+		let dependents = this.getFieldExpressionDependents(field);
+
+		for (i = 0; i < dependents.length; i++) {
+			// delete this.valueCache[dependents[i].path];
+			this.clearValueCache(dependents[i].path);
+		}
 	}
-	
+
 	/**
-	 * Derive a field's name from its path.
+	 * Derive a field's label from its path.
 	 *
 	 * @protected
-	 * @param {Field} field
-	 * @return {string} The derived name
+	 * @param {Field} field The field to derive a label for
+	 * @return {string} The derived label
 	 */
-	deriveFieldName(field)
+	deriveFieldLabel(field)
 	{
 		let path = field.path;
 		let lastDotIndex = path.lastIndexOf('.');
-		
+
 		return util.sentenceCase(path.substring(lastDotIndex + 1));
 	}
-	
+
 	/**
 	 * Set the default field properties for each field type.
 	 *
@@ -829,11 +910,11 @@ export default class FormProcessor
 			fieldProperties
 		);
 	}
-	
+
 	/**
 	 * Apply the form's default properties to the given fields.
 	 *
-	 * Fills in default values, derives default names.
+	 * Fills in default values, derives default labels.
 	 *
 	 * @protected
 	 * @param {Field[]} fields - The fields to apply default values to.
@@ -844,41 +925,41 @@ export default class FormProcessor
 		if (!fields || !fields.length) {
 			return fields;
 		}
-		
+
 		let i, field;
-		
+
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
-			
-			// Derive a name
-			if (field.name === undefined) {
-				field.name = this.deriveFieldName(field);
+
+			// Derive a label
+			if (field.label === undefined) {
+				field.label = this.deriveFieldLabel(field);
 			}
-			
+
 			// Apply global defaults
 			field = defaults(field, this.defaults['*']);
-			
+
 			// Apply type-specific defaults
 			if (this.defaults[field.type]) {
 				field = defaults(field, this.defaults[field.type]);
 			}
-			
-			// Apply default input options
-			if (this.inputOptions[field.input]) {
+
+			// Apply default tag options
+			if (this.tagOptions[field.tag]) {
 				field.options = field.options || {};
-				
-				field.options = defaults(field.options, this.inputOptions[field.input]);
+
+				field.options = defaults(field.options, this.tagOptions[field.tag]);
 			}
-			
+
 			// Disable the field implicitly if it has an expression
 			if (!field.hasOwnProperty('disabled')) {
 				field.disabled = !!field.expression;
 			}
 		}
-		
+
 		return fields;
 	}
-	
+
 	/**
 	 * Add to the form's functions.
 	 *
@@ -888,14 +969,14 @@ export default class FormProcessor
 	{
 		// Add the functions to the form
 		this.functions = merge(this.functions, functions);
-		
+
 		// Add the functions to the expression parser
 		this.parser.functions = merge(this.parser.functions, this.functions);
-		
+
 		// Clear the expression cache
-		//this.expressionCache = {};
+		this.expressionCache = {};
 	}
-	
+
 	/**
 	 * Diff the given data with the current form data.
 	 *
@@ -908,18 +989,18 @@ export default class FormProcessor
 		//console.time('buildData(this.tree)');
 		let formData = this.buildData(this.tree);
 		//console.timeEnd('buildData(this.tree)');
-		
+
 		//console.log(formData);
-		
+
 		//console.time('detailedDiff');
 		let diff = detailedDiff(formData, data);
 		//console.timeEnd('detailedDiff');
-		
+
 		//console.log(diff);
-		
+
 		return diff;
 	}
-	
+
 	/**
 	 * Update the form using the given data.
 	 *
@@ -930,7 +1011,7 @@ export default class FormProcessor
 	{
 		this.updatePath('', data);
 	}
-	
+
 	/**
 	 * Update the field at the given path.
 	 *
@@ -941,15 +1022,20 @@ export default class FormProcessor
 	updatePath(path, data, visited = {})
 	{
 		let field = this.getField(path);
-		
-		if (!field || visited[field.path]) {
+
+		if (!field) {
 			return;
 		}
-		
+
+		if (this.options.updateCache && visited[field.path]) {
+			// console.info('Skipped visited path', field.path);
+			return;
+		}
+
 		this.clearValueCache(path);
-		
+
 		// Update the field and its children
-		//console.time('updatePath() ' + path);
+		// console.time('updatePath() ' + path);
 		traverseTree(
 			field,
 			(field) => {
@@ -957,34 +1043,34 @@ export default class FormProcessor
 			},
 			(field) => {
 				// Skip fields that have already been visited
-				if (visited[field.path]) {
-					//console.warn('skipped visited field', field.path);
+				if (this.options.updateCache && visited[field.path]) {
+					// console.info('Skipped visited field', field.path);
 					return;
 				}
-				
+
 				this.updateField(field, data, visited);
-				
+
 				visited[field.path] = true;
 			}
 		);
-		
+
 		// Update parent fields and their dependencies
 		let i;
 		let ancestors = this.getFieldAncestors(field);
-		
+
 		for (i = 0; i < ancestors.length; i++) {
-			if (visited[ancestors[i].path]) {
-				//console.log('skipped visited ancestor', field.path, ancestors[i].path, visited);
+			if (this.options.updateCache && visited[ancestors[i].path]) {
+				// console.info('Skipped visited ancestor', ancestors[i].path, 'of field', field.path);
 				continue;
 			}
-			
+
 			this.updateField(ancestors[i], data, visited);
-			
+
 			visited[ancestors[i].path] = true;
 		}
-		//console.timeEnd('updatePath() ' + path);
+		// console.timeEnd('updatePath() ' + path);
 	}
-	
+
 	/**
 	 * Update the given fields with the given data.
 	 *
@@ -1000,12 +1086,12 @@ export default class FormProcessor
 		if (!Array.isArray(fields) || !fields.length) {
 			return;
 		}
-		
+
 		for (let i = 0; i < fields.length; i++) {
 			this.updatePath(fields[i].path, data);
 		}
 	}
-	
+
 	/**
 	 * Pre-order update the given field with the given data.
 	 *
@@ -1017,10 +1103,10 @@ export default class FormProcessor
 	preUpdateField(field, data)
 	{
 		this.updateFieldInheritance(field, data);
-		
+
 		return !field.omit;
 	}
-	
+
 	/**
 	 * Update the given field with the given data.
 	 *
@@ -1034,21 +1120,45 @@ export default class FormProcessor
 	 */
 	updateField(field, data, visited = {})
 	{
-		//console.log('updateField()', field.path);
-		
+		let isDebugField = field.path.indexOf('classes.') === 0;
+
+		if (isDebugField) {
+			console.log('updateField()', field.path);
+		}
+
+		let previousValue = field.value;
+
 		// Apply default values
 		this.applyDefaults([field]);
-		
+
+		// Update the fields that this field is dependent upon the values of
+		// this.updateDataValue(field, data); // TODO: Dirty; forces field dependency updates because we're not currently learning them early enough
+		// this.updateFieldDependencies(field, data, visited);
+
 		// Update the state's value
 		this.updateDataValue(field, data);
-		
+
 		// Update the field's value
 		this.updateFieldValue(field, data);
-		
-		// Update the fields that are dependent upon the value of this field
-		this.updateFieldDependencies(field, data, visited);
+
+		// Cache invalidation for dependent field updates
+		if (previousValue !== field.value) {
+			// console.log('field value changed', field.path, previousValue, field.value);
+			// this.clearValueCache(field.path);
+			// delete this.valueCache[field.path];
+
+			let dependents = this.getFieldExpressionDependents(field);
+
+			for (let i = 0; i < dependents.length; i++) {
+				delete visited[dependents[i].path];
+			}
+		}
+
+		// Update the paths of fields that are dependent upon the value of this field
+		// TODO: updateDependentFieldPaths? updateFieldDependentsPaths?
+		this.updateFieldDependents(field, data, visited);
 	}
-	
+
 	/**
 	 * Update data from the given field.
 	 *
@@ -1062,12 +1172,12 @@ export default class FormProcessor
 		if (!field || field.omit || field.virtual) {
 			return data;
 		}
-		
+
 		set(data, field.path, this.deriveValue(field.path, data));
-		
+
 		return data;
 	}
-	
+
 	/**
 	 * Update a field using the given data.
 	 *
@@ -1080,15 +1190,15 @@ export default class FormProcessor
 		if (!field) {
 			return;
 		}
-		
+
 		//console.log('updateFieldValue()', field.path);
-		
+
 		// Update the field value
 		field.value = get(data, field.path);
 	}
-	
+
 	/**
-	 * Update fields that are dependent upon the value of the given field.
+	 * Update fields that the given field depends upon the values of.
 	 *
 	 * @protected
 	 * @param {Field}  field        - The field to update dependencies of.
@@ -1097,30 +1207,47 @@ export default class FormProcessor
 	 */
 	updateFieldDependencies(field, data, visited = {})
 	{
-		// Update the field's expression dependencies
 		let dependencies = this.getFieldExpressionDependencies(field);
-		
+
 		for (let i = 0; i < dependencies.length; i++) {
 			this.updatePath(dependencies[i].path, data, visited);
 		}
 	}
-	
+
 	/**
-	 * Update the ancestors of the given field.
+	 * Update fields that are dependent upon the value of the given field.
 	 *
 	 * @protected
-	 * @param {Field}  field - The field to update parents of.
+	 * @param {Field}  field        - The field to update dependents of.
+	 * @param {Object} data         - The data to update from.
+	 * @param {Object} [visited={}] - Map of fields already visited.
+	 */
+	updateFieldDependents(field, data, visited = {})
+	{
+		// Update the field's expression dependents
+		let dependents = this.getFieldExpressionDependents(field);
+
+		for (let i = 0; i < dependents.length; i++) {
+			this.updatePath(dependents[i].path, data, visited);
+		}
+	}
+
+	/**
+	 * Update values of the ancestors of the given field.
+	 *
+	 * @protected
+	 * @param {Field}  field - The field to update ancestor values of.
 	 * @param {Object} data  - The data to update with.
 	 */
 	updateFieldAncestorValues(field, data)
 	{
 		let i, parents = this.getFieldAncestors(field);
-		
+
 		for (i = 0; i < parents.length; i++) {
 			this.updateFieldValue(parents[i], data);
 		}
 	}
-	
+
 	/**
 	 * Update a field's inheritance.
 	 *
@@ -1133,11 +1260,11 @@ export default class FormProcessor
 	{
 		// Update child template fields
 		this.updateTemplateFields(field, data);
-		
+
 		// Inherit the field's template
 		this.inheritTemplate(field, data);
 	}
-	
+
 	/**
 	 * Get the keys of child fields that don't exist in the given data.
 	 *
@@ -1155,23 +1282,23 @@ export default class FormProcessor
 		let childData      = this.getFieldValue(field, data);
 		let childDataKeys  = childData ? Object.keys(childData) : [];
 		let childFieldKeys = this.getFieldChildrenKeys(field);
-		
+
 		// Keys in data that aren't in fields
 		let newKeys = difference(childDataKeys, childFieldKeys);
-		
+
 		// Keys in data and fields
 		let existingKeys = intersection(childDataKeys, childFieldKeys);
-		
+
 		// Keys in fields that aren't in data
 		let oldKeys = difference(childFieldKeys, childDataKeys);
-		
+
 		// console.log('diffTemplateFieldKeys()', field.path, 'newKeys', newKeys);
 		// console.log('diffTemplateFieldKeys()', field.path, 'existingKeys', existingKeys);
 		// console.log('diffTemplateFieldKeys()', field.path, 'oldKeys', oldKeys);
-		
+
 		return [newKeys, existingKeys, oldKeys];
 	}
-	
+
 	/**
 	 * Unravel all templates into fields for the given field and data.
 	 *
@@ -1187,13 +1314,13 @@ export default class FormProcessor
 		if (!field) {
 			return;
 		}
-		
+
 		let template = this.getFieldChildrenTemplate(field);
-		
+
 		if (!template) {
 			return;
 		}
-		
+
 		let i,
 			key,
 			path,
@@ -1202,18 +1329,18 @@ export default class FormProcessor
 			existingField,
 			newField,
 			newFields = [];
-		
+
 		// Find child fields that need to be added, updated or removed
 		let [newKeys, existingKeys, oldKeys] = this.diffFieldDataKeys(field, data);
-		
+
 		let existingFieldKeys = this.getFieldChildrenKeys(field);
-		
+
 		let fixedKeys = field.fixed || [];
-		
+
 		// TODO: Extract to... diffFixedFieldDataKeys()...?
 		// Remove fixed keys from the keys that need removing
 		oldKeys = difference(oldKeys, fixedKeys);
-		
+
 		// Add the existent fixed keys to the keys that need updating
 		existingKeys = existingKeys.concat(
 			difference(
@@ -1222,71 +1349,71 @@ export default class FormProcessor
 				newKeys
 			)
 		);
-		
+
 		// Add the non-existent fixed keys to the keys that need creating
 		newKeys = newKeys.concat(difference(fixedKeys, existingFieldKeys, newKeys));
-		
+
 		//console.log(field.path, newKeys, existingKeys, oldKeys, fixedKeys, existingFieldKeys);
-		
+
 		// Remove old fields
 		for (i = 0; i < oldKeys.length; i++) {
 			key  = oldKeys[i];
 			path = joinPath(field.path, key);
-			
+
 			//console.log('updateTemplateFields() oldField', field.path, path);
-			
+
 			this.removeField(this.getField(path));
 		}
-		
+
 		// Update existing fields
 		for (i = 0; i < existingKeys.length; i++) {
 			key  = existingKeys[i];
 			path = joinPath(field.path, key);
-			
+
 			//console.log('updateTemplateFields() existingField', field.path, path);
-			
+
 			// Ensure the existing field has the correct template
 			existingField          = this.getField(path);
 			existingField.extends  = template.path;
 		}
-		
+
 		// Build new fields
 		value        = this.getFieldValue(field, data);
 		defaultValue = this.getFieldDefaultValue(field);
-		
+
 		for (i = 0; i < newKeys.length; i++) {
 			key  = newKeys[i];
 			path = joinPath(field.path, key);
-			
+
 			//console.log('updateTemplateFields() newField', path, value[key]);
-			
+
 			newField = {
 				path:         path,
 				pathFragment: key,
 				parent:       field.path,
 				extends:      template.path
 			};
-			
+
 			if (value != null && value.hasOwnProperty(key)) {
 				newField.value = value[key];
 			}
-			
+
 			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
 				newField.default = defaultValue[key];
 			}
-			
+
 			newFields.push(newField);
 		}
-		
+
 		// Add the new fields to the parent field and dictionary
 		if (newFields.length) {
 			field.children = field.children || [];
 			field.children = field.children.concat(newFields);
 		}
-		
+
 		this.updateDictionary(newFields);
 	}
-	
+
 	/**
 	 * Diff the keys of the first field's children with those of the second
 	 * field's children.
@@ -1303,19 +1430,19 @@ export default class FormProcessor
 	{
 		let firstFieldKeys  = this.getFieldChildrenKeys(firstField);
 		let secondFieldKeys = this.getFieldChildrenKeys(secondField);
-		
+
 		// Child keys of the first field that aren't of the second field
 		let newKeys = difference(firstFieldKeys, secondFieldKeys);
-		
+
 		// Keys in the children of both fields
 		let existingKeys = intersection(firstFieldKeys, secondFieldKeys);
-		
+
 		// Child keys of the second field that aren't of the first
 		let oldKeys = difference(secondFieldKeys, firstFieldKeys);
-		
+
 		return [newKeys, existingKeys, oldKeys];
 	}
-	
+
 	/**
 	 * Apply a field's inheritance.
 	 *
@@ -1330,18 +1457,18 @@ export default class FormProcessor
 		if (!field) {
 			return field;
 		}
-		
+
 		let template = this.getFieldTemplate(field);
-		
+
 		// Skip fields without a template
 		if (!template) {
 			return field;
 		}
-		
+
 		// Inherit the template
 		if (field.extended !== template.path) {
 			let templateClone = clone(template);
-			
+
 			// We don't want to inherit children, nor do we support more than a
 			// single layer of inheritance
 			delete templateClone.children;
@@ -1350,21 +1477,21 @@ export default class FormProcessor
 			// if (field.path === 'skills.list.test.ability') {
 			// 	console.log('skills.list.test.ability', clone(field), templateClone);
 			// }
-			
+
 			// Merge sandwich to retain original values
 			field = merge(field, templateClone, clone(field));
-			
-			if (field.name == null) {
-				field.name = this.deriveFieldName(field);
+
+			if (field.label == null) {
+				field.label = this.deriveFieldLabel(field);
 			}
-			
+
 			field.extended = template.path;
-			
+
 			this.prepareFields([field]);
 		}
-		
+
 		//console.log('inheritTemplate()', field.path, template.path);
-		
+
 		// Update child field inheritance
 		let i,
 			key,
@@ -1374,32 +1501,32 @@ export default class FormProcessor
 			existingField,
 			newField,
 			newFields = [];
-		
+
 		// Diff field child keys and template child keys
 		let [newKeys, existingKeys] = this.diffFieldChildrenKeys(template, field);
-		
+
 		// Update existing template fields
 		for (let i = 0; i < existingKeys.length; i++) {
 			key  = existingKeys[i];
 			path = joinPath(field.path, key);
-			
+
 			existingField         = this.getField(path);
 			//console.log('inheritTemplate() existingField', path, existingField);
 			existingField.extends = joinPath(template.path, key);
 		}
-		
+
 		// Build new template fields
 		value        = this.getFieldValue(field, data);
 		defaultValue = this.getFieldDefaultValue(field);
-		
+
 		//console.log('inheritTemplate()', field.path, value);
-		
+
 		for (let i = 0; i < newKeys.length; i++) {
 			key  = newKeys[i];
 			path = joinPath(field.path, key);
-			
+
 			//console.log('inherit newKey', path, value[key]);
-			
+
 			// Build the new field
 			newField = {
 				path:         path,
@@ -1407,47 +1534,47 @@ export default class FormProcessor
 				parent:       field.path,
 				extends:      joinPath(template.path, key)
 			};
-			
+
 			// Propagate values
 			if (value != null && value.hasOwnProperty(key)) {
 				newField.value = value[key];
 			}
-			
+
 			if (defaultValue != null && defaultValue.hasOwnProperty(key)) {
 				newField.default = defaultValue[key];
 			}
-			
+
 			newFields.push(newField);
 		}
-		
+
 		// Add the new fields to the parent field and dictionary
 		// TODO: Extract addFieldChildren(field, children)
 		if (newFields.length) {
 			field.children = field.children || [];
 			field.children = field.children.concat(newFields);
-			
+
 			// We then want to sort these in the order of template's children
 			// TODO: Extract sortFieldChildren(field)
 			let templateChildKeys = this.getFieldChildrenKeys(template);
-			
+
 			// We flip the child keys into an object where the values are the
 			// indices of the child keys array
 			templateChildKeys = zipObject(
 				templateChildKeys,
 				[...templateChildKeys.keys()]
 			);
-			
+
 			// This makes it easier to sort
 			field.children = sortBy(field.children, (child) => {
 				return templateChildKeys[child.pathFragment];
 			});
 		}
-		
+
 		this.updateDictionary(newFields);
-		
+
 		return field;
 	}
-	
+
 	/**
 	 * Remove data from the given path.
 	 *
@@ -1459,7 +1586,7 @@ export default class FormProcessor
 	{
 		this.removePath(path, data);
 	}
-	
+
 	/**
 	 * Remove data at the given path and update parent fields.
 	 *
@@ -1474,18 +1601,18 @@ export default class FormProcessor
 	removePath(path, data)
 	{
 		let field = this.getField(path);
-		
+
 		if (!field) {
 			return;
 		}
-		
+
 		// Remove the state data
 		this.removeData(field, data);
-		
+
 		// Update the parent field
 		this.updatePath(this.getFieldParent(field).path, data);
 	}
-	
+
 	/**
 	 * Remove the given fields.
 	 *
@@ -1498,16 +1625,16 @@ export default class FormProcessor
 		if (!Array.isArray(fields) || !fields.length) {
 			return [];
 		}
-		
+
 		let removed = [];
-		
+
 		for (let i = 0; i < fields.length; i++) {
 			removed.push(this.removeField(fields[i]));
 		}
-		
+
 		return removed;
 	}
-	
+
 	/**
 	 * Remove a field.
 	 *
@@ -1524,23 +1651,23 @@ export default class FormProcessor
 		if (!field) {
 			return field;
 		}
-		
+
 		// Remove the field and its children from the value cache, dictionary
 		// and dependency list
 		this.clearValueCache(field.path);
-		
+
 		traverseTree(field, (field) => {
 			delete this.dictionary[field.path];
-			delete this.expressionDependencies[field.path];
+			delete this.expressionDependents[field.path];
 		});
-		
+
 		// Remove the field from its parent
 		let parent = this.getFieldParent(field);
 		pull(parent.children, field);
-		
+
 		return field;
 	}
-	
+
 	/**
 	 * Remove a field's path from the given data.
 	 *
@@ -1553,26 +1680,26 @@ export default class FormProcessor
 		if (!field) {
 			return;
 		}
-		
+
 		let parent = this.getField(field.parent);
-		
+
 		if (!parent) {
 			return;
 		}
-		
+
 		let parentPath = parent.path;
 		let parentValue = this.getFieldValue(parent, data);
 		let key = field.pathFragment;
-		
+
 		if (Array.isArray(parentValue)) {
 			parentValue.splice(key, 1);
 		} else {
 			delete parentValue[key];
 		}
-		
+
 		set(data, parentPath, parentValue);
 	}
-	
+
 	/**
 	 * Update the dictionary with the given fields.
 	 *
@@ -1584,18 +1711,18 @@ export default class FormProcessor
 		if (!Array.isArray(fields)) {
 			return this.dictionary;
 		}
-		
+
 		for (let i = 0; i < fields.length; i++) {
 			if (!fields[i] || !fields[i].path) {
 				continue;
 			}
-			
+
 			this.dictionary[fields[i].path] = fields[i];
 		}
-		
+
 		return this.dictionary;
 	}
-	
+
 	/**
 	 * Build a dictionary from the given fields.
 	 *
@@ -1606,7 +1733,7 @@ export default class FormProcessor
 	{
 		return buildDictionary(fields);
 	}
-	
+
 	/**
 	 * Build a tree from the given dictionary.
 	 *
@@ -1618,7 +1745,7 @@ export default class FormProcessor
 	{
 		return buildTree(dictionary);
 	}
-	
+
 	/**
 	 * Build data from the current field state.
 	 *
@@ -1631,30 +1758,30 @@ export default class FormProcessor
 		if (!field) {
 			return data;
 		}
-		
+
 		let child, childData;
-		
+
 		// If the field has children, build the data of its children
 		if (field.children) {
 			for (let c = 0; c < field.children.length; c++) {
 				child = field.children[c];
-				
+
 				if (child.omit) {
 					continue;
 				}
-				
+
 				childData = this.buildData(field.children[c], data);
 			}
-			
+
 			return data;
 		}
-		
+
 		// Set data
 		set(data, field.path, defaultTo(field.value, field.default));
-		
+
 		return data;
 	}
-	
+
 	/**
 	 * Build data for a field's template.
 	 *
@@ -1666,14 +1793,14 @@ export default class FormProcessor
 	buildTemplateData(field, data)
 	{
 		let template = this.getFieldChildrenTemplate(field);
-		
+
 		if (!template) {
 			return null;
 		}
-		
+
 		return get(this.buildData(template), template.path);
 	}
-	
+
 	/**
 	 * Add new a new data item for the field at the given path.
 	 *
@@ -1690,13 +1817,13 @@ export default class FormProcessor
 		if (!field) {
 			return;
 		}
-		
+
 		// Build the new child data
 		let newData = merge(this.buildTemplateData(field), value || {});
-		
+
 		// Get the target for the data
 		let target = get(data, path, []);
-		
+
 		// Add the new child data to the collection
 		if (Array.isArray(target)) {
 			target.push(newData);
@@ -1708,13 +1835,13 @@ export default class FormProcessor
 				`Could not create new child data for '${path}';` +
 				` either it wasn't an array or wasn't an object with a key provided`
 			);
-			
+
 			return;
 		}
-		
+
 		// Set it back
 		set(data, path, target);
-		
+
 		// Update the form
 		this.updatePath(path, data);
 	}
@@ -1749,23 +1876,23 @@ export default class FormProcessor
  * @property {string}         [parent]         - The path of the field's parent, if any. Overrides the parent that would otherwise be determined from the `path`.
  * @property {string}         [pathFragment]   - The leaf of the field's path. TODO: Rename to key
  * @property {string}         [type]           - The type of the field. Determines the type of value to read and store. Defaults to `'number'`.
- * @property {string}         [input]          - The input type to use for this field, if any. // TODO: Rename? Might not be an actual input... (i.e. section). `element` might be a good name.
- * @property {Object}         [options]        - The input options. A free-form object for different input types to interpret and utilise.
- * @property {string}         [name]           - The field's name. Defaults to a sentence-case translation of the field's key. TODO: Rename to label?
+ * @property {string}         [tag]            - The tag to use for this field, if any.
+ * @property {Object}         [options]        - The tag options. A free-form object for different tag types to interpret and utilise.
+ * @property {string}         [label]          - The field's label. Defaults to a sentence-case translation of the field's key.
  * @property {string}         [description]    - The field's description.
- * @property {boolean}        [omit=false]     - Whether to prevent storing the property's value in data AND prevent updating any children. Defaults to `false`.
- * @property {boolean}        [virtual=false]  - Whether to prevent storing the property's value in data. Defaults to `false`.
- * @property {string|boolean} [visible=true]   - Whether the property is visible. Defaults to `true`. String values are interpreted as expressions.
- * @property {string|boolean} [disabled=false] - Whether the property is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. String values are interpreted as expressions. TODO: Input options?
+ * @property {boolean}        [omit=false]     - Whether to prevent storing the field's value in data AND prevent updating any of its children. Defaults to `false`.
+ * @property {boolean}        [virtual=false]  - Whether to prevent storing the field's value in data. Defaults to `false`.
+ * @property {string|boolean} [visible=true]   - Whether the field is visible. Defaults to `true`. String values are interpreted as expressions.
+ * @property {string|boolean} [disabled=false] - Whether the field is disabled. Defaults to `true` if `expression` is set, otherwise defaults to `false`. String values are interpreted as expressions. TODO: Input options?
  * @property {*}              [value]          - The field's value.
- * @property {*}              [default]        - The field's default value. Defaults appropriately for the set `type`.
+ * @property {*}              [default]        - The field's default value. Defaults appropriately for the field's `type`.
  * @property {boolean}        [merge]          - Whether to merge the field's non-scalar value with its default value.
  * @property {string}         [expression]     - An expression used to compute the field's value. Implies `disabled` when set.
- * @property {string}         [validator]      - The field's validation function. Defaults as appropriate to the `type`.
- * @property {string}         [extends]        - The path of a field to inherit.
- * @property {string}         [extended]       - The path of a field that been inherited.
+ * @property {string}         [validator]      - The field's value validation function. Defaults appropriately for the field's `type`.
+ * @property {string}         [extends]        - The path of a field to inherit from.
+ * @property {string}         [extended]       - The path of a field that been has inherited from.
  * @property {string}         [mirror]         - The path of a field to mirror. TODO: Implement
  * @property {Field[]}        [children]       - Child fields.
- * @property {string}         [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
+ * @property {Field|string}   [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
  * @property {Object|array}   [fixed]          - A map or list of child keys that cannot be removed at runtime, if present.
  */

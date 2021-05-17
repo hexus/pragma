@@ -2,18 +2,15 @@
 <html lang="en">
 	<head>
 		<title>Pragma - Character Sheet</title>
-		<style>
-			.container {
-				/*width: 968px;*/
-				margin: 0 auto;
-			}
-		</style>
-		<link rel="stylesheet" href="node_modules/choices.js/public/assets/styles/choices.css"/>
 	</head>
 	<body>
-		<div class="container">
-			<character-sheet id="characterSheet" debug></character-sheet>
-		</div>
+		<pragma-form id="form">
+			<input type="number" name="abilities.dex.modifier" disabled/>
+			<input type="number" name="abilities.dex.base"/>
+
+			<pragma-fields path=""></pragma-fields>
+		</pragma-form>
+
 		<script src="build/index.js"></script>
 	</body>
 </html>

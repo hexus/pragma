@@ -1,11 +1,25 @@
-import riot from 'riot';
-import './tags/character-sheet.tag';
-import store from './store';
+// Stencil
+import { defineCustomElements, applyPolyfills } from "../loader";
+import abilityModifier                          from "./model/functions/abilityModifier";
+import fields                                   from "../src/data/fields";
+import store                                    from "../src/store";
+
+applyPolyfills().then(() => {
+	return defineCustomElements(window);
+});
 
 document.addEventListener('DOMContentLoaded', function () {
-	riot.mount('*');
-	
-	let characterSheet = document.getElementById('characterSheet');
-	characterSheet.state = store.characters[1];
-	characterSheet.update();
+	let form = document.getElementById('form');
+
+	if (!form) {
+		console.error('No form found!');
+		return;
+	}
+
+	form.functions = {
+		abilityModifier
+	};
+
+	form.fields = fields;
+	form.state = store.characters[1];
 });

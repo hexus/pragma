@@ -22,24 +22,24 @@ const fields = [
 		type: 'virtual',
 		omit: true
 	},
-	
+
 	// Profile
 	{
 		path:        'profile',
 		type:        'section',
-		name:        'Profile',
+		label:       'Profile',
 		description: 'Character profile'
 	},
 	{
 		path:        'profile.name',
 		type:        'string',
-		name:        'Name',
+		label:       'Name',
 		description: "The character's given or chosen name"
 	},
 	{
 		path:        'profile.alignment',
 		type:        'selection',
-		name:        'Alignment',
+		label:       'Alignment',
 		description: "The character's general and moral attitude",
 		options:     {
 			options: {
@@ -53,48 +53,49 @@ const fields = [
 				'neutralEvil':    'Neutral Evil',
 				'chaoticEvil':    'Chaotic Evil'
 			}
-		}
+		},
+		default:     'trueNeutral'
 	},
 	{
 		path:        'profile.age',
 		type:        'string',
-		name:        'Age',
+		label:       'Age',
 		description: "The character's age"
 	},
 	{
 		path:        'profile.gender',
 		type:        'string',
-		name:        'Gender',
+		label:       'Gender',
 		description: "The character's gender"
 	},
 	{
 		path:        'profile.height',
 		type:        'string',
-		name:        'Height',
+		label:       'Height',
 		description: "The character's height"
 	},
 	{
 		path:        'profile.weight',
 		type:        'string',
-		name:        'Weight',
+		label:       'Weight',
 		description: "The character's weight"
 	},
 	{
 		path:        'profile.hair',
 		type:        'string',
-		name:        'Hair',
+		label:       'Hair',
 		description: "The character's eye color"
 	},
 	{
 		path:        'profile.eyes',
 		type:        'string',
-		name:        'Eyes',
+		label:       'Eyes',
 		description: "The character's eye color"
 	},
 	{
 		path:        'race',
 		type:        'section',
-		name:        'Race',
+		label:       'Race',
 		description: "The character's race"
 	},
 	{
@@ -102,16 +103,16 @@ const fields = [
 		type:        'string',
 		description: "The name of the race"
 	},
-	
+
 	// Classes
 	{
-		path: 'templates.class.name',
-		type: 'string',
-		name: 'Class name'
+		path:  'templates.class.name',
+		type:  'string',
+		label: 'Class name'
 	},
 	{
 		path:    'templates.class',
-		name:    'Class',
+		label:   'Class',
 		type:    'group',
 		options: {
 			hideLabel: true
@@ -120,7 +121,7 @@ const fields = [
 	{
 		path:    'templates.class.levels',
 		type:    'number',
-		name:    'Levels',
+		label:   'Levels',
 		options: {
 			min: 1
 		},
@@ -129,7 +130,7 @@ const fields = [
 	{
 		path:        'classes',
 		type:        'section',
-		name:        'Classes',
+		label:       'Classes',
 		description: "The character's classes"
 	},
 	{
@@ -147,19 +148,19 @@ const fields = [
 			0: true // Always keep the first class
 		}
 	},
-	
+
 	// Abilities
 	{
-		path: 'templates.ability',
-		type: 'group',
-		name: 'Ability'
+		path:  'templates.ability',
+		type:  'group',
+		label: 'Ability'
 	},
 	{
 		path: 'templates.ability.score',
 		expression:
-			  '$parent.base +' +
-				  '$parent.racialBonus +' +
-				  '$parent.miscBonus +' +
+			  '$parent.base + ' +
+				  '$parent.racialBonus + ' +
+				  '$parent.miscBonus + ' +
 				  '$parent.tempBonus'
 	},
 	{
@@ -183,7 +184,7 @@ const fields = [
 		path:    'sections.abilities',
 		parent:  '',
 		type:    'section',
-		name:    'Abilities',
+		label:   'Abilities',
 		virtual: true
 	},
 	{
@@ -206,45 +207,45 @@ const fields = [
 		}
 	},
 	{
-		path: 'abilities.str',
-		type: 'group',
-		name: 'Strength'
+		path:  'abilities.str',
+		type:  'group',
+		label: 'Strength'
 	},
 	{
-		path: 'abilities.dex',
-		type: 'group',
-		name: 'Dexterity'
+		path:  'abilities.dex',
+		type:  'group',
+		label: 'Dexterity'
 	},
 	{
-		path: 'abilities.con',
-		type: 'group',
-		name: 'Constitution'
+		path:  'abilities.con',
+		type:  'group',
+		label: 'Constitution'
 	},
 	{
-		path: 'abilities.int',
-		type: 'group',
-		name: 'Intelligence'
+		path:  'abilities.int',
+		type:  'group',
+		label: 'Intelligence'
 	},
 	{
-		path: 'abilities.wis',
-		type: 'group',
-		name: 'Wisdom'
+		path:  'abilities.wis',
+		type:  'group',
+		label: 'Wisdom'
 	},
 	{
-		path: 'abilities.cha',
-		type: 'group',
-		name: 'Charisma'
+		path:  'abilities.cha',
+		type:  'group',
+		label: 'Charisma'
 	},
 	{
 		path:        'defense',
 		type:        'section',
-		name:        'Defense',
+		label:       'Defense',
 		description: 'Defense statistics'
 	},
 	{
-		path: 'defense.hitPoints',
-		type: 'group',
-		name: 'Hit points'
+		path:  'defense.hitPoints',
+		type:  'group',
+		label: 'Hit points'
 	},
 	{
 		path:       'defense.hitPoints.current',
@@ -265,13 +266,13 @@ const fields = [
 		path: 'defense.hitPoints.nonLethalDamage'
 	},
 	{
-		path: 'defense.armorClass',
-		type: 'group',
-		name: 'AC'
+		path:  'defense.armorClass',
+		type:  'group',
+		label: 'AC'
 	},
 	{
 		path:       'defense.armorClass.total',
-		name:       'Armor Class',
+		label:      'Armor Class',
 		expression: '10 + $parent.armorBonus + $parent.shieldBonus + $parent.abilityModifier + ' +
 						'$parent.sizeModifier + $parent.naturalArmor + $parent.deflectionModifier + ' +
 						'$parent.miscModifier + $parent.tempModifier'
@@ -282,7 +283,7 @@ const fields = [
 	},
 	{
 		path:       'defense.armorClass.flatFooted',
-		name:       'Flat-footed Armor Class',
+		label:      'Flat-footed Armor Class',
 		expression: '$parent.total - $parent.abilityModifier'
 	},
 	{
@@ -320,7 +321,7 @@ const fields = [
 	{
 		path: 'templates.save',
 		type: 'group',
-		//name: null
+		//label: null
 	},
 	{
 		path:       'templates.save.total',
@@ -347,7 +348,7 @@ const fields = [
 	{
 		path:    'sections.saves',
 		parent:  'defense',
-		name:    'Saving throws',
+		label:   'Saving throws',
 		type:    'section',
 		virtual: true
 	},
@@ -507,9 +508,9 @@ const fields = [
 		path: 'offense.combatManeuverBonus.tempModifier'
 	},
 	{
-		path: 'templates.skill',
-		name: null,
-		type: 'group'
+		path:  'templates.skill',
+		label: null,
+		type:  'group'
 	},
 	{
 		path:     'templates.skill.trained',
@@ -577,7 +578,7 @@ const fields = [
 	{
 		path:     'skills.list',
 		type:     'list',
-		input:    'pragma-table',
+		tag:      'pragma-table',
 		options:  {
 			showLabel: true,
 			headings:  [
@@ -647,14 +648,14 @@ const fields = [
 	},
 	{
 		path:    'skills.list.test',
-		name:    'Test skill',
+		label:   'Test skill',
 		default: {
 			ability: 'dex'
 		}
 	},
 	{
 		path:    'skills.list.test2',
-		name:    'Test skill 2',
+		label:   'Test skill 2',
 		default: {
 			ability: 'cha'
 		}
@@ -666,18 +667,18 @@ const fields = [
 	{
 		// TODO: Collection type used for lists *and* selects/pickers?
 		//       Generic loading for child data and/or options?
-		path:    'spells.search',
-		type:    'selection',
-		input:   'picker',
+		path: 'spells.search',
+		type: 'selection',
+		tag:  'pragma-picker',
 		//virtual: true
 		options: {
 			target:      'spells.list',            // Add selections to spell list
-			source:      '/src/data/spells.csv',   // Source URL for data
+			source:      '/src/data/spells.csv',   // Source URL for options data
 			static:      true,                     // Load the data source once
 			type:        'csv',                    // TODO: Support different source data types
-			key:         'id',                     // Item value key
-			label:       'name',                   // Item label key
-			placeholder: 'Search for a spell' // Placeholder text
+			valueKey:    'id',                     // Item value key
+			labelKey:    'name',                   // Item label key
+			placeholder: 'Search for a spell'      // Placeholder text
 		}
 	},
 	{

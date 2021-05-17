@@ -20,8 +20,8 @@
 		import './input/group.tag';
 		import './input/list.tag';
 		import './input/pragma-table.tag';
-		import domEvent      from '../mixins/domEvent';
-		import FormProcessor from "../services/FormProcessor";
+		import domEvent          from '../mixins/domEvent';
+		import { FormProcessor } from "../services/FormProcessor";
 
 		// Globally mixin the DOM event helper
 		riot.mixin(domEvent);

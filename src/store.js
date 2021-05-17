@@ -4,7 +4,7 @@ export default {
 			profile: {
 				name: 'Shade',
 				alignment: 'chaoticNeutral',
-				age: 27,
+				age: 29,
 				gender: 'Male',
 				height: "5'9\"",
 				weight: '10st',
@@ -20,30 +20,13 @@ export default {
 				list: [
 					{
 						name: 'Sorcerer',
-						levels: 11
+						levels: 14
 					},
 					{
 						name: 'Test second class',
 						levels: 1
-					},
-					{
-						name: 'Two',
-						levels: 2,
-					},
-					{
-						name: 'Three',
-						levels: 3
-					},
-					{
-						name: 'Four',
-						levels: 4
-					},
-					{
-						name: 'Five',
-						levels: 5
 					}
-				],
-				level: 11
+				]
 			},
 			abilities: {
 				str: {
@@ -203,8 +186,14 @@ export default {
 				eyes: 'Black',
 				home: 'Ilun'
 			},
-			race: 'Catfolk',
-			class: 'Mindblade',
+			race: {
+				name: 'Catfolk'
+			},
+			classes: {
+				list: [
+					{ name: 'Mindblade', levels: 13 }
+				]
+			},
 			abilities: {
 				str: {
 					base: 14

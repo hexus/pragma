@@ -1,12 +1,33 @@
 {
   "name": "pragma",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Declarative form builder",
-  "main": "src/pragma.js",
+  "main_old": "src/pragma.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "es2015": "dist/esm/index.js",
+  "es2017": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/pragma/pragma.js",
+  "files": [
+    "build/",
+    "dist/",
+    "loader/"
+  ],
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack -w",
-    "watch prod": "webpack -w --mode=production"
+    "build": "npm run stencil.build && npm run webpack.build",
+    "watch": "npm run stencil.watch & npm run webpack.watch",
+    "webpack.build": "webpack",
+    "webpack.watch": "webpack -w",
+    "webpack.watch.prod": "webpack -w --mode=production",
+    "stencil.build": "stencil build --docs",
+    "stencil.watch": "stencil build --docs --watch",
+    "stencil.start": "stencil build --dev --watch --serve",
+    "stencil.test": "stencil test --spec --e2e",
+    "stencil.test.watch": "stencil test --spec --e2e --watchAll",
+    "stencil.generate": "stencil generate"
   },
   "repository": {
     "type": "git",
@@ -15,6 +36,8 @@
   "keywords": [
     "form builder",
     "declarative",
+    "stencil",
+    "web components",
     "ui"
   ],
   "author": "Chris Andrew <chris@hexus.io>",
@@ -25,8 +48,13 @@
   "homepage": "https://github.com/hexus/pragma#readme",
   "devDependencies": {
     "@babel/core": "^7.6.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/polyfill": "^7.6.0",
     "@babel/preset-env": "^7.6.3",
+    "@stencil/core": "^2.5.2",
+    "@stencil/sass": "^1.4.1",
+    "@types/jest": "^26.0.23",
+    "@types/papaparse": "^5.2.5",
     "babel-loader": "^8.0.6",
     "babel-minify-webpack-plugin": "^0.3.1",
     "case": "^1.6.2",
@@ -34,13 +62,13 @@
     "deep-object-diff": "^1.1.0",
     "expr-eval": "^1.2.3",
     "flat": "^4.1.0",
-    "lodash": "^4.17.15",
-    "papaparse": "^4.6.3",
+    "lodash": "^4.17.20",
+    "papaparse": "^5.3.0",
     "riot": "^3.13.2",
     "riot-compiler": "^3.6.0",
     "riot-route": "^3.1.4",
     "riot-tag-loader": "^2.1.0",
-    "webpack": "^4.41.2",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.10"
   }
 }
