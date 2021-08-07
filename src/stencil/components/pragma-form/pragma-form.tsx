@@ -12,7 +12,7 @@ import { FormProcessor } from "../../../services/FormProcessor";
  *  - [~] Maintain form state
  *  - [x] Initial binding to any underlying <pragma-fields> elements
  *  - [ ] True one way binding to any element... right?
- *    - [ ] Find them on DOM changes with mutation observers https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+ *    - [ ] Find new elements on DOM changes with mutation observers https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  *  - [ ] Generate fields from elements into the fields tree if they have name and data-pragma attributes
  *  - [ ] fetch() fields and state via fields-src and state-src or similar
  */
@@ -233,8 +233,8 @@ export class PragmaForm {
     this.form.setFields(this.fields);
     this.form.update(this.state);
 
-    console.log('fields, state', this.fields, this.state);
-    console.log('form.tree.children', this.form.tree.children);
+    // console.log('fields, state', this.fields, this.state);
+    // console.log('form.tree.children', this.form.tree.children);
 
     // Find and update any field elements in the host element's light DOM
     // TODO: Find a way to not look these up every update; could end up quite redundant

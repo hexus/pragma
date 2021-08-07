@@ -56,6 +56,10 @@ export class PragmaGroup {
   parseFieldDefinition(newValue, oldValue) {
     this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
+    // console.log('pragma-group', oldValue, newValue, this.field);
+
+    this.field.children = this.field.children || [];
+
     this.path = this.field.path;
     this.label = this.field.label;
     this.hideLabel = !!this.field.options.hideLabel;
@@ -70,7 +74,7 @@ export class PragmaGroup {
             : null
         }
         <span>
-          <pragma-fields path={this.field.path} fields={...this.field.children}/>
+          <pragma-fields path={this.field.path} fields={[...this.field.children]}/>
         </span>
       </div>
     );

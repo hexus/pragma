@@ -53,11 +53,7 @@ export class PragmaFields {
 
         const ChildTag = child.tag;
 
-        // Force Stencil to update the child component
-        // TODO: Is there a better way? There must be.
-        child = { ...child };
-
-        return <ChildTag key={child.path} field={child}/>;
+        return <ChildTag key={child.path} field={{ ...child }}/>;
       })
     );
   }

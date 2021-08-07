@@ -181,9 +181,17 @@ export namespace Components {
          */
         "source": string;
         /**
+          * Whether to assume the source data is static and only load it once.
+         */
+        "static": boolean;
+        /**
           * Target field path for selected options to be added to.
          */
         "target": string | null;
+        /**
+          * Source data type.
+         */
+        "type": 'csv' | 'json';
         /**
           * The field's value.
          */
@@ -528,9 +536,17 @@ declare namespace LocalJSX {
          */
         "source"?: string;
         /**
+          * Whether to assume the source data is static and only load it once.
+         */
+        "static"?: boolean;
+        /**
           * Target field path for selected options to be added to.
          */
         "target"?: string | null;
+        /**
+          * Source data type.
+         */
+        "type"?: 'csv' | 'json';
         /**
           * The field's value.
          */

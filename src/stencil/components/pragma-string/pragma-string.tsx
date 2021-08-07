@@ -62,7 +62,7 @@ export class PragmaString {
    *
    * @param {InputEvent} event
    */
-  inputChanged = (event: InputEvent) => {
+  onInputEvent = (event: InputEvent) => {
     const target = event.target as HTMLInputElement;
 
     this.value = target.value;
@@ -75,7 +75,7 @@ export class PragmaString {
       title={this.label}
       value={this.value}
       disabled={this.disabled}
-      onInput={this.inputChanged}
+      onInput={this.onInputEvent}
     />;
   }
 }

@@ -55,6 +55,8 @@ export class PragmaPicker {
     this.placeholder = this.field.options.placeholder;
 
     this.source = this.field.options.source;
+    this.static = this.field.options.static;
+    this.type = this.field.options.type;
     this.options = this.options || this.field.options.options;
     this.target = this.field.options.target;
     this.listPath = this.field.options.listPath;
@@ -95,6 +97,16 @@ export class PragmaPicker {
    * TODO: Watch and reload options
    */
   @Prop({ attribute: 'src', mutable: true }) source: string = '';
+
+  /**
+   * Whether to assume the source data is static and only load it once.
+   */
+  @Prop({ mutable: true, reflect: true }) static: boolean = false;
+
+  /**
+   * Source data type.
+   */
+  @Prop({ mutable: true, reflect: true }) type: 'csv' | 'json' = 'json';
 
   /**
    * Placeholder value displayed when an option hasn't been selected.
@@ -287,14 +299,6 @@ export class PragmaPicker {
 
     // this.destroy(); // ???
 
-    const buttonAttributes = {
-      disabled: !this.value,
-      'data-pragma-add': this.target,
-      'data-pragma-value': this.getOption(this.value) // TODO: Configurable, this.value or this.getOption(this.value)
-    };
-
-    // console.log('<pragma-picker> render() buttonAttributes', buttonAttributes);
-
     const select = <select
       name={this.path}
       data-choices={true}
@@ -304,6 +308,14 @@ export class PragmaPicker {
     </select>;
 
     // TODO: data-pragma-add-from="this.path"? Altered event propagation for full values?
+    const buttonAttributes = {
+      disabled: !this.value,
+      'data-pragma-add': this.target || false,
+      'data-pragma-value': this.getOption(this.value) // TODO: Configurable, this.value or this.getOption(this.value)
+    };
+
+    // console.log('<pragma-picker> render() buttonAttributes', buttonAttributes);
+
     return [
       select,
       <button type="button" { ...buttonAttributes }>Add</button>

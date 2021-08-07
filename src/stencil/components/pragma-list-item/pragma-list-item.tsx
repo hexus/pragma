@@ -37,12 +37,13 @@ export class PragmaListItem {
   parseFieldDefinition(newValue, oldValue) {
     this.field = parseAndMergeFields(this.field, oldValue, newValue);
 
-    // console.log('pragma-list-item', oldValue, newValue, this.field);
+    console.log('pragma-list-item', oldValue, newValue, this.field);
   };
 
   render() {
     return <div>
-      <pragma-fields path={this.field.path} fields={[{...this.field}]}/><button data-pragma-remove={this.field.path}>Remove</button>
+      <pragma-fields path={this.field.path} fields={[{...this.field}]}/>
+      <button data-pragma-remove={this.field.path}>Remove</button>
     </div>
   }
 }
