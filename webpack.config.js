@@ -6,6 +6,7 @@ module.exports = {
 	mode: 'development',
 	entry: {
 		index: ['@babel/polyfill', './src/index.js'],
+		playground: ['@babel/polyfill', './src/playground.js'],
 		pragma: './src/pragma.js',
 		old: './src/old.js'
 	},

@@ -1,5 +1,5 @@
 // Stencil
-import { defineCustomElements, applyPolyfills } from "../loader";
+import { applyPolyfills, defineCustomElements } from "../loader";
 import abilityModifier                          from "./model/functions/abilityModifier";
 import fields                                   from "../src/data/fields";
 import store                                    from "../src/store";
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	let form = document.getElementById('form');
 
 	if (!form) {
-		console.error('No form found!');
+		console.error('No form element found!');
 		return;
 	}
 

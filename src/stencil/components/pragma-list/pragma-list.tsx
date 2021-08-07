@@ -34,9 +34,7 @@ export class PragmaList {
     this.path = this.field.path;
     this.label = this.field.label;
     this.disabled = this.field.disabled;
-
-    const options = this.field.options || {};
-    this.showLabel = options ? options.showLabel : this.showLabel;
+    this.showLabel = this.field.options?.showLabel;
   };
 
   /**

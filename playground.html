@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Pragma - Playground</title>
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+				font-family: sans-serif;
+			}
+			.playground {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+			.menu {
+				background: #202020;
+				color: #fafafa;
+				height: 50px;
+				display: flex;
+			}
+			.menu h1 {
+				font-size: 1.5em;
+				margin: 0;
+			}
+			.menu > div {
+				margin: auto 0;
+			}
+			.panels {
+				display: flex;
+				flex: 1;
+				width: 100vw;
+			}
+			.panel {
+				flex: 1;
+			}
+			.editor {
+				height: 100%;
+			}
+			.hidden {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="playground">
+			<header class="menu">
+				<div>
+					<h1>Pragma Playground</h1>
+				</div>
+				<div>
+					<!-- TODO: Use a Pragma form for the menu, like a badass -->
+					<label>
+						<input type="radio" name="editor" value="fields" checked/> Fields
+					</label>
+					<label>
+						<input type="radio" name="editor" value="data"/> Data
+					</label>
+					<label>
+						<input type="radio" name="editor" value="layout"/> Layout
+					</label>
+				</div>
+			</header>
+			<section class="panels">
+				<div class="panel">
+					<div id="fields-editor" class="editor"></div>
+				</div>
+				<div class="panel hidden">
+					<div id="data-editor" class="editor"></div>
+				</div>
+				<div class="panel hidden">
+					<div id="layout-editor" class="editor"></div>
+				</div>
+				<div class="panel">
+					Form
+					<pragma-form id="form">
+						<pragma-fields></pragma-fields>
+					</pragma-form>
+				</div>
+			</section>
+		</div>
+		<script src="build/playground.js"></script>
+	</body>
+</html>
