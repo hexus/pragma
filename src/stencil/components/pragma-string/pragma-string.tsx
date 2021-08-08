@@ -75,6 +75,7 @@ export class PragmaString {
       title={this.label}
       value={this.value}
       disabled={this.disabled}
+      placeholder={this.label}
       onInput={this.onInputEvent}
     />;
   }

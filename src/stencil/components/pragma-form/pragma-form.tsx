@@ -216,18 +216,27 @@ export class PragmaForm {
       return;
     }
 
+    let hasPragmaFieldsParent = element.parentElement.closest('pragma-fields');
+
     if (element.nodeName === 'PRAGMA-FIELDS') {
       let fieldsElement = element as HTMLPragmaFieldsElement;
 
-      if (!element.parentElement.closest('pragma-fields')) {
+      if (!hasPragmaFieldsParent) {
         fieldsElement.fields = Array.isArray(field.children) ? [...field.children] : [];
       }
+    }
+
+    // Elements below should be updated automatically
+    // by state propagation
+    if (hasPragmaFieldsParent) {
+      return;
     }
 
     if (element instanceof HTMLInputElement) {
       if (element.type === 'checkbox') {
         element.checked = !!field.value;
       } else {
+        console.debug('Setting element value from field', field.value, element, field);
         element.value = field.value;
       }
     }

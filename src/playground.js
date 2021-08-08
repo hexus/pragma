@@ -44,14 +44,16 @@ document.addEventListener('DOMContentLoaded', function () {
 	let fieldsEditor = ace.edit('fields-editor', {
 		mode: 'ace/mode/yaml',
 		theme: 'ace/theme/tomorrow_night_eighties',
-		tabSize: 2
+		tabSize: 2,
+		useSoftTabs: true
 	});
 
 	// noinspection JSVoidFunctionReturnValueUsed
 	let dataEditor = ace.edit('data-editor', {
 		mode: 'ace/mode/yaml',
 		theme: 'ace/theme/tomorrow_night_eighties',
-		tabSize: 2
+		tabSize: 2,
+		useSoftTabs: true
 	});
 
 	// Switch editors
@@ -70,25 +72,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// TODO: Layout editor?
 
-	// Fetch and plop some form fields and data JSON into the editors
-	fetch('src/data/examples/pathfinder.fields.yml').catch(function() {
-		console.error('Failed to fetch form fields file', arguments);
-	}).then(function (response) {
-		console.debug('Fetched form fields file', response.url);
-		return response.text();
-	}).then(function (text) {
-		console.debug('Writing form fields file to editor', text);
-		fieldsEditor.session.setValue(text);
-	});
 
-	fetch('src/data/examples/pathfinder.data.yml').catch(function () {
-		console.error('Failed to fetch form data file', arguments);
-	}).then(function (response) {
-		console.debug('Fetched form data file', response.url);
-		return response.text();
-	}).then(function (text) {
-		console.debug('Writing form data to editor', arguments);
-		dataEditor.session.setValue(text);
+	// Fetch and update form fields and data into the editors, from examples
+	let loadExample = function (example) {
+		fetch(`src/data/examples/${example}.fields.yml`).catch(function () {
+			console.error('Failed to fetch form fields file', arguments);
+			fieldsEditor.session.setValue('');
+		}).then(function (response) {
+			if (!response.ok) {
+				throw new Error(`Response code ${response.status} ${response.statusText} for ${response.url}`);
+			}
+
+			console.debug('Fetched form fields file', response.url);
+			return response.text();
+		}).then(function (text = '') {
+			console.debug('Writing form fields file to editor', text);
+			fieldsEditor.session.setValue(text);
+		}).catch (function (error) {
+			console.warn(error.message);
+		});
+
+		fetch(`src/data/examples/${example}.data.yml`).catch(function () {
+			console.error('Failed to fetch form data file', arguments);
+			dataEditor.session.setValue('');
+		}).then(function (response) {
+			console.debug('Fetched form data file', response.url);
+			if (!response.ok) {
+				throw new Error(`Response code ${response.status} ${response.statusText} for ${response.url}`);
+			}
+
+			return response.text();
+		}).then(function (text = '') {
+			console.debug('Writing form data to editor', arguments);
+			dataEditor.session.setValue(text);
+		}).catch (function (error) {
+			console.warn(error.message);
+		});
+	};
+
+	let exampleElement = document.getElementById('example');
+	loadExample(exampleElement.value);
+
+	exampleElement.addEventListener('change', function (event) {
+		let example = exampleElement.value;
+		loadExample(example);
 	});
 
 
@@ -127,6 +154,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	form.addEventListener('change', function (event) {
 		console.debug(arguments);
 
+		if (event.target !== form) {
+			console.debug('Non-form change event ignored', event);
+			return;
+		}
+
 		let text;
 
 		try {
@@ -136,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 
-		console.debug('Form data dumped to YAML', event.detail, text);
+		console.debug('Form data dumped to YAML', event, text);
 
 		dataEditor.session.setValue(text);
 	});

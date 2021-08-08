@@ -8,6 +8,8 @@ export default function (dictionary) {
 	// Let's make a tree out of a dictionary
 	let tree = {
 		path: '',
+		type: 'virtual',
+		omit: false,
 		children: []
 	};
 
@@ -19,6 +21,7 @@ export default function (dictionary) {
 	// Ensure that the root is available as a parent in the dictionary
 	if (dictionary['']) {
 		tree = dictionary[''];
+		tree.path = '';
 		tree.type = 'virtual';
 		tree.omit = false;
 		tree.children = []; // Ensure a new set of child fields

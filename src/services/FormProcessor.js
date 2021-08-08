@@ -803,7 +803,7 @@ export class FormProcessor
 
 		// TODO: Build dictionary from given fields, compare with current fields,
 		//       add/update/remove fields and clear caches accordingly
-		//this.dictionary = this.buildDictionary(this.fields);
+		// this.dictionary = this.buildDictionary(this.fields); // TODO: This currently breaks templates for some reason, templated fields don't get added to the dictionary
 		this.dictionary = this.updateDictionary(this.fields);
 
 		// console.log(this.dictionary);
@@ -1091,7 +1091,7 @@ export class FormProcessor
 			(field) => {
 				// Skip fields that have already been visited
 				if (this.options.updateCache && visited[field.path]) {
-					// console.info('Skipped visited field', field.path);
+					// console.debug('Skipped visited field', field.path);
 					return;
 				}
 
@@ -1107,7 +1107,7 @@ export class FormProcessor
 
 		for (i = 0; i < ancestors.length; i++) {
 			if (this.options.updateCache && visited[ancestors[i].path]) {
-				// console.info('Skipped visited ancestor', ancestors[i].path, 'of field', field.path);
+				// console.debug('Skipped visited ancestor', ancestors[i].path, 'of field', field.path);
 				continue;
 			}
 
@@ -1417,7 +1417,7 @@ export class FormProcessor
 			key  = existingKeys[i];
 			path = joinPath(field.path, key);
 
-			//console.log('updateTemplateFields() existingField', field.path, path);
+			console.debug('updateTemplateFields() existingField', field.path, path);
 
 			// Ensure the existing field has the correct template
 			existingField          = this.getField(path);
@@ -1751,14 +1751,18 @@ export class FormProcessor
 	 * Update the dictionary with the given fields.
 	 *
 	 * @protected
-	 * @param {Field[]|<FieldDictionary>} fields
+	 * @param {Field[]} fields
 	 * @returns {FieldDictionary}
 	 */
 	updateDictionary(fields)
 	{
-		if (Array.isArray(fields)) {
+		// TODO: Add/update/delete
+		// console.debug('Updating dictionary with fields', fields);
+
+		if (Array.isArray(fields) && fields.length) {
+
 			for (let i = 0; i < fields.length; i++) {
-				if (!fields[i] || !fields[i].path) {
+				if (!fields[i] || fields[i].path == null) {
 					continue;
 				}
 
@@ -1772,7 +1776,7 @@ export class FormProcessor
 	/**
 	 * Build a dictionary from the given fields.
 	 *
-	 * @param {Field[]} fields
+	 * @param {Field[]|FieldDictionary} fields
 	 * @return {FieldDictionary}
 	 */
 	buildDictionary(fields)

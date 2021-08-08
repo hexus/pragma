@@ -31,6 +31,7 @@
 			}
 			.menu > div {
 				margin: auto 0;
+				padding: 0 8px;
 			}
 			.panels {
 				display: flex;
@@ -66,6 +67,16 @@
 						<!--<label>
 							<input type="radio" name="editor" value="layout"/> Layout
 						</label>-->
+
+						<div>
+							<label>
+								<select id="example" name="example">
+									<option value="pathfinder" selected>Pathfinder</option>
+									<option value="shopping">Shopping</option>
+								</select>
+							</label>
+							<button type="button">Load example</button>
+						</div>
 					</form>
 				</div>
 			</header>

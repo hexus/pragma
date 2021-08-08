@@ -117,6 +117,7 @@ export class Number {
       step={this.step}
       value={this.value}
       disabled={this.disabled}
+      placeholder={this.label}
       onInput={this.onInputEvent}
     />;
   }

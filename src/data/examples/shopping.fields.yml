@@ -1,0 +1,43 @@
+templates:
+  virtual: true
+  omit: true
+
+templates.item:
+  type: 'group'
+  name: 'Item'
+  options:
+    hideLabel: true
+
+templates.item.price:
+  type: number
+
+total:
+  name: 'Total cost'
+  type: number
+  options:
+    min: 0
+    max: 200
+
+bethany:
+  type: 'section'
+
+bethany.pays:
+  type: number
+  expression: '(total - chris.pays)'
+
+chris:
+  type: 'section'
+
+chris.pays:
+  type: number
+  expression: '(total - chris.total) / 2 + chris.total'
+
+chris.total:
+  type: number
+  expression: "sumBy(chris.items, 'price')"
+
+chris.items:
+  type: 'list'
+  template: 'templates.item'
+  options:
+    editable: true
