@@ -42,8 +42,8 @@ export class PragmaListItem {
 
   render() {
     return <div>
-      <pragma-fields path={this.field.path} fields={[{...this.field}]}/>
-      <button data-pragma-remove={this.field.path}>Remove</button>
+      <pragma-fields path={this.field.path} fields={[{ ...this.field }]} style={{ display: 'inline-block' }}/>
+      <button data-pragma-remove={this.field.path} style={{ display: 'inline-block' }}>Remove</button>
     </div>
   }
 }

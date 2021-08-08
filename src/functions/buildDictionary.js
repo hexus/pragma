@@ -7,18 +7,16 @@
  */
 export default function (objects, key = 'path') {
 	let dictionary = {};
-	
-	if (!Array.isArray(objects)) {
-		return dictionary;
-	}
-	
-	for (let i = 0; i < objects.length; i++) {
-		if (!objects[i] || !objects[i][key]) {
-			continue;
+
+	if (Array.isArray(objects) && objects.length) {
+		for (let i = 0; i < objects.length; i++) {
+			if (!objects[i] || objects[i][key] == null) {
+				continue;
+			}
+
+			dictionary[objects[i][key]] = objects[i];
 		}
-		
-		dictionary[objects[i][key]] = objects[i];
 	}
-	
+
 	return dictionary;
 }

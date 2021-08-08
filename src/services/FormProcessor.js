@@ -1750,6 +1750,9 @@ export class FormProcessor
 	/**
 	 * Update the dictionary with the given fields.
 	 *
+	 * TODO: This gets called a LOT, likely due to templated fields.
+	 *       See if that can be avoided.
+	 *
 	 * @protected
 	 * @param {Field[]} fields
 	 * @returns {FieldDictionary}
@@ -1757,9 +1760,9 @@ export class FormProcessor
 	updateDictionary(fields)
 	{
 		// TODO: Add/update/delete
-		// console.debug('Updating dictionary with fields', fields);
 
 		if (Array.isArray(fields) && fields.length) {
+			// console.debug('Updating dictionary with fields', fields);
 
 			for (let i = 0; i < fields.length; i++) {
 				if (!fields[i] || fields[i].path == null) {
