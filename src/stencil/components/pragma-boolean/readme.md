@@ -1,6 +1,6 @@
 # pragma-boolean
 
-Boolean switch component.
+Boolean checkbox component.
 
 <!-- Auto Generated Below -->
 

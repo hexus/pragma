@@ -1,0 +1,52 @@
+sections:
+  type: virtual
+  omit: true
+
+templates:
+  type: virtual
+  omit: true
+
+profile:
+  type: section
+  description: Character profile
+
+profile.name:
+  type: string
+  description: The character's given or chosen name
+
+profile.alignment:
+  type: selection
+  description: The character's general and moral attitude
+  options:
+    options:
+      - Lawful Good
+      - Neutral Good
+      - Chaotic Good
+      - Lawful Neutral
+      - True Neutral
+      - Chaotic Neutral
+      - Lawful Evil
+      - Neutral Evil
+      - Chaotic Evil
+  default: 4
+
+profile.age:
+  type: string
+  description: The character's age in years
+
+profile.height:
+  type: string
+  description: The character's height in feet
+
+profile.weight:
+  type: string
+  description: The character's weight in pounds
+
+profile.hair:
+  type: string
+  description: The character's hair color and style
+
+profile.eyes:
+  type: string
+  description: The character's eye color
+

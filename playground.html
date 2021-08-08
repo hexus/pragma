@@ -56,27 +56,29 @@
 				</div>
 				<div>
 					<!-- TODO: Use a Pragma form for the menu, like a badass -->
-					<label>
-						<input type="radio" name="editor" value="fields" checked/> Fields
-					</label>
-					<label>
-						<input type="radio" name="editor" value="data"/> Data
-					</label>
-					<label>
-						<input type="radio" name="editor" value="layout"/> Layout
-					</label>
+					<form id="playground-form">
+						<label>
+							<input type="radio" name="editor" value="fields" checked/> Fields
+						</label>
+						<label>
+							<input type="radio" name="editor" value="data"/> Data
+						</label>
+						<!--<label>
+							<input type="radio" name="editor" value="layout"/> Layout
+						</label>-->
+					</form>
 				</div>
 			</header>
 			<section class="panels">
-				<div class="panel">
+				<div class="panel editor-panel">
 					<div id="fields-editor" class="editor"></div>
 				</div>
-				<div class="panel hidden">
+				<div class="panel editor-panel hidden">
 					<div id="data-editor" class="editor"></div>
 				</div>
-				<div class="panel hidden">
+				<!--<div class="panel editor-panel hidden">
 					<div id="layout-editor" class="editor"></div>
-				</div>
+				</div>-->
 				<div class="panel">
 					<pragma-form id="form">
 						<pragma-fields></pragma-fields>

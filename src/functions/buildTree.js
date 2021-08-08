@@ -19,6 +19,8 @@ export default function (dictionary) {
 	// Ensure that the root is available as a parent in the dictionary
 	if (dictionary['']) {
 		tree = dictionary[''];
+		tree.type = 'virtual';
+		tree.omit = false;
 		tree.children = []; // Ensure a new set of child fields
 	} else {
 		dictionary[''] = tree;

@@ -16,6 +16,13 @@
 | `state`     | `state`   | Form state data.                              | `any`                          | `{}`        |
 
 
+## Events
+
+| Event    | Description                                           | Type               |
+| -------- | ----------------------------------------------------- | ------------------ |
+| `change` | Event emitted when form user input changes form data. | `CustomEvent<any>` |
+
+
 ## Methods
 
 ### `getForm() => Promise<FormProcessor>`

@@ -414,6 +414,10 @@ declare namespace LocalJSX {
          */
         "name"?: string;
         /**
+          * Event emitted when form user input changes form data.
+         */
+        "onChange"?: (event: CustomEvent<any>) => void;
+        /**
           * Form state data.
          */
         "state"?: any;

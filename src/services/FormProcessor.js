@@ -109,19 +109,19 @@ export class FormProcessor
 				tag: 'pragma-boolean',
 				default: false
 			},
-			'selection': {
+			'selection': { // TODO: This is not a type.
 				tag: 'pragma-select',
 				options: {
 					options: {}
 				}
 			},
-			'section': {
+			'section': { // TODO: `object`
 				tag: 'pragma-section'
 			},
-			'group': {
+			'group': { // TODO: `object`
 				tag: 'pragma-group'
 			},
-			'list': {
+			'list': { // TODO:
 				tag: 'pragma-list'
 			},
 			'list-item': {
@@ -141,6 +141,9 @@ export class FormProcessor
 
 		/**
 		 * Expression functions.
+		 *
+		 * A map of additional functions to make available to field expressions,
+		 * keyed by name.
 		 *
 		 * @type {Object.<string, Function>}
 		 */

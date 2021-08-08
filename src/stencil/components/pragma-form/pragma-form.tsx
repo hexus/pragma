@@ -1,4 +1,4 @@
-import { Component, Element, forceUpdate, Listen, Method, Prop, State, h } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, forceUpdate, Listen, Method, Prop, State, h } from '@stencil/core';
 import { Field } from "../../types";
 import { HTMLStencilElement } from '@stencil/core/internal';
 import { FormProcessor } from "../../../services/FormProcessor";
@@ -65,6 +65,16 @@ export class PragmaForm {
   @Prop({ mutable: true }) state: any = {};
 
   /**
+   * Event emitted when form user input changes form data.
+   */
+  @Event({
+    eventName: 'change',
+    composed: true,
+    cancelable: true,
+    bubbles: true
+  }) changeEvent: EventEmitter;
+
+  /**
    * Handle input events to update form data.
    *
    * Forces an update of the form component.
@@ -83,6 +93,7 @@ export class PragmaForm {
       || element.getAttribute('path')
       || element.getAttribute('name');
 
+    // Ignore the event if a field name cannot be determined
     if (!fieldName) {
       return;
     }
@@ -102,11 +113,17 @@ export class PragmaForm {
 
     // console.log('pragma-form onInputEvent()', event, fieldName, event.detail?.value, element.value, value);
 
+    // Get the current (previous) value
+    let previousValue = this.form.getValue(fieldName);
+
     // Set the updated value
     this.form.setValue(this.state, fieldName, value);
 
-    // TODO: Conditional update like the click event handler
-    forceUpdate(this.element);
+    // Conditional update; only if the value changed
+    if (previousValue !== this.form.getValue(fieldName)) {
+      forceUpdate(this.element);
+      this.changeEvent.emit(this.state);
+    }
   }
 
   /**
@@ -119,7 +136,7 @@ export class PragmaForm {
    */
   @Listen('click', { capture: true })
   onClickEvent(event: MouseEvent) {
-    console.log(event);
+    console.debug(event);
 
     if (!event.target) {
       return;
@@ -131,7 +148,7 @@ export class PragmaForm {
       return;
     }
 
-    console.log(element, element.dataset);
+    console.debug(element, element.dataset);
 
     let changes = 0;
     let data = element.dataset;
@@ -154,6 +171,7 @@ export class PragmaForm {
 
     if (changes > 0) {
       forceUpdate(this.element);
+      this.changeEvent.emit(this.state);
     }
   }
 
