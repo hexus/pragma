@@ -1417,7 +1417,7 @@ export class FormProcessor
 			key  = existingKeys[i];
 			path = joinPath(field.path, key);
 
-			console.debug('updateTemplateFields() existingField', field.path, path);
+			// console.debug('updateTemplateFields() existingField', field.path, path);
 
 			// Ensure the existing field has the correct template
 			existingField          = this.getField(path);
