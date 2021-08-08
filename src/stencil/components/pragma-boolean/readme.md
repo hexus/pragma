@@ -1,5 +1,5 @@
 # pragma-boolean
- 
+
 Boolean switch component.
 
 <!-- Auto Generated Below -->

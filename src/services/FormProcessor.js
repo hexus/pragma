@@ -11,6 +11,7 @@ import pull             from 'lodash/pull';
 import defaultTo        from 'lodash/defaultTo';
 import difference       from 'lodash/difference';
 import intersection     from 'lodash/intersection';
+import isObject         from 'lodash/isObject';
 import isPlainObject    from 'lodash/isPlainObject';
 import toNumber         from 'lodash/toNumber';
 import zipObject        from 'lodash/zipObject';
@@ -712,27 +713,65 @@ export class FormProcessor
 	/**
 	 * Prepare fields from a set of field descriptions.
 	 *
-	 * Ascertain's the parent path and path fragment (key) of each field.
+	 * Ascertains the parent path and path fragment (key) of each field.
 	 *
 	 * TODO: Field class, FieldDescription typedef.
 	 *
 	 * @protected
-	 * @param {Field[]} fields - The field description.
+	 * @param {Field[]|FieldDictionary} fields - The field definitions.
 	 * @returns {Field[]} The given fields prepared with pathFragment and parent properties.
 	 */
 	prepareFields(fields)
 	{
-		if (!fields || !fields.length) {
-			return fields;
+		if (!fields) {
+			return [];
 		}
 
 		let i, field, pathFragment, parentPath;
 
+		// Convert dictionaries to arrays
+		if (isPlainObject(fields)) {
+			let field, fieldsArray = [];
+
+			for (let path in fields) {
+				if (!fields.hasOwnProperty(path)) {
+					continue;
+				}
+
+				field = fields[path];
+
+				// console.log(field);
+
+				if (!isObject(field)) {
+					continue;
+				}
+
+				if (!field.path) {
+					field.path = path;
+				}
+
+				fieldsArray.push(field);
+			}
+
+			fields = fieldsArray;
+		}
+
+		// Ignore anything that isn't an array of fields by this point
+		if (!Array.isArray(fields)) {
+			fields = [];
+		}
+
 		for (i = 0; i < fields.length; i++) {
 			field = fields[i];
 
-			if (!field.path)
+			if (!field) {
 				continue;
+			}
+
+			if (!field.path) {
+				console.warn('Ignored field with missing path', field);
+				continue;
+			}
 
 			// Ascertain a parent path and path fragment
 			[parentPath, pathFragment] = splitPath(field.path);
@@ -740,6 +779,8 @@ export class FormProcessor
 			field.pathFragment = defaultTo(field.pathFragment, pathFragment);
 			field.parent = defaultTo(field.parent, parentPath);
 		}
+
+		// console.log('prepareFields', fields);
 
 		return fields;
 	}
@@ -750,7 +791,7 @@ export class FormProcessor
 	 * TODO: Creates, updates and removes fields accordingly.
 	 *
 	 * @public
-	 * @param {Field[]} fields
+	 * @param {Field[]|<FieldDictionary>} fields
 	 */
 	setFields(fields)
 	{
@@ -758,9 +799,12 @@ export class FormProcessor
 		this.fields = this.prepareFields(fields);
 
 		// TODO: Build dictionary from given fields, compare with current fields,
-		//       update things accordingly
+		//       add/update/remove fields and clear caches accordingly
 		//this.dictionary = this.buildDictionary(this.fields);
 		this.dictionary = this.updateDictionary(this.fields);
+
+		// console.log(this.dictionary);
+		// debugger;
 
 		// Compose the fields into a tree
 		this.tree = this.buildTree(this.dictionary);
@@ -1703,21 +1747,20 @@ export class FormProcessor
 	/**
 	 * Update the dictionary with the given fields.
 	 *
-	 * @param {Field[]} fields
+	 * @protected
+	 * @param {Field[]|<FieldDictionary>} fields
 	 * @returns {FieldDictionary}
 	 */
 	updateDictionary(fields)
 	{
-		if (!Array.isArray(fields)) {
-			return this.dictionary;
-		}
+		if (Array.isArray(fields)) {
+			for (let i = 0; i < fields.length; i++) {
+				if (!fields[i] || !fields[i].path) {
+					continue;
+				}
 
-		for (let i = 0; i < fields.length; i++) {
-			if (!fields[i] || !fields[i].path) {
-				continue;
+				this.dictionary[fields[i].path] = fields[i];
 			}
-
-			this.dictionary[fields[i].path] = fields[i];
 		}
 
 		return this.dictionary;
@@ -1894,5 +1937,5 @@ export class FormProcessor
  * @property {string}         [mirror]         - The path of a field to mirror. TODO: Implement
  * @property {Field[]}        [children]       - Child fields.
  * @property {Field|string}   [template]       - Template field that all child fields should extend. Can be a `Field` or a `path` to a field.
- * @property {Object|array}   [fixed]          - A map or list of child keys that cannot be removed at runtime, if present.
+ * @property {Object|array}   [fixed]          - A map or list of child keys that cannot be removed at runtime, if present. TODO: Rename to required? Allow boolean for primitives (required: true)? Defer to children.[n].required for fixed fields instead?
  */

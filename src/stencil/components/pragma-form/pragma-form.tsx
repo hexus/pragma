@@ -247,9 +247,9 @@ export class PragmaForm {
     // console.log('fieldElements', this.fieldElements);
   }
 
-  componentWillRender() {
+  async componentWillRender() {
     return new Promise((resolve) => {
-      this.sync()
+      this.sync();
       resolve(true);
     });
   }

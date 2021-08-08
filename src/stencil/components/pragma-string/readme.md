@@ -1,6 +1,6 @@
-# pragma-boolean
- 
-Boolean switch component.
+# pragma-string
+
+
 
 <!-- Auto Generated Below -->
 
@@ -13,7 +13,7 @@ Boolean switch component.
 | `field`    | `field`    | Pragma field definition.       | `any`     | `defaultField` |
 | `label`    | `label`    | The field's label.             | `string`  | `undefined`    |
 | `path`     | `path`     | The field's path.              | `string`  | `undefined`    |
-| `value`    | `value`    | The field's value.             | `boolean` | `false`        |
+| `value`    | `value`    | The field's value.             | `string`  | `''`           |
 
 
 ----------------------------------------------
