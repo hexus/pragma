@@ -791,7 +791,8 @@ export class FormProcessor
 	/**
 	 * Set the form's fields.
 	 *
-	 * TODO: Creates, updates and removes fields accordingly.
+	 * Creates, updates and removes fields from the form, given the new set
+	 * of fields.
 	 *
 	 * @public
 	 * @param {Field[]|<FieldDictionary>} fields
@@ -801,13 +802,14 @@ export class FormProcessor
 		// Prepare the fields
 		this.fields = this.prepareFields(fields);
 
-		// TODO: Build dictionary from given fields, compare with current fields,
-		//       add/update/remove fields and clear caches accordingly
-		// this.dictionary = this.buildDictionary(this.fields); // TODO: This currently breaks templates for some reason, templated fields don't get added to the dictionary
-		this.dictionary = this.updateDictionary(this.fields);
+		// Build a dictionary from the fields
+		let dictionary = this.buildDictionary(this.fields);
 
-		// console.log(this.dictionary);
-		// debugger;
+		// Remove any existing fields that aren't in the new dictionary
+		this.pruneFromDictionary(dictionary);
+
+		// Update the dictionary
+		this.dictionary = this.updateDictionary(this.fields);
 
 		// Compose the fields into a tree
 		this.tree = this.buildTree(this.dictionary);
@@ -1631,22 +1633,6 @@ export class FormProcessor
 	 */
 	removeValue(data, path)
 	{
-		this.removePath(path, data);
-	}
-
-	/**
-	 * Remove data at the given path and update parent fields.
-	 *
-	 * TODO: The naming and existence of this method doesn't quite make sense.
-	 *       You'd expect it to remove the field(s) too, considering updatePath().
-	 *       Refactor?
-	 *
-	 * @protected
-	 * @param {string}  path - The path to remove.
-	 * @param {Object}  data - The data to remove the path from.
-	 */
-	removePath(path, data)
-	{
 		let field = this.getField(path);
 
 		if (!field) {
@@ -1748,6 +1734,25 @@ export class FormProcessor
 	}
 
 	/**
+	 * Remove fields at paths that aren't in the given dictionary.
+	 *
+	 * Useful to ensure that switching field sets entirely works as expected;
+	 * updateDictionary() is a partial update by design.
+	 *
+	 * @param {FieldDictionary} dictionary
+	 */
+	pruneFromDictionary(dictionary)
+	{
+		let newDictionaryKeys = Object.keys(dictionary);
+		let currentDictionaryKeys = Object.keys(this.dictionary);
+		let keysToRemove = difference(currentDictionaryKeys, newDictionaryKeys);
+
+		for (let i = 0; i < keysToRemove.length; i++)
+			if (keysToRemove[i] !== '') // Always keep the root field
+				this.removeField(this.getField(keysToRemove[i]));
+	}
+
+	/**
 	 * Update the dictionary with the given fields.
 	 *
 	 * TODO: This gets called a LOT, likely due to templated fields.
@@ -1759,8 +1764,6 @@ export class FormProcessor
 	 */
 	updateDictionary(fields)
 	{
-		// TODO: Add/update/delete
-
 		if (Array.isArray(fields) && fields.length) {
 			// console.debug('Updating dictionary with fields', fields);
 
